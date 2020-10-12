@@ -1,4 +1,4 @@
-# CTF-Writeups
+# CTF-Writeups-TryHackMe
 
 Collection of write ups from TryHackMe and HackTheBox
 
