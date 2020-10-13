@@ -38,10 +38,7 @@ nikto -h http://10.10.201.221:1234 -id bob:bubbles
 + /manager/html: Tomcat Manager / Host Manager interface found (pass protected)
 + /host-manager/html: Tomcat Manager / Host Manager interface found (pass protected)
 + /manager/status: Tomcat Server Status interface found (pass protected)
-+ 7521 requests: 0 error(s) and 14 item(s) reported on remote host
-+ End Time:           2020-10-11 15:37:42 (GMT-4) (197 seconds)
----------------------------------------------------------------------------
-+ 1 host(s) tested
+
 
 EXPLOITATION
 
