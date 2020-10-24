@@ -868,10 +868,10 @@ whoami
 GET ROOT AND USER FLAGS
 C:\PROGRA~2\SYSTEM~1>type C:\Users\jeff\Desktop\user.txt
 type C:\Users\jeff\Desktop\user.txt
-759bd8af507517bcfaede78a21a73e39
+
 C:\PROGRA~2\SYSTEM~1>type C:\Users\Administrator\Desktop\root.txt
 type C:\Users\Administrator\Desktop\root.txt
-7e13d97f05f7ceb9881a3eb3d78d3e72
+
 
 
 
