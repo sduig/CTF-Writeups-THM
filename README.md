@@ -1,6 +1,5 @@
 # CTF-Writeups-TryHackMe
 
-Collection of write ups from TryHackMe and HackTheBox
+Collection of write ups from TryHackMe
 
-HTB
-https://p0i5on8.github.io/
+
