@@ -53,9 +53,9 @@ Mode                LastWriteTime     Length Name
 ----                -------------     ------ ----                              
 -a---        10/25/2019  11:22 PM         32 user.txt                          
 
-
+GET USER FLAG
 PS C:\users\bruce\Desktop> type user.txt
-79007a09481963edf2e1321abd9ae2a0
+############################
 
 PRIVESC
 
@@ -154,7 +154,6 @@ The command completed successfully.
 RDP TO ALFRED WITH HIGHER PRIVILEGED ACCOUNT HACKOR
 rdesktop 10.10.120.85
 
-ROOT.TXT
+GET ROOT FLAGROOT.TXT
 C:\Windows\System32\config
-
-dff0f748678f280250f25a45b8046b4a
+####################################
