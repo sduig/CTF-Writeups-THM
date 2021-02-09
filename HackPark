@@ -50,7 +50,6 @@ Your BlogEngine.NET Specification
     Membership provider: XmlMembershipProvider
     Role provider: XmlRoleProvider
 
-
 SEARCH FOR EXPLOIT
 https://www.exploit-db.com/exploits/46353
 
