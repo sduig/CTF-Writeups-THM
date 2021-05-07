@@ -79,7 +79,7 @@ Host script results:
 |_  start_date: 2020-10-27 16:22:43
 
 ENUM SMB
-oot@kali:~/tryhackme/relevant# smbclient -L //10.10.86.58
+root@kali:~/tryhackme/relevant# smbclient -L //10.10.86.58
 WARNING: The "syslog" option is deprecated
 Enter WORKGROUP\root's password: 
 
@@ -291,5 +291,3 @@ type C:\Users\Bob\Desktop\user.txt
 ROOT FLAG
 C:\Windows\system32>type C:\Users\Administrator\Desktop\root.txt
 type C:\Users\Administrator\Desktop\root.txt
-
-
