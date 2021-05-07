@@ -54,7 +54,6 @@ ENUMERATE WEBSITE
 + OSVDB-3233: /icons/README: Apache default file found.
 + /login.php: Admin login page/section found.
 
-
 INVESTIGATE NEW WEB PAGES
 view-source:http://10.10.249.187/index.html
 Username: R1ckRul3s
