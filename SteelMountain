@@ -117,55 +117,6 @@ dir
                2 Dir(s)  44,211,249,152 bytes free
 
 C:\Users\bill\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup>.\winPEAS.exe
-.\winPEAS.exe
-ANSI color bit for Windows is not set. If you are execcuting this from a Windows terminal inside the host you should run 'REG ADD HKCU\Console /v VirtualTerminalLevel /t REG_DWORD /d 1' and then start a new CMD
-   Creating Dynamic lists, this could take a while, please wait...
-   - Checking if domain...
-   - Getting Win32_UserAccount info...
-   - Creating current user groups list...
-   - Creating active users list...
-   - Creating disabled users list...
-   - Admin users list...
-     
-             *((,.,/((((((((((((((((((((/,  */               
-      ,/*,..*((((((((((((((((((((((((((((((((((,           
-    ,*/((((((((((((((((((/,  .*//((//**, .*(((((((*       
-    ((((((((((((((((**********/########## .(* ,(((((((   
-    (((((((((((/********************/####### .(. (((((((
-    ((((((..******************/@@@@@/***/###### ./(((((((
-    ,,....********************@@@@@@@@@@(***,#### .//((((((
-    , ,..********************/@@@@@%@@@@/********##((/ /((((
-    ..((###########*********/%@@@@@@@@@/************,,..((((
-    .(##################(/******/@@@@@/***************.. /((
-    .(#########################(/**********************..*((
-    .(##############################(/*****************.,(((
-    .(###################################(/************..(((
-    .(#######################################(*********..(((
-    .(#######(,.***.,(###################(..***.*******..(((
-    .(#######*(#####((##################((######/(*****..(((
-    .(###################(/***********(##############(...(((
-    .((#####################/*******(################.((((((
-    .(((############################################(..((((
-    ..(((##########################################(..(((((
-    ....((########################################( .(((((
-    ......((####################################( .((((((
-    (((((((((#################################(../((((((
-        (((((((((/##########################(/..((((((
-              (((((((((/,.  ,*//////*,. ./(((((((((((((((.
-                 (((((((((((((((((((((((((((((/
-
-ADVISORY: winpeas should be used for authorized penetration testing and/or educational purposes only.Any misuse of this software will not be the responsibility of the author or of any other collaborator. Use it at your own networks and/or with the network owner's permission.
-
-  WinPEAS vBETA VERSION, Please if you find any issue let me know in https://github.com/carlospolop/privilege-escalation-awesome-scripts-suite/issues by carlospolop
-
-  [+] Leyend:
-         Red                Indicates a special privilege over an object or something is misconfigured
-         Green              Indicates that some protection is enabled or something is well configured
-         Cyan               Indicates active users
-         Blue               Indicates disabled users
-         LightYellow        Indicates links
-
-   [?] You can find a Windows local PE Checklist here: https://book.hacktricks.xyz/windows/checklist-windows-privilege-escalation
 
 
   ==========================================(System Information)==========================================
