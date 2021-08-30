@@ -1,5 +1,4 @@
 ENUMERATION
-
 nmap 10.10.225.249 -v
 PORT   STATE SERVICE
 21/tcp open  ftp
